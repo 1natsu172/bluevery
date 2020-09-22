@@ -33,6 +33,7 @@ export class BlueveryCore {
   #checkBluetoothEnabled = async () => {
     const isEnabled = await checkBluetoothEnabled();
     this.#coreState.bluetoothEnabled = isEnabled;
+    return isEnabled;
   };
 
   #checkAndRequestPermission = async (): Promise<
