@@ -1,15 +1,23 @@
-import {Platform} from 'react-native';
-import BleManager from 'react-native-ble-manager';
+import {
+  NativeModules,
+  NativeEventEmitter,
+  EmitterSubscription,
+} from 'react-native';
+import BleManager, {Peripheral} from 'react-native-ble-manager';
 import {Permission} from 'react-native-permissions';
 import promiseRetry from 'p-retry';
 import promiseTimeout from 'p-timeout';
 import wait from 'delay';
-import {BlueveryOptions, CoreState} from './interface';
+import {BlueveryOptions, CoreState, PeripheralInfo} from './interface';
 import {
   checkBluetoothEnabled,
   checkPermission,
+  handleDiscoverPeripheral,
   requestPermission,
 } from './libs';
+
+const BleManagerModule = NativeModules.BleManager;
+const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
 export class BlueveryCore {
   constructor() {}
@@ -26,8 +34,17 @@ export class BlueveryCore {
     // notificationListeners: any[],
   };
 
+  /**
+   * @property listeners
+   */
+  #discoverPeripheralListener?: EmitterSubscription;
+
   setUserDefinedOptions = (options: BlueveryOptions) => {
     this.#userDefinedOptions = options;
+  };
+
+  #setPeripheralToState = (peripheralInfo: PeripheralInfo) => {
+    this.#coreState.peripherals.set(peripheralInfo.id, peripheralInfo);
   };
 
   #checkBluetoothEnabled = async () => {
@@ -61,8 +78,28 @@ export class BlueveryCore {
     }
   };
 
-  #scan = async (...args: Parameters<typeof BleManager.scan>) => {
-    await BleManager.scan(...args);
+  scan = async ({
+    scanOptions,
+    discoverHandler,
+  }: {
+    scanOptions: Parameters<typeof BleManager.scan>;
+    discoverHandler?: (peripheralInfo: PeripheralInfo) => any;
+  }) => {
+    if (!this.#coreState.scanning) {
+      await BleManager.scan(...scanOptions);
+
+      this.#discoverPeripheralListener = bleManagerEmitter.addListener(
+        'BleManagerDiscoverPeripheral',
+        (peripheral: Peripheral) => {
+          handleDiscoverPeripheral(peripheral, (peripheralInfo) => {
+            // call passed handler by user.
+            discoverHandler && discoverHandler(peripheralInfo);
+            // set peripheral to coreState.
+            this.#setPeripheralToState(peripheralInfo);
+          });
+        },
+      );
+    }
   };
 
   #connect = async (...args: Parameters<typeof BleManager.connect>) => {

@@ -1,5 +1,6 @@
+import BleManager from 'react-native-ble-manager';
 import {BlueveryCore} from './blueveryCore';
-import {BlueveryOptions} from './interface';
+import {BlueveryOptions, PeripheralInfo} from './interface';
 
 export class Bluevery extends BlueveryCore {
   constructor() {
@@ -17,11 +18,14 @@ export class Bluevery extends BlueveryCore {
     }
   };
 
-  scan = () => {
-    return {
-      connected: [],
-      discovered: [],
-    };
+  startScan = async ({
+    scanOptions,
+    discoverHandler,
+  }: {
+    scanOptions: Parameters<typeof BleManager.scan>;
+    discoverHandler?: (peripheralInfo: PeripheralInfo) => any;
+  }) => {
+    await super.scan({scanOptions, discoverHandler});
   };
 
   connect = () => {
