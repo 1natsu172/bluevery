@@ -24,4 +24,11 @@
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
     </application>
 
+  <!-- 🚨 Keep only the permissions used in your app 🚨 -->
+  <uses-permission android:name="android.permission.BLUETOOTH"/>
+  <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+  <!-- 🚨 Keep only the permissions used in your app 🚨 -->
+
+
 </manifest>
