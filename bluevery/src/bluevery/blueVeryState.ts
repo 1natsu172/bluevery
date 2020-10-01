@@ -35,6 +35,13 @@ export class BlueveryState {
     this.#state.bluetoothEnabled = false;
   };
 
+  onScanning = () => {
+    this.#state.scanning = true;
+  };
+  offScanning = () => {
+    this.#state.scanning = false;
+  };
+
   setPeripheralToState = (peripheralInfo: PeripheralInfo) => {
     Reflect.set(this.#state.peripherals, peripheralInfo.id, peripheralInfo);
   };

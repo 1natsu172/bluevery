@@ -16,24 +16,23 @@ import {
   requestPermission,
 } from './libs';
 import {BlueveryState} from './blueVeryState';
-import {EventEmitter} from 'events';
+import {eventmit, Eventmitter} from 'eventmit';
 import onChange from 'on-change';
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
 export class BlueveryCore {
+  #userDefinedOptions: BlueveryOptions = {};
+  #state: BlueveryState;
+  emitter: Eventmitter<State>;
+
   constructor() {
-    this.emitter = new EventEmitter();
+    this.emitter = eventmit<State>();
     this.#state = new BlueveryState({
       onChangeStateHandler: this.#onChangeCoreState,
     });
   }
-
-  #userDefinedOptions: BlueveryOptions = {};
-  #state: BlueveryState;
-
-  emitter: EventEmitter;
 
   /**
    * @property listeners
@@ -47,7 +46,7 @@ export class BlueveryCore {
   #onChangeCoreState = (
     ..._args: Parameters<Parameters<typeof onChange>[1]>
   ) => {
-    this.emitter.emit('didChangeBlueveryState', this);
+    this.emitter.emit(this.#getState());
   };
 
   #getState = (): Readonly<State> => {
@@ -55,10 +54,11 @@ export class BlueveryCore {
   };
 
   #requireCheckBeforeBleProcess = async () => {
-    const isEnableBluetooth = await this.#checkBluetoothEnabled();
-    if (!isEnableBluetooth) {
-      throw new Error('bluetooth is not enabled.');
-    }
+    /**
+     * initialize managing
+     */
+    this.#managing();
+
     const [, requestedThenGranted] = await this.#checkAndRequestPermission();
     if (requestedThenGranted) {
       throw new Error(
@@ -66,10 +66,10 @@ export class BlueveryCore {
       );
     }
 
-    /**
-     * initialize managing
-     */
-    this.#managing();
+    const isEnableBluetooth = await this.#checkBluetoothEnabled();
+    if (!isEnableBluetooth) {
+      throw new Error('bluetooth is not enabled.');
+    }
   };
 
   #checkBluetoothEnabled = async () => {
@@ -116,7 +116,9 @@ export class BlueveryCore {
   }) => {
     if (!this.#getState().scanning) {
       await this.#requireCheckBeforeBleProcess();
-      await BleManager.scan(...scanOptions);
+
+      this.#state.onScanning();
+      await BleManager.scan(...scanOptions).catch((err) => console.warn(err));
 
       this.#discoverPeripheralListener = bleManagerEmitter.addListener(
         'BleManagerDiscoverPeripheral',

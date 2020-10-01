@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "delay": "^4.4.0",
-    "events": "^3.2.0",
+    "eventmit": "^1.1.0",
     "on-change": "^2.1.2",
     "p-cancelable": "^2.0.0",
     "p-retry": "^4.2.0",
