@@ -7,7 +7,7 @@ export type PeripheralInfo = Peripheral & {
   connected?: boolean;
 };
 
-export type CoreState = {
+export type State = {
   bluetoothEnabled: boolean;
   permissionGranted: boolean;
   managing: boolean;
@@ -16,3 +16,5 @@ export type CoreState = {
   peripherals: Map<PeripheralId, PeripheralInfo>;
   error: Error | undefined;
 };
+
+export type BlueveryEvents = 'didChangeBlueveryState';
