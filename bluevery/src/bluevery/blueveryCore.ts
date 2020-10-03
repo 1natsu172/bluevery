@@ -18,6 +18,7 @@ import {
 import {BlueveryState} from './blueVeryState';
 import {eventmit, Eventmitter} from 'eventmit';
 import onChange from 'on-change';
+import delay from 'delay';
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -110,28 +111,49 @@ export class BlueveryCore {
   scan = async ({
     scanOptions,
     discoverHandler,
+    matchFn,
   }: {
     scanOptions: Parameters<typeof BleManager.scan>;
     discoverHandler?: (peripheralInfo: PeripheralInfo) => any;
+    matchFn?: (peripheral: Peripheral) => boolean;
   }) => {
     if (!this.#getState().scanning) {
       await this.#requireCheckBeforeBleProcess();
 
       this.#state.onScanning();
-      await BleManager.scan(...scanOptions).catch((err) => console.warn(err));
 
-      this.#discoverPeripheralListener = bleManagerEmitter.addListener(
-        'BleManagerDiscoverPeripheral',
-        (peripheral: Peripheral) => {
-          handleDiscoverPeripheral(peripheral, (peripheralInfo) => {
-            // set peripheral to state.
-            this.#state.setPeripheralToState(peripheralInfo);
-            // call passed handler by user.
-            discoverHandler && discoverHandler(peripheralInfo);
-          });
-        },
-      );
+      const [, discoverPeripheralListener] = await Promise.all([
+        // scan開始
+        await BleManager.scan(...scanOptions).catch((err) => console.warn(err)),
+        // discover処理を登録
+        bleManagerEmitter.addListener(
+          'BleManagerDiscoverPeripheral',
+          (peripheral: Peripheral) => {
+            if (matchFn && !matchFn(peripheral)) {
+              return;
+            }
+            handleDiscoverPeripheral(peripheral, (peripheralInfo) => {
+              // set peripheral to state.
+              this.#state.setPeripheralToState(peripheralInfo);
+              // call passed handler by user.
+              discoverHandler && discoverHandler(peripheralInfo);
+            });
+          },
+        ),
+      ]);
+      this.#discoverPeripheralListener = discoverPeripheralListener;
+
+      // スキャン秒数経ったらscan処理を終える
+      const [, scanSeconds] = scanOptions;
+      await delay(scanSeconds * 1000).then(this.#cleanupScan);
     }
+  };
+
+  #cleanupScan = () => {
+    return Promise.all([
+      BleManager.stopScan(),
+      this.#discoverPeripheralListener?.remove(),
+    ]);
   };
 
   #connect = async (...args: Parameters<typeof BleManager.connect>) => {
