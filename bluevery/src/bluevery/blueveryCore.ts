@@ -44,9 +44,7 @@ export class BlueveryCore {
     this.#userDefinedOptions = options;
   };
 
-  #onChangeCoreState = (
-    ..._args: Parameters<Parameters<typeof onChange>[1]>
-  ) => {
+  #onChangeCoreState = (..._args: unknown[]) => {
     this.emitter.emit(this.#getState());
   };
 

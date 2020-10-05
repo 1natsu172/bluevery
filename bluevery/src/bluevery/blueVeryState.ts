@@ -1,52 +1,68 @@
 import {State, PeripheralInfo} from './interface';
-import onChange from 'on-change';
+import {IMutationTree, ITrackStateTree, ProxyStateTree} from 'proxy-state-tree';
+
+const initialState: State = {
+  bluetoothEnabled: false,
+  permissionGranted: false,
+  managing: false,
+  connecting: false,
+  scanning: false,
+  error: undefined,
+  peripherals: new Map(),
+  // notificationListeners: any[],
+};
 
 export class BlueveryState {
-  #state: State = {
-    bluetoothEnabled: false,
-    permissionGranted: false,
-    managing: false,
-    connecting: false,
-    scanning: false,
-    error: undefined,
-    peripherals: new Map(),
-    // notificationListeners: any[],
-  };
+  #stateTree: ProxyStateTree<State>;
+  #mutationState: IMutationTree<State>;
+  #trackState: ITrackStateTree<State>;
 
   constructor({
     onChangeStateHandler,
   }: {
-    onChangeStateHandler: Parameters<typeof onChange>[1];
+    onChangeStateHandler: (...args: unknown[]) => unknown;
   }) {
-    this.#state = onChange(this.#state, onChangeStateHandler);
+    this.#stateTree = new ProxyStateTree(initialState);
+    this.#trackState = this.#stateTree.getTrackStateTree();
+    this.#mutationState = this.#stateTree.getMutationTree();
+    this.#mutationState.onMutation(() => {
+      onChangeStateHandler();
+    });
   }
 
+  /**
+   * premitive
+   */
+  getState = () => {
+    return this.#trackState.state;
+  };
+
   onManaging = () => {
-    this.#state.managing = true;
+    this.#mutationState.state.managing = true;
   };
   offManaging = () => {
-    this.#state.managing = false;
+    this.#mutationState.state.managing = false;
   };
 
   setBluetoothEnabled = () => {
-    this.#state.bluetoothEnabled = true;
+    this.#mutationState.state.bluetoothEnabled = true;
   };
   setBluetoothDisabled = () => {
-    this.#state.bluetoothEnabled = false;
+    this.#mutationState.state.bluetoothEnabled = false;
   };
 
   onScanning = () => {
-    this.#state.scanning = true;
+    this.#mutationState.state.scanning = true;
   };
   offScanning = () => {
-    this.#state.scanning = false;
+    this.#mutationState.state.scanning = false;
   };
 
   setPeripheralToState = (peripheralInfo: PeripheralInfo) => {
-    Reflect.set(this.#state.peripherals, peripheralInfo.id, peripheralInfo);
-  };
-
-  getState = () => {
-    return this.#state;
+    Reflect.set(
+      this.#mutationState.state.peripherals,
+      peripheralInfo.id,
+      peripheralInfo,
+    );
   };
 }
