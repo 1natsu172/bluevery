@@ -1,4 +1,4 @@
-import {Peripheral} from 'react-native-ble-manager';
+import BleManager, {Peripheral} from 'react-native-ble-manager';
 
 export type BlueveryOptions = {};
 
@@ -18,3 +18,8 @@ export type State = {
 };
 
 export type BlueveryEvents = 'didChangeBlueveryState';
+
+/**
+ * options
+ */
+export type ScanningSettings = Parameters<typeof BleManager.scan>;
