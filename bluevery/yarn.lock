@@ -3756,6 +3756,11 @@ is-number@^7.0.0:
   resolved "https://registry.yarnpkg.com/is-number/-/is-number-7.0.0.tgz#7535345b896734d5f80c4d06c50955527a14f12b"
   integrity sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==
 
+is-plain-obj@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/is-plain-obj/-/is-plain-obj-1.1.0.tgz#71a50c8429dfca773c92a390a4a03b39fcd51d3e"
+  integrity sha1-caUMhCnfync8kqOQpKA7OfzVHT4=
+
 is-plain-object@^2.0.3, is-plain-object@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-2.0.4.tgz#2c163b3fafb1b606d9d17928f05c2a1c38e07677"
@@ -5330,11 +5335,6 @@ object.values@^1.1.1:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-on-change@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/on-change/-/on-change-2.1.2.tgz#4dea2c481b97302ae10f27ab02bd46f7f6284c71"
-  integrity sha512-NrqTIHeY9EjxaQ7urD/bPQNK0QCoQIwBfApgscsXtOWeZlNgr9JHhEe9HfWSVmPei8RWqxlevMejmQaIIhlfOw==
-
 on-finished@~2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/on-finished/-/on-finished-2.3.0.tgz#20f1336481b083cd75337992a16971aa2d906947"
@@ -5698,6 +5698,13 @@ prop-types@^15.6.2, prop-types@^15.7.2:
     loose-envify "^1.4.0"
     object-assign "^4.1.1"
     react-is "^16.8.1"
+
+proxy-state-tree@^6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/proxy-state-tree/-/proxy-state-tree-6.0.2.tgz#8cfd51c1a2b84910e3e6cc1a91ecefacea88665d"
+  integrity sha512-FZh7PqvG7SDCOmnSFKmXoF9eWBXTiBkc/f1+1dSi+Wcnc7j7NPeP7HT2HgXUhLe1WL9GDYVe6W2L4VebonwK9w==
+  dependencies:
+    is-plain-obj "^1.1.0"
 
 pseudomap@^1.0.2:
   version "1.0.2"
