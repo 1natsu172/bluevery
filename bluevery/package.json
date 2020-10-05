@@ -12,11 +12,12 @@
   "dependencies": {
     "delay": "^4.4.0",
     "eventmit": "^1.1.0",
-    "proxy-state-tree":"^6.0.2",
+    "interval-promise": "^1.4.0",
     "p-cancelable": "^2.0.0",
     "p-retry": "^4.2.0",
     "p-tap": "^3.1.0",
     "p-timeout": "^3.2.0",
+    "proxy-state-tree": "^6.0.2",
     "react": "16.13.1",
     "react-native": "0.63.2",
     "react-native-ble-manager": "^7.3.1",

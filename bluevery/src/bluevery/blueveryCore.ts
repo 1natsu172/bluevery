@@ -8,7 +8,14 @@ import {Permission} from 'react-native-permissions';
 import promiseRetry from 'p-retry';
 import promiseTimeout from 'p-timeout';
 import wait from 'delay';
-import {BlueveryOptions, PeripheralInfo, State} from './interface';
+import {eventmit, Eventmitter} from 'eventmit';
+import delay from 'delay';
+import {
+  BlueveryOptions,
+  PeripheralInfo,
+  ScanningSettings,
+  State,
+} from './interface';
 import {
   checkBluetoothEnabled,
   checkPermission,
@@ -16,9 +23,6 @@ import {
   requestPermission,
 } from './libs';
 import {BlueveryState} from './blueVeryState';
-import {eventmit, Eventmitter} from 'eventmit';
-import onChange from 'on-change';
-import delay from 'delay';
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -107,11 +111,11 @@ export class BlueveryCore {
   };
 
   scan = async ({
-    scanOptions,
+    scanningSettings,
     discoverHandler,
     matchFn,
   }: {
-    scanOptions: Parameters<typeof BleManager.scan>;
+    scanningSettings: ScanningSettings;
     discoverHandler?: (peripheralInfo: PeripheralInfo) => any;
     matchFn?: (peripheral: Peripheral) => boolean;
   }) => {
@@ -122,7 +126,9 @@ export class BlueveryCore {
 
       const [, discoverPeripheralListener] = await Promise.all([
         // scan開始
-        await BleManager.scan(...scanOptions).catch((err) => console.warn(err)),
+        await BleManager.scan(...scanningSettings).catch((err) =>
+          console.warn(err),
+        ),
         // discover処理を登録
         bleManagerEmitter.addListener(
           'BleManagerDiscoverPeripheral',
@@ -142,7 +148,7 @@ export class BlueveryCore {
       this.#discoverPeripheralListener = discoverPeripheralListener;
 
       // スキャン秒数経ったらscan処理を終える
-      const [, scanSeconds] = scanOptions;
+      const [, scanSeconds] = scanningSettings;
       await delay(scanSeconds * 1000).then(this.#cleanupScan);
     }
   };
@@ -151,6 +157,7 @@ export class BlueveryCore {
     return Promise.all([
       BleManager.stopScan(),
       this.#discoverPeripheralListener?.remove(),
+      this.#state.offScanning(),
     ]);
   };
 
