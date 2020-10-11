@@ -1,3 +1,4 @@
+import {Eventmitter} from 'eventmit';
 import BleManager, {Peripheral} from 'react-native-ble-manager';
 
 export type BlueveryOptions = {};
@@ -16,6 +17,8 @@ export type State = {
   peripherals: Map<PeripheralId, PeripheralInfo>;
   error: Error | undefined;
 };
+
+export type Listeners = {stateListener: Eventmitter<State>};
 
 export type BlueveryEvents = 'didChangeBlueveryState';
 

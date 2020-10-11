@@ -7,7 +7,6 @@ import BleManager, {Peripheral} from 'react-native-ble-manager';
 import {Permission} from 'react-native-permissions';
 import promiseRetry from 'p-retry';
 import promiseTimeout from 'p-timeout';
-import wait from 'delay';
 import {eventmit, Eventmitter} from 'eventmit';
 import delay from 'delay';
 import {
@@ -30,10 +29,10 @@ const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 export class BlueveryCore {
   #userDefinedOptions: BlueveryOptions = {};
   #state: BlueveryState;
-  emitter: Eventmitter<State>;
+  stateEmitter: Eventmitter<State>;
 
   constructor() {
-    this.emitter = eventmit<State>();
+    this.stateEmitter = eventmit<State>();
     this.#state = new BlueveryState({
       onChangeStateHandler: this.#onChangeCoreState,
     });
@@ -49,8 +48,12 @@ export class BlueveryCore {
   };
 
   #onChangeCoreState = (..._args: unknown[]) => {
-    this.emitter.emit(this.#getState());
+    this.emitState();
   };
+
+  emitState() {
+    this.stateEmitter.emit(this.#getState());
+  }
 
   #getState = (): Readonly<State> => {
     return this.#state.getState();

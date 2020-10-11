@@ -1,13 +1,19 @@
 import {Peripheral} from 'react-native-ble-manager';
 import promiseInterval from 'interval-promise';
 import {BlueveryCore} from './blueveryCore';
-import {BlueveryOptions, PeripheralInfo, ScanningSettings} from './interface';
+import {
+  BlueveryOptions,
+  Listeners,
+  PeripheralInfo,
+  ScanningSettings,
+} from './interface';
 
 export class Bluevery extends BlueveryCore {
-  addListener = this.emitter.on;
+  listeners: Listeners;
 
   constructor() {
     super();
+    this.listeners = {stateListener: this.stateEmitter};
   }
 
   #initialized: boolean = false;
@@ -19,12 +25,17 @@ export class Bluevery extends BlueveryCore {
     if (blueveryOptions) {
       this.setUserDefinedOptions(blueveryOptions);
     }
+    this.#initialized = true;
   };
 
-  /**
-   * @description
-   * fooo
-   */
+  checkIsInitialized = (): boolean => {
+    return this.#initialized;
+  };
+
+  forceCheckState = () => {
+    this.emitState();
+  };
+
   startScan = async ({
     scanOptions,
     discoverHandler,
