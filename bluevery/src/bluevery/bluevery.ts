@@ -18,6 +18,27 @@ export class Bluevery extends BlueveryCore {
 
   #initialized: boolean = false;
 
+  /**
+   * ↓ Primitive APIs
+   */
+
+  checkIsInitialized = (): boolean => {
+    return this.#initialized;
+  };
+
+  forceCheckState = () => {
+    this.emitState();
+  };
+
+  /**;
+   * Force stop Bluevery's operation completely.
+   */
+  stopBluevery = () => {};
+
+  /**
+   * ↓ Commands API
+   */
+
   init = (blueveryOptions?: BlueveryOptions) => {
     if (this.#initialized) {
       throw Error('bluevery is already initialized.');
@@ -26,14 +47,6 @@ export class Bluevery extends BlueveryCore {
       this.setUserDefinedOptions(blueveryOptions);
     }
     this.#initialized = true;
-  };
-
-  checkIsInitialized = (): boolean => {
-    return this.#initialized;
-  };
-
-  forceCheckState = () => {
-    this.emitState();
   };
 
   startScan = async ({
