@@ -7,9 +7,11 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "typecheck": "tsc ./src/**/*.ts --noEmit"
   },
   "dependencies": {
+    "auto-bind": "^4.0.0",
     "delay": "^4.4.0",
     "eventmit": "^1.1.0",
     "interval-promise": "^1.4.0",
@@ -56,6 +58,7 @@
     ],
     "setupFiles": [
       "<rootDir>/jest.setup.js"
-    ]
+    ],
+    "modulePathIgnorePatterns": ["<rootDir>/__tests__/__utils__"]
   }
 }

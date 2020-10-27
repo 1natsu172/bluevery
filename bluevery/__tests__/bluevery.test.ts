@@ -1,19 +1,13 @@
 import {bluevery as truthExportedBluevery} from '../src/bluevery';
 import {Bluevery} from '../src/bluevery/bluevery';
+import {BlueveryCore} from '../src/bluevery/blueveryCore';
+import {BlueveryState} from '../src/bluevery/blueVeryState';
+import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
 
-const mockedBluevery = jest.mock('');
-
-// jest.mock('../src/bluevery/bluevery', () => {
-//   return {
-//     Bluevery: jest.fn().mockImplementation(() => {
-//       return { playSoundFile: mockPlaySoundFile };
-//     })
-//   };
-// });
-
-// beforeEach(() => {
-//   mockedBluevery
-// })
+let bluevery: Bluevery;
+beforeEach(() => {
+  bluevery = new Bluevery({BlueveryCore, BlueveryState});
+});
 
 describe('truthExportedBluevery', () => {
   describe('bluevery is singleton', () => {
@@ -27,49 +21,130 @@ describe('truthExportedBluevery', () => {
 
 describe('bluevery: primitive APIs', () => {
   describe('checkIsInitialized', () => {
-    test.todo('should return isInitialized', () => {});
+    test('should return isInitialized', () => {
+      const actual = bluevery.checkIsInitialized();
+      expect(actual).toBe(false);
+      bluevery.init();
+      const actualThenInitialized = bluevery.checkIsInitialized();
+      expect(actualThenInitialized).toBe(true);
+    });
   });
 
   describe('forceCheckState', () => {
-    test.todo('should emit on the state change.', () => {});
+    const listenerHandler = jest.fn((state) => state);
+
+    afterAll(() => {
+      // cleanup listener.
+      bluevery.listeners.stateListener.offAll();
+    });
+
+    test('should emit on the state change.', () => {
+      bluevery.listeners.stateListener.on(listenerHandler);
+      bluevery.forceCheckState();
+      expect(listenerHandler).toHaveBeenCalledTimes(1);
+
+      bluevery.forceCheckState();
+      expect(listenerHandler).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('stopBluevery', () => {
-    test.todo('should reset bluevery completely ', () => {});
+    test.skip('should reset bluevery completely ', () => {});
   });
 });
 
 describe('bluevery: commands APIs', () => {
-  describe('#init', () => {
-    test.todo('init only once', () => {
-      // 1回しかinitできないこと
+  describe('init', () => {
+    test('can only init once', () => {
+      bluevery.init();
+      expect(() => bluevery.init()).toThrow();
     });
 
-    test.todo('setting userDefinedOptions', () => {});
+    test.skip('setting userDefinedOptions', () => {});
   });
 
-  describe('#startScan', () => {
-    describe('check calls on the processing', () => {
-      test.todo('should call requireCheckBeforeBleProcess', () => {});
-      test.todo('should call state#onScanning', () => {});
-      test.todo('should not call state#onScanning when scanning', () => {});
-      test.todo('should call requireCheckBeforeBleProcess', () => {});
-      test.todo('should call cleanupScan at the end of process', () => {});
-    });
-
+  describe('startScan', () => {
     describe('interval', () => {
-      test.todo('should correct intervalLength', () => {});
-      test.todo('should iterate the number of times', () => {});
-      test.todo('should possible non iterate', () => {});
-    });
+      const scanFn = jest.fn();
+      const core = jest.fn().mockImplementation(() => ({
+        scan: scanFn,
+      }));
+      jest.useFakeTimers();
 
-    describe('discoverHandler', () => {
-      test.todo('should call passed handler', () => {});
-    });
+      beforeEach(() => {
+        scanFn.mockClear();
+        bluevery = new Bluevery({BlueveryCore: core, BlueveryState});
+      });
+      test('should correct intervalLength', async () => {
+        bluevery.startScan({
+          scanOptions: {
+            scanningSettings: [[], 1, true],
+            intervalLength: 50,
+            iterations: 3,
+          },
+        });
 
-    describe('matchFn', () => {
-      test.todo('should discover only that match the result of matchFn', () => {
-        // discoverHandlerの呼ばれる回数をモックする
+        await flushPromisesAdvanceTimer(50);
+        expect(scanFn).toHaveBeenCalledTimes(1);
+        await flushPromisesAdvanceTimer(50);
+        expect(scanFn).toHaveBeenCalledTimes(2);
+        await flushPromisesAdvanceTimer(50);
+        expect(scanFn).toHaveBeenCalledTimes(3);
+      });
+      test('no interval pattern', async () => {
+        bluevery.startScan({
+          scanOptions: {
+            scanningSettings: [[], 1, true],
+            intervalLength: 0,
+            iterations: 3,
+          },
+        });
+
+        await flushPromisesAdvanceTimer(0);
+        expect(scanFn).toHaveBeenCalledTimes(1);
+        await flushPromisesAdvanceTimer(0);
+        expect(scanFn).toHaveBeenCalledTimes(2);
+        await flushPromisesAdvanceTimer(0);
+        expect(scanFn).toHaveBeenCalledTimes(3);
+      });
+      test('should iterate the number of times', async () => {
+        bluevery.startScan({
+          scanOptions: {
+            scanningSettings: [[], 1, true],
+            intervalLength: 50,
+            iterations: 50,
+          },
+        });
+
+        jest.runAllTimers();
+        expect(scanFn).toHaveBeenCalledTimes(50);
+      });
+      test('should possible non iterate', async () => {
+        bluevery.startScan({
+          scanOptions: {
+            scanningSettings: [[], 1, true],
+            intervalLength: 500,
+            iterations: 1,
+          },
+        });
+
+        jest.runAllTimers();
+        expect(scanFn).toHaveBeenCalledTimes(1);
+        expect(scanFn).not.toHaveBeenCalledTimes(2);
+      });
+      test('should not call immediate scan function', async () => {
+        bluevery.startScan({
+          scanOptions: {
+            scanningSettings: [[], 1, true],
+            intervalLength: 500,
+            iterations: 1,
+          },
+        });
+
+        await flushPromisesAdvanceTimer(499);
+        expect(scanFn).toHaveBeenCalledTimes(0);
+        await flushPromisesAdvanceTimer(500);
+        expect(scanFn).toHaveBeenCalledTimes(1);
       });
     });
   });

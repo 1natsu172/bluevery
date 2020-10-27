@@ -1,19 +1,28 @@
 import {Peripheral} from 'react-native-ble-manager';
 import promiseInterval from 'interval-promise';
-import {BlueveryCore} from './blueveryCore';
+import {BlueveryCore as _BlueveryCore} from './blueveryCore';
+import {BlueveryState as _BlueveryState} from './blueVeryState';
 import {
   BlueveryOptions,
   Listeners,
   PeripheralInfo,
   ScanningSettings,
 } from './interface';
+import autoBind from 'auto-bind';
 
-export class Bluevery extends BlueveryCore {
+type ConstructorArgs = {
+  BlueveryCore: typeof _BlueveryCore;
+  BlueveryState: typeof _BlueveryState;
+};
+
+export class Bluevery {
+  #core: _BlueveryCore;
   listeners: Listeners;
 
-  constructor() {
-    super();
-    this.listeners = {stateListener: this.stateEmitter};
+  constructor({BlueveryCore, BlueveryState}: ConstructorArgs) {
+    this.#core = new BlueveryCore({BlueveryState});
+    this.listeners = {stateListener: this.#core.stateEmitter};
+    autoBind(this);
   }
 
   #initialized: boolean = false;
@@ -22,34 +31,34 @@ export class Bluevery extends BlueveryCore {
    * ↓ Primitive APIs
    */
 
-  checkIsInitialized = (): boolean => {
+  checkIsInitialized(): boolean {
     return this.#initialized;
-  };
+  }
 
-  forceCheckState = () => {
-    this.emitState();
-  };
+  forceCheckState() {
+    this.#core.emitState();
+  }
 
   /**;
    * Force stop Bluevery's operation completely.
    */
-  stopBluevery = () => {};
+  stopBluevery() {}
 
   /**
    * ↓ Commands API
    */
 
-  init = (blueveryOptions?: BlueveryOptions) => {
+  init(blueveryOptions?: BlueveryOptions) {
     if (this.#initialized) {
       throw Error('bluevery is already initialized.');
     }
     if (blueveryOptions) {
-      this.setUserDefinedOptions(blueveryOptions);
+      this.#core.setUserDefinedOptions(blueveryOptions);
     }
     this.#initialized = true;
-  };
+  }
 
-  startScan = async ({
+  async startScan({
     scanOptions,
     discoverHandler,
     matchFn,
@@ -71,12 +80,12 @@ export class Bluevery extends BlueveryCore {
     };
     discoverHandler?: (peripheralInfo: PeripheralInfo) => any;
     matchFn?: (peripheral: Peripheral) => boolean;
-  }) => {
+  }) {
     const {scanningSettings, intervalLength = 0, iterations = 1} = scanOptions;
 
     await promiseInterval(
       async () => {
-        await this.scan({
+        await this.#core.scan({
           scanningSettings,
           discoverHandler,
           matchFn,
@@ -85,17 +94,17 @@ export class Bluevery extends BlueveryCore {
       intervalLength,
       {iterations: iterations},
     );
-  };
+  }
 
-  connect = () => {
+  connect() {
     return {
       isConnecting: true,
     };
-  };
+  }
 
-  receiveCharacteristicValue = () => {
+  receiveCharacteristicValue() {
     return {
       rawData: [],
     };
-  };
+  }
 }

@@ -5,9 +5,9 @@ import {
 } from 'react-native';
 import BleManager, {Peripheral} from 'react-native-ble-manager';
 import {Permission} from 'react-native-permissions';
-import promiseRetry from 'p-retry';
-import promiseTimeout from 'p-timeout';
-import {eventmit, Eventmitter} from 'eventmit';
+// import promiseRetry from 'p-retry';
+// import promiseTimeout from 'p-timeout';
+import {Eventmitter} from 'eventmit';
 import delay from 'delay';
 import {
   BlueveryOptions,
@@ -21,21 +21,25 @@ import {
   handleDiscoverPeripheral,
   requestPermission,
 } from './libs';
-import {BlueveryState} from './blueVeryState';
+import {BlueveryState as _BlueveryState} from './blueVeryState';
+import autoBind from 'auto-bind';
+
+type ConstructorArgs = {
+  BlueveryState: typeof _BlueveryState;
+};
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
 export class BlueveryCore {
   #userDefinedOptions: BlueveryOptions = {};
-  #state: BlueveryState;
+  #state: _BlueveryState;
   stateEmitter: Eventmitter<State>;
 
-  constructor() {
-    this.stateEmitter = eventmit<State>();
-    this.#state = new BlueveryState({
-      onChangeStateHandler: this.#onChangeCoreState,
-    });
+  constructor({BlueveryState}: ConstructorArgs) {
+    this.#state = new BlueveryState({});
+    this.stateEmitter = this.#state.stateEmitter;
+    autoBind(this);
   }
 
   /**
@@ -43,42 +47,38 @@ export class BlueveryCore {
    */
   #discoverPeripheralListener?: EmitterSubscription;
 
-  setUserDefinedOptions = (options: BlueveryOptions) => {
+  setUserDefinedOptions(options: BlueveryOptions) {
     this.#userDefinedOptions = options;
-  };
-
-  #onChangeCoreState = (..._args: unknown[]) => {
-    this.emitState();
-  };
-
-  emitState() {
-    this.stateEmitter.emit(this.#getState());
   }
 
-  #getState = (): Readonly<State> => {
-    return this.#state.getState();
-  };
+  emitState() {
+    this.#state.emitState();
+  }
 
-  #requireCheckBeforeBleProcess = async () => {
+  private getState(): Readonly<State> {
+    return this.#state.getState();
+  }
+
+  private async requireCheckBeforeBleProcess() {
     /**
      * initialize managing
      */
-    this.#managing();
+    this.managing();
 
-    const [, requestedThenGranted] = await this.#checkAndRequestPermission();
+    const [, requestedThenGranted] = await this.checkAndRequestPermission();
     if (requestedThenGranted) {
       throw new Error(
         `need these permission: ${JSON.stringify(requestPermission)}`,
       );
     }
 
-    const isEnableBluetooth = await this.#checkBluetoothEnabled();
+    const isEnableBluetooth = await this.checkBluetoothEnabled();
     if (!isEnableBluetooth) {
       throw new Error('bluetooth is not enabled.');
     }
-  };
+  }
 
-  #checkBluetoothEnabled = async () => {
+  private async checkBluetoothEnabled() {
     const isEnabled = await checkBluetoothEnabled();
     if (isEnabled) {
       this.#state.setBluetoothEnabled();
@@ -86,11 +86,11 @@ export class BlueveryCore {
       this.#state.setBluetoothDisabled();
     }
     return isEnabled;
-  };
+  }
 
-  #checkAndRequestPermission = async (): Promise<
+  private async checkAndRequestPermission(): Promise<
     [granted: Permission[], requestedThenGranted?: Permission[]]
-  > => {
+  > {
     const [granted, ungranted] = await checkPermission();
     if (ungranted.length) {
       const [
@@ -103,17 +103,17 @@ export class BlueveryCore {
       return [granted, requestedThenGranted];
     }
     return [granted];
-  };
+  }
 
-  #managing = async () => {
-    if (this.#getState().managing === false) {
+  private async managing() {
+    if (this.getState().managing === false) {
       await BleManager.start().then(() => {
         this.#state.onManaging();
       });
     }
-  };
+  }
 
-  scan = async ({
+  async scan({
     scanningSettings,
     discoverHandler,
     matchFn,
@@ -121,9 +121,9 @@ export class BlueveryCore {
     scanningSettings: ScanningSettings;
     discoverHandler?: (peripheralInfo: PeripheralInfo) => any;
     matchFn?: (peripheral: Peripheral) => boolean;
-  }) => {
-    if (!this.#getState().scanning) {
-      await this.#requireCheckBeforeBleProcess();
+  }) {
+    if (!this.getState().scanning) {
+      await this.requireCheckBeforeBleProcess();
 
       this.#state.onScanning();
 
@@ -152,33 +152,33 @@ export class BlueveryCore {
 
       // スキャン秒数経ったらscan処理を終える
       const [, scanSeconds] = scanningSettings;
-      await delay(scanSeconds * 1000).then(this.#cleanupScan);
+      await delay(scanSeconds * 1000).then(this.cleanupScan);
     }
-  };
+  }
 
-  #cleanupScan = () => {
+  private cleanupScan() {
     return Promise.all([
       BleManager.stopScan(),
       this.#discoverPeripheralListener?.remove(),
       this.#state.offScanning(),
     ]);
-  };
+  }
 
-  #connect = async (...args: Parameters<typeof BleManager.connect>) => {
+  private async connect(...args: Parameters<typeof BleManager.connect>) {
     await BleManager.connect(...args);
-  };
+  }
 
-  #discoverHandler = () => {};
+  private discoverHandler() {}
 
-  #startNotification = async (
+  private async startNotification(
     ...args: Parameters<typeof BleManager.startNotification>
-  ) => {
+  ) {
     await BleManager.startNotification(...args);
-  };
+  }
 
-  stopNotification = async (
+  async stopNotification(
     ...args: Parameters<typeof BleManager.stopNotification>
-  ) => {
+  ) {
     await BleManager.stopNotification(...args);
-  };
+  }
 }

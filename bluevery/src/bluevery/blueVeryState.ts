@@ -1,5 +1,7 @@
 import {State, PeripheralInfo} from './interface';
 import {IMutationTree, ITrackStateTree, ProxyStateTree} from 'proxy-state-tree';
+import {eventmit, Eventmitter} from 'eventmit';
+import autoBind from 'auto-bind';
 
 const initialState: State = {
   bluetoothEnabled: false,
@@ -17,52 +19,61 @@ export class BlueveryState {
   #mutationState: IMutationTree<State>;
   #trackState: ITrackStateTree<State>;
 
+  stateEmitter: Eventmitter<State>;
+
   constructor({
     onChangeStateHandler,
   }: {
-    onChangeStateHandler: (...args: unknown[]) => unknown;
+    onChangeStateHandler?: (...args: unknown[]) => unknown;
   }) {
+    this.stateEmitter = eventmit<State>();
     this.#stateTree = new ProxyStateTree(initialState);
     this.#trackState = this.#stateTree.getTrackStateTree();
     this.#mutationState = this.#stateTree.getMutationTree();
     this.#mutationState.onMutation(() => {
-      onChangeStateHandler();
+      this.emitState();
+      onChangeStateHandler && onChangeStateHandler();
     });
+    autoBind(this);
   }
 
   /**
    * premitive
    */
-  getState = () => {
+  emitState() {
+    this.stateEmitter.emit(this.getState());
+  }
+
+  getState() {
     return this.#trackState.state;
-  };
+  }
 
-  onManaging = () => {
+  onManaging() {
     this.#mutationState.state.managing = true;
-  };
-  offManaging = () => {
+  }
+  offManaging() {
     this.#mutationState.state.managing = false;
-  };
+  }
 
-  setBluetoothEnabled = () => {
+  setBluetoothEnabled() {
     this.#mutationState.state.bluetoothEnabled = true;
-  };
-  setBluetoothDisabled = () => {
+  }
+  setBluetoothDisabled() {
     this.#mutationState.state.bluetoothEnabled = false;
-  };
+  }
 
-  onScanning = () => {
+  onScanning() {
     this.#mutationState.state.scanning = true;
-  };
-  offScanning = () => {
+  }
+  offScanning() {
     this.#mutationState.state.scanning = false;
-  };
+  }
 
-  setPeripheralToState = (peripheralInfo: PeripheralInfo) => {
+  setPeripheralToState(peripheralInfo: PeripheralInfo) {
     Reflect.set(
       this.#mutationState.state.peripherals,
       peripheralInfo.id,
       peripheralInfo,
     );
-  };
+  }
 }
