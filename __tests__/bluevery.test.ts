@@ -1,7 +1,7 @@
-import {bluevery as truthExportedBluevery} from '../src/bluevery';
-import {Bluevery} from '../src/bluevery/bluevery';
-import {BlueveryCore} from '../src/bluevery/blueveryCore';
-import {BlueveryState} from '../src/bluevery/blueVeryState';
+import {bluevery as truthExportedBluevery} from '../src';
+import {Bluevery} from '../src/bluevery';
+import {BlueveryCore} from '../src/blueveryCore';
+import {BlueveryState} from '../src/blueVeryState';
 import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
 
 let bluevery: Bluevery;

@@ -8,7 +8,7 @@
  * @format
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -25,16 +25,31 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-import {bluevery} from './src/bluevery';
+import {bluevery} from 'bluevery';
 
 declare const global: {HermesInternal: null | {}};
 
 const App = () => {
-  bluevery.init();
-  bluevery.addListener((state) => {
-    console.log('current state…', state);
-  });
-  bluevery.startScan({scanOptions: [[], 3, true]});
+  useEffect(() => {
+    if (!bluevery.checkIsInitialized()) {
+      bluevery.init();
+    }
+    bluevery.listeners.stateListener.on((state) => {
+      console.log('current state…', state);
+    });
+    bluevery.startScan({
+      scanOptions: {
+        scanningSettings: [[], 1, true],
+        intervalLength: 1000,
+        iterations: 5,
+      },
+      // matchFn: (p) => !!p.id.match(new RegExp(/^634/)),
+    });
+
+    // return () => {
+    //   cleanup
+    // }
+  }, []);
 
   return (
     <>
