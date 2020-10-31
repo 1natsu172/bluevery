@@ -1260,11 +1260,6 @@
   resolved "https://registry.yarnpkg.com/@types/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#1ee30d79544ca84d68d4b3cdb0af4f205663dd2d"
   integrity sha512-OCutwjDZ4aFS6PB1UZ988C4YgwlBHJd6wCeQqaLdmadZ/7e+w79+hbMUFC1QXDNCmdyoRfAFdm0RypzwR+Qpag==
 
-"@types/events@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@types/events/-/events-3.0.0.tgz#2862f3f58a9a7f7c3e78d79f130dd4d71c25c2a7"
-  integrity sha512-EaObqwIvayI5a8dCzhFrjKzVwKLxjoG9T6Ppd5CEo07LRKfQ8Yokw54r5+Wq7FaBQ+yXRvQAYPrHwya1/UFt9g==
-
 "@types/graceful-fs@^4.1.2":
   version "4.1.3"
   resolved "https://registry.yarnpkg.com/@types/graceful-fs/-/graceful-fs-4.1.3.tgz#039af35fe26bec35003e8d86d2ee9c586354348f"
@@ -2030,20 +2025,9 @@ bindings@^1.5.0:
   dependencies:
     file-uri-to-path "1.0.0"
 
-bluevery@../:
-  version "0.0.1"
-  dependencies:
-    auto-bind "^4.0.0"
-    delay "^4.4.0"
-    eventmit "^1.1.0"
-    interval-promise "^1.4.0"
-    p-cancelable "^2.0.0"
-    p-retry "^4.2.0"
-    p-tap "^3.1.0"
-    p-timeout "^3.2.0"
-    proxy-state-tree "^6.0.2"
-    react-native-ble-manager "^7.3.1"
-    react-native-permissions "^2.2.0"
+"bluevery@link:..":
+  version "0.0.0"
+  uid ""
 
 bplist-creator@0.0.8:
   version "0.0.8"
@@ -5934,9 +5918,9 @@ prop-types@^15.6.2, prop-types@^15.7.2:
     react-is "^16.8.1"
 
 proxy-state-tree@^6.0.2:
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/proxy-state-tree/-/proxy-state-tree-6.0.2.tgz#8cfd51c1a2b84910e3e6cc1a91ecefacea88665d"
-  integrity sha512-FZh7PqvG7SDCOmnSFKmXoF9eWBXTiBkc/f1+1dSi+Wcnc7j7NPeP7HT2HgXUhLe1WL9GDYVe6W2L4VebonwK9w==
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/proxy-state-tree/-/proxy-state-tree-6.1.0.tgz#7a85eb89328e5973dc21f30b82062cf58186095e"
+  integrity sha512-3vXW9NBjWutNakrRA4Wpy8EQ4knjjmGY583vQQxIR3xsvJ2iuUrGh5jSG+aVoccW0qWKNzaPdGAxpQXaQNdXrQ==
   dependencies:
     is-plain-obj "^1.1.0"
 
@@ -5987,14 +5971,14 @@ react-is@^16.12.0, react-is@^16.8.1, react-is@^16.8.4, react-is@^16.8.6:
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
 react-native-ble-manager@^7.3.1:
-  version "7.3.1"
-  resolved "https://registry.yarnpkg.com/react-native-ble-manager/-/react-native-ble-manager-7.3.1.tgz#f2cb982c2070cadd9650fde353a092d29ba00d97"
-  integrity sha512-/pw3Z+TLrZWyvGgyIaiA0YJkuNn/Gn0SVJATds9A9PQ1XuKqcR/ibgWVfnZ2UBhPXwVhPtmuEhBhseGP1Su2uQ==
+  version "7.4.1"
+  resolved "https://registry.yarnpkg.com/react-native-ble-manager/-/react-native-ble-manager-7.4.1.tgz#062c13614e0e627a4d2648075716e02938d44a13"
+  integrity sha512-d9VS9y11SKxU6eUBIlUYrGo3kJKtGfuLJ4eDV7corETARz8JRWd5a/lXO5uqvyNP2lV5w3SiuycOJXEZdX7sow==
 
 react-native-permissions@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-2.2.0.tgz#7980caccf98814c6a4677816d21e90ba456362d3"
-  integrity sha512-y5GvcYdEe9PEWVM12UgdkNI/BVvjEU6SZGN7zBpoalTczSlWGQ4SeD2dBz9KfCu1jg5l1752sKDAggTjaq3QKQ==
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-2.2.2.tgz#3d2a63f6b7d6be52fc86e30f77412a9566283028"
+  integrity sha512-ihf4shQDSX5Oo9ChQXb9kr13mmyyNem5MaEvOpr3dCjhBOBWyEMztXm9/uPK1Qg5PsNpaYLa1KpcPZDCw87LXg==
 
 react-native@0.63.2:
   version "0.63.2"
