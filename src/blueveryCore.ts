@@ -63,12 +63,12 @@ export class BlueveryCore {
     /**
      * initialize managing
      */
-    this.managing();
+    await this.managing();
 
-    const [, requestedThenGranted] = await this.checkAndRequestPermission();
-    if (requestedThenGranted) {
+    const [, , requestedButUngranted] = await this.checkAndRequestPermission();
+    if (requestedButUngranted) {
       throw new Error(
-        `need these permission: ${JSON.stringify(requestPermission)}`,
+        `need these permission: ${JSON.stringify(requestedButUngranted)}`,
       );
     }
 
@@ -89,7 +89,11 @@ export class BlueveryCore {
   }
 
   private async checkAndRequestPermission(): Promise<
-    [granted: Permission[], requestedThenGranted?: Permission[]]
+    [
+      granted: Permission[],
+      requestedThenGranted?: Permission[],
+      requestedButUngranted?: Permission[],
+    ]
   > {
     const [granted, ungranted] = await checkPermission();
     if (ungranted.length) {
@@ -100,7 +104,7 @@ export class BlueveryCore {
       if (requestedButUngranted) {
         throw new Error(JSON.stringify(requestedButUngranted));
       }
-      return [granted, requestedThenGranted];
+      return [granted, requestedThenGranted, requestedButUngranted];
     }
     return [granted];
   }
@@ -128,7 +132,7 @@ export class BlueveryCore {
       this.#state.onScanning();
 
       const [, discoverPeripheralListener] = await Promise.all([
-        // scan開始
+        // note: scan開始。promiseだがscan秒数待たないので後続処理でscan秒数を担保している
         await BleManager.scan(...scanningSettings).catch((err) =>
           console.warn(err),
         ),
@@ -150,7 +154,7 @@ export class BlueveryCore {
       ]);
       this.#discoverPeripheralListener = discoverPeripheralListener;
 
-      // スキャン秒数経ったらscan処理を終える
+      // note: スキャン秒数の担保。指定秒数経ったらscan処理を終える
       const [, scanSeconds] = scanningSettings;
       await delay(scanSeconds * 1000).then(this.cleanupScan);
     }
