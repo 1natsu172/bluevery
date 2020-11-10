@@ -1,5 +1,5 @@
 {
-  "name": "bluevery-example",
+  "name": "example",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -7,12 +7,13 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "typecheck": "tsc ./src/**/*.ts --noEmit"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
     "react": "16.13.1",
     "react-native": "0.63.2",
+    "react-native-ble-manager": "^7.3.1",
+    "react-native-permissions": "^2.2.0",
     "bluevery": "link:../"
   },
   "devDependencies": {

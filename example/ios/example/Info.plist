@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>bluevery</string>
+	<string>example</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -64,6 +64,5 @@
   <key>NSLocationWhenInUseUsageDescription</key>
   <string>位置情報をアプリ起動中に使用します</string>
 	<!-- 🚨 Keep only the permissions used in your app 🚨 -->
-
 </dict>
 </plist>

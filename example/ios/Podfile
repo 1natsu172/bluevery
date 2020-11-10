@@ -3,12 +3,12 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 platform :ios, '10.0'
 
-target 'bluevery' do
+target 'example' do
   config = use_native_modules!
 
   use_react_native!(:path => config["reactNativePath"])
 
-  target 'blueveryTests' do
+  target 'exampleTests' do
     inherit! :complete
     # Pods for testing
   end
@@ -23,17 +23,16 @@ target 'bluevery' do
   end
 
   permissions_path = '../node_modules/react-native-permissions/ios'
-
   pod 'Permission-BluetoothPeripheral', :path => "#{permissions_path}/BluetoothPeripheral.podspec"
   pod 'Permission-LocationWhenInUse', :path => "#{permissions_path}/LocationWhenInUse.podspec"
   pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications.podspec"
 
 end
 
-target 'bluevery-tvOS' do
-  # Pods for bluevery-tvOS
+target 'example-tvOS' do
+  # Pods for example-tvOS
 
-  target 'bluevery-tvOSTests' do
+  target 'example-tvOSTests' do
     inherit! :search_paths
     # Pods for testing
   end
