@@ -5,6 +5,8 @@ import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
 
 jest.mock('../src/libs', () => ({
   __esModule: true,
+  ...jest.requireActual('../src/libs'),
+  // mocking only some of the following libs as they use NativeModules
   checkBluetoothEnabled: jest.fn(async () => true),
 }));
 
@@ -17,7 +19,9 @@ let spiedCheckAndRequestPermission: jest.SpyInstance;
 let spiedRequireCheckBeforeBleProcess: jest.SpyInstance;
 let spiedCleanupScan: jest.SpyInstance;
 beforeEach(() => {
+  // cleanup mocks
   jest.clearAllMocks();
+  // cleanup spys
   jest.restoreAllMocks();
 
   // note: methods spying
@@ -31,6 +35,7 @@ beforeEach(() => {
     .spyOn(BlueveryCore.prototype, 'requireCheckBeforeBleProcess')
     // @ts-ignore
     .mockImplementation(async () => {});
+  // note: The lack of mockimplementation is intentional.
   spiedCleanupScan = jest
     // @ts-ignore
     .spyOn(BlueveryCore.prototype, 'cleanupScan');
@@ -103,16 +108,6 @@ describe('BlueveryCore', () => {
         blueveryCore.scan({scanningSettings: [[], 1]});
         await flushPromisesAdvanceTimer(1000);
         expect(spiedCleanupScan).toBeCalledTimes(1);
-      });
-    });
-
-    describe('discoverHandler', () => {
-      test.skip('should call passed handler', () => {});
-    });
-
-    describe('matchFn', () => {
-      test.skip('should discover only that match the result of matchFn', () => {
-        // discoverHandlerの呼ばれる回数をモックする
       });
     });
   });

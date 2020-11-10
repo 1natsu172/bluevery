@@ -18,7 +18,10 @@ import {
 import {
   checkBluetoothEnabled,
   checkPermission,
-  handleDiscoverPeripheral,
+  registerDiscoverPeripheralListener,
+  createHandleDiscoverPeripheral,
+  onDiscoverPeripheral,
+  createPeripheralInfoHandler,
   requestPermission,
 } from './libs';
 import {BlueveryState as _BlueveryState} from './blueVeryState';
@@ -127,6 +130,18 @@ export class BlueveryCore {
     matchFn?: (peripheral: Peripheral) => boolean;
   }) {
     if (!this.getState().scanning) {
+      const peripheralInfoHandler = createPeripheralInfoHandler({
+        setPeripheralToState: this.#state.setPeripheralToState,
+        handlePeripheralInfo: discoverHandler,
+      });
+      const handleDiscoverPeripheral = createHandleDiscoverPeripheral(
+        onDiscoverPeripheral,
+        {
+          matchFn,
+          peripheralInfoHandler,
+        },
+      );
+
       await this.requireCheckBeforeBleProcess();
 
       this.#state.onScanning();
@@ -137,19 +152,9 @@ export class BlueveryCore {
           console.warn(err),
         ),
         // discover処理を登録
-        bleManagerEmitter.addListener(
-          'BleManagerDiscoverPeripheral',
-          (peripheral: Peripheral) => {
-            if (matchFn && !matchFn(peripheral)) {
-              return;
-            }
-            handleDiscoverPeripheral(peripheral, (peripheralInfo) => {
-              // set peripheral to state.
-              this.#state.setPeripheralToState(peripheralInfo);
-              // call passed handler by user.
-              discoverHandler && discoverHandler(peripheralInfo);
-            });
-          },
+        registerDiscoverPeripheralListener(
+          bleManagerEmitter,
+          handleDiscoverPeripheral,
         ),
       ]);
       this.#discoverPeripheralListener = discoverPeripheralListener;
