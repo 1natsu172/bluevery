@@ -49,6 +49,9 @@ export class BlueveryState {
     return this.#trackState.state;
   }
 
+  /**
+   * state change handlers
+   */
   onManaging() {
     this.#mutationState.state.managing = true;
   }

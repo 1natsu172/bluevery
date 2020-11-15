@@ -1,5 +1,5 @@
 import {BlueveryCore} from '../src/blueveryCore';
-import {BlueveryState} from '../src/blueVeryState';
+import {BlueveryState} from '../src/blueveryState';
 import {checkBluetoothEnabled} from '../src/libs';
 import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
 

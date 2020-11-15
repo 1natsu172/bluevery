@@ -24,7 +24,7 @@ import {
   createPeripheralInfoHandler,
   requestPermission,
 } from './libs';
-import {BlueveryState as _BlueveryState} from './blueVeryState';
+import {BlueveryState as _BlueveryState} from './blueveryState';
 import autoBind from 'auto-bind';
 
 type ConstructorArgs = {

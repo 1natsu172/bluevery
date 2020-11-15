@@ -1,7 +1,7 @@
 import {Peripheral} from 'react-native-ble-manager';
 import promiseInterval from 'interval-promise';
 import {BlueveryCore as _BlueveryCore} from './blueveryCore';
-import {BlueveryState as _BlueveryState} from './blueVeryState';
+import {BlueveryState as _BlueveryState} from './blueveryState';
 import {
   BlueveryOptions,
   Listeners,

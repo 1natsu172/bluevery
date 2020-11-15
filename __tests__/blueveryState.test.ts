@@ -1,4 +1,4 @@
-import {BlueveryState} from '../src/blueVeryState';
+import {BlueveryState} from '../src/blueveryState';
 import {PeripheralInfo, State} from '../src/interface';
 
 /**

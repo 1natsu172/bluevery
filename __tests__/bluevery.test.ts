@@ -1,7 +1,7 @@
 import {bluevery as truthExportedBluevery} from '../src';
 import {Bluevery} from '../src/bluevery';
 import {BlueveryCore} from '../src/blueveryCore';
-import {BlueveryState} from '../src/blueVeryState';
+import {BlueveryState} from '../src/blueveryState';
 import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
 
 let bluevery: Bluevery;
