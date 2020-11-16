@@ -125,6 +125,21 @@ describe('BlueveryState', () => {
       expect(blueveryState.getState().scanning).toBe(false);
     });
   });
+  describe('setPermissionGranted', () => {
+    test('should change to truthy(granted) permissionGranted of the State', () => {
+      expect(blueveryState.getState().permissionGranted).toBe(false);
+      blueveryState.setPermissionGranted();
+      expect(blueveryState.getState().permissionGranted).toBe(true);
+    });
+  });
+  describe('setPermissionUnGranted', () => {
+    test('should change to falsy(ungranted) permissionGranted of the State', () => {
+      blueveryState.setPermissionGranted();
+      expect(blueveryState.getState().permissionGranted).toBe(true);
+      blueveryState.setPermissionUnGranted();
+      expect(blueveryState.getState().permissionGranted).toBe(false);
+    });
+  });
   describe('setPeripheralToState', () => {
     test('should set Peripheral', () => {
       const dummyPeripheralInfo: PeripheralInfo = {

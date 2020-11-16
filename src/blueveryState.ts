@@ -73,6 +73,13 @@ export class BlueveryState {
     this.#mutationState.state.scanning = false;
   }
 
+  setPermissionGranted() {
+    this.#mutationState.state.permissionGranted = true;
+  }
+  setPermissionUnGranted() {
+    this.#mutationState.state.permissionGranted = false;
+  }
+
   setPeripheralToState(peripheralInfo: PeripheralInfo) {
     Reflect.set(
       this.#mutationState.state.peripherals,
