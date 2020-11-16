@@ -2,11 +2,15 @@ import {State, PeripheralInfo} from './interface';
 import {IMutationTree, ITrackStateTree, ProxyStateTree} from 'proxy-state-tree';
 import {eventmit, Eventmitter} from 'eventmit';
 import autoBind from 'auto-bind';
+import {Permission} from 'react-native-permissions';
 
 export class BlueveryState {
   #_initialState: State = {
     bluetoothEnabled: false,
-    permissionGranted: false,
+    permissionGranted: {
+      is: 'unknown',
+      lack: [],
+    },
     managing: false,
     connecting: false,
     scanning: false,
@@ -74,10 +78,16 @@ export class BlueveryState {
   }
 
   setPermissionGranted() {
-    this.#mutationState.state.permissionGranted = true;
+    this.#mutationState.state.permissionGranted = {
+      is: 'granted',
+      lack: [],
+    };
   }
-  setPermissionUnGranted() {
-    this.#mutationState.state.permissionGranted = false;
+  setPermissionUnGranted(lack: Permission[]) {
+    this.#mutationState.state.permissionGranted = {
+      is: 'ungranted',
+      lack,
+    };
   }
 
   setPeripheralToState(peripheralInfo: PeripheralInfo) {

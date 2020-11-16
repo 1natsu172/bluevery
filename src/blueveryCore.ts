@@ -69,16 +69,19 @@ export class BlueveryCore {
     await this.managing();
 
     const [, , requestedButUngranted] = await this.checkAndRequestPermission();
-    if (requestedButUngranted) {
-      throw new Error(
-        `need these permission: ${JSON.stringify(requestedButUngranted)}`,
-      );
+    if (requestedButUngranted?.length) {
+      return false;
     }
 
     const isEnableBluetooth = await this.checkBluetoothEnabled();
     if (!isEnableBluetooth) {
-      throw new Error('bluetooth is not enabled.');
+      return false;
     }
+
+    /**
+     * check passed.
+     */
+    return true;
   }
 
   private async checkBluetoothEnabled() {
@@ -104,8 +107,11 @@ export class BlueveryCore {
         requestedThenGranted,
         requestedButUngranted,
       ] = await requestPermission(ungranted);
-      if (requestedButUngranted) {
-        throw new Error(JSON.stringify(requestedButUngranted));
+
+      if (requestedButUngranted.length) {
+        this.#state.setPermissionUnGranted(requestedButUngranted);
+      } else {
+        this.#state.setPermissionGranted();
       }
       return [granted, requestedThenGranted, requestedButUngranted];
     }
@@ -142,7 +148,10 @@ export class BlueveryCore {
         },
       );
 
-      await this.requireCheckBeforeBleProcess();
+      const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
+      if (isPassedRequireCheck) {
+        return;
+      }
 
       this.#state.onScanning();
 

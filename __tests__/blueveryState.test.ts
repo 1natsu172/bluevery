@@ -27,10 +27,16 @@ describe('BlueveryState', () => {
               managing: false,
               peripherals: new Map(),
               scanning: false,
-              permissionGranted: true,
+              permissionGranted: {
+                is: 'ungranted',
+                lack: ['ios.permission.BLUETOOTH_PERIPHERAL'],
+              },
             },
           });
-          expect(blueveryState.getState().permissionGranted).toBe(true);
+          expect(blueveryState.getState().permissionGranted).toEqual({
+            is: 'ungranted',
+            lack: ['ios.permission.BLUETOOTH_PERIPHERAL'],
+          });
         });
       });
       describe('onChangeStateHandler', () => {
@@ -127,17 +133,31 @@ describe('BlueveryState', () => {
   });
   describe('setPermissionGranted', () => {
     test('should change to truthy(granted) permissionGranted of the State', () => {
-      expect(blueveryState.getState().permissionGranted).toBe(false);
+      expect(blueveryState.getState().permissionGranted).toEqual({
+        is: 'unknown',
+        lack: [],
+      });
       blueveryState.setPermissionGranted();
-      expect(blueveryState.getState().permissionGranted).toBe(true);
+      expect(blueveryState.getState().permissionGranted).toEqual({
+        is: 'granted',
+        lack: [],
+      });
     });
   });
   describe('setPermissionUnGranted', () => {
     test('should change to falsy(ungranted) permissionGranted of the State', () => {
       blueveryState.setPermissionGranted();
-      expect(blueveryState.getState().permissionGranted).toBe(true);
-      blueveryState.setPermissionUnGranted();
-      expect(blueveryState.getState().permissionGranted).toBe(false);
+      expect(blueveryState.getState().permissionGranted).toEqual({
+        is: 'granted',
+        lack: [],
+      });
+      blueveryState.setPermissionUnGranted([
+        'ios.permission.BLUETOOTH_PERIPHERAL',
+      ]);
+      expect(blueveryState.getState().permissionGranted).toEqual({
+        is: 'ungranted',
+        lack: ['ios.permission.BLUETOOTH_PERIPHERAL'],
+      });
     });
   });
   describe('setPeripheralToState', () => {

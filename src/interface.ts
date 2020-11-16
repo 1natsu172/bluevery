@@ -1,5 +1,6 @@
 import {Eventmitter} from 'eventmit';
 import BleManager, {Peripheral} from 'react-native-ble-manager';
+import {Permission} from 'react-native-permissions';
 
 export type BlueveryOptions = {};
 
@@ -10,7 +11,10 @@ export type PeripheralInfo = Peripheral & {
 
 export type State = {
   bluetoothEnabled: boolean;
-  permissionGranted: boolean;
+  permissionGranted: {
+    is: 'granted' | 'ungranted' | 'unknown';
+    lack: Permission[];
+  };
   managing: boolean;
   scanning: boolean;
   connecting: boolean;

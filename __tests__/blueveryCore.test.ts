@@ -1,6 +1,10 @@
 import {BlueveryCore} from '../src/blueveryCore';
 import {BlueveryState} from '../src/blueveryState';
-import {checkBluetoothEnabled} from '../src/libs';
+import {
+  checkBluetoothEnabled,
+  checkPermission,
+  requestPermission,
+} from '../src/libs';
 import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
 
 jest.mock('../src/libs', () => ({
@@ -8,6 +12,8 @@ jest.mock('../src/libs', () => ({
   ...jest.requireActual('../src/libs'),
   // mocking only some of the following libs as they use NativeModules
   checkBluetoothEnabled: jest.fn(async () => true),
+  checkPermission: jest.fn(),
+  requestPermission: jest.fn(),
 }));
 
 /**
@@ -16,6 +22,7 @@ jest.mock('../src/libs', () => ({
 let blueveryCore: BlueveryCore;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let spiedCheckAndRequestPermission: jest.SpyInstance;
+let spiedCheckBluetoothEnabled: jest.SpyInstance;
 let spiedRequireCheckBeforeBleProcess: jest.SpyInstance;
 let spiedCleanupScan: jest.SpyInstance;
 beforeEach(() => {
@@ -30,6 +37,11 @@ beforeEach(() => {
     .spyOn(BlueveryCore.prototype, 'checkAndRequestPermission')
     // @ts-ignore
     .mockImplementation(async () => []);
+  spiedCheckBluetoothEnabled = jest
+    // @ts-ignore
+    .spyOn(BlueveryCore.prototype, 'checkBluetoothEnabled')
+    // @ts-ignore
+    .mockImplementation(async () => true);
   spiedRequireCheckBeforeBleProcess = jest
     // @ts-ignore
     .spyOn(BlueveryCore.prototype, 'requireCheckBeforeBleProcess')
@@ -45,6 +57,67 @@ beforeEach(() => {
 });
 
 describe('BlueveryCore', () => {
+  describe('checkAndRequestPermission', () => {
+    const mockedCheckPermission = checkPermission as jest.MockedFunction<
+      typeof checkPermission
+    >;
+    const mockedRequestPermission = requestPermission as jest.MockedFunction<
+      typeof requestPermission
+    >;
+    describe('record to state the permissionGranted', () => {
+      test('should record `requestedButUngranted`', async () => {
+        mockedCheckPermission.mockImplementationOnce(async () => [
+          [],
+          ['ios.permission.BLUETOOTH_PERIPHERAL'],
+        ]);
+        mockedRequestPermission.mockImplementationOnce(async () => [
+          [],
+          ['ios.permission.BLUETOOTH_PERIPHERAL'],
+        ]);
+
+        // unSpy checkAndRequestPermission because want to test with substance method
+        spiedCheckAndRequestPermission.mockRestore();
+        blueveryCore = new BlueveryCore({BlueveryState});
+
+        // @ts-ignore ts(2341) access to private
+        expect(blueveryCore.getState().permissionGranted).toEqual({
+          is: 'unknown',
+          lack: [],
+        });
+        // @ts-ignore ts(2341) access to private
+        await blueveryCore.checkAndRequestPermission();
+        // @ts-ignore ts(2341) access to private
+        expect(blueveryCore.getState().permissionGranted).toEqual({
+          is: 'ungranted',
+          lack: ['ios.permission.BLUETOOTH_PERIPHERAL'],
+        });
+      });
+      test('should record `permissionGranted`', async () => {
+        mockedCheckPermission.mockImplementationOnce(async () => [
+          [],
+          ['ios.permission.BLUETOOTH_PERIPHERAL'],
+        ]);
+        mockedRequestPermission.mockImplementationOnce(async () => [[], []]);
+
+        // unSpy checkAndRequestPermission because want to test with substance method
+        spiedCheckAndRequestPermission.mockRestore();
+        blueveryCore = new BlueveryCore({BlueveryState});
+
+        // @ts-ignore ts(2341) access to private
+        expect(blueveryCore.getState().permissionGranted).toEqual({
+          is: 'unknown',
+          lack: [],
+        });
+        // @ts-ignore ts(2341) access to private
+        await blueveryCore.checkAndRequestPermission();
+        // @ts-ignore ts(2341) access to private
+        expect(blueveryCore.getState().permissionGranted).toEqual({
+          is: 'granted',
+          lack: [],
+        });
+      });
+    });
+  });
   describe('requireCheckBeforeBleProcess', () => {
     test('should be managing', async () => {
       // unSpy requireCheckBeforeBleProcess because want to test with substance method
@@ -58,6 +131,32 @@ describe('BlueveryCore', () => {
       // @ts-ignore ts(2341) access to private
       expect(blueveryCore.getState().managing).toBe(true);
     });
+    describe('unpassed(false) pattern', () => {
+      test('should return false if permission requestedButUngranted', async () => {
+        spiedCheckAndRequestPermission.mockResolvedValueOnce([
+          [],
+          [],
+          ['ios.permission.BLUETOOTH_PERIPHERAL'],
+        ]);
+        // unSpy requireCheckBeforeBleProcess because want to test with substance method
+        spiedRequireCheckBeforeBleProcess.mockRestore();
+        blueveryCore = new BlueveryCore({BlueveryState});
+
+        // @ts-ignore ts(2341) access to private
+        const ret = await blueveryCore.requireCheckBeforeBleProcess();
+        expect(ret).toBe(false);
+      });
+      test('should return false if is not BluetoothEnabled requestedButUngranted', async () => {
+        spiedCheckBluetoothEnabled.mockResolvedValueOnce(false);
+        // unSpy requireCheckBeforeBleProcess because want to test with substance method
+        spiedRequireCheckBeforeBleProcess.mockRestore();
+        blueveryCore = new BlueveryCore({BlueveryState});
+
+        // @ts-ignore ts(2341) access to private
+        const ret = await blueveryCore.requireCheckBeforeBleProcess();
+        expect(ret).toBe(false);
+      });
+    });
   });
 
   describe('checkBluetoothEnabled', () => {
@@ -66,6 +165,10 @@ describe('BlueveryCore', () => {
     >;
     describe('should change state the depend on the result', () => {
       test('the result is enabled', async () => {
+        // unSpy
+        spiedCheckBluetoothEnabled.mockRestore();
+        blueveryCore = new BlueveryCore({BlueveryState});
+
         mockedCheckBluetoothEnabled.mockImplementationOnce(async () => true);
         // @ts-ignore ts(2341) access to private
         await blueveryCore.checkBluetoothEnabled();
@@ -74,6 +177,10 @@ describe('BlueveryCore', () => {
       });
 
       test('the result is disabled', async () => {
+        // unSpy
+        spiedCheckBluetoothEnabled.mockRestore();
+        blueveryCore = new BlueveryCore({BlueveryState});
+
         mockedCheckBluetoothEnabled.mockImplementationOnce(async () => false);
         // @ts-ignore ts(2341) access to private
         await blueveryCore.checkBluetoothEnabled();
