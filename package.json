@@ -5,6 +5,7 @@
   "main": "dist",
   "types": "dist",
   "scripts": {
+    "dev": "tsc --watch --incremental",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "typecheck": "tsc --noEmit",
