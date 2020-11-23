@@ -3,3 +3,62 @@
 # Bluevery
 
 The ble communicate utility on react-native.
+
+## setup
+
+```
+$ yarn add bluevery
+```
+
+and don't forget install peerDependencies
+
+**[See peerDependencies](./package.json)**
+
+### for Android
+
+`AndroidManifest.xml`
+
+```
+  <!-- 🚨 Keep only the permissions used in your app 🚨 -->
+  <uses-permission android:name="android.permission.BLUETOOTH"/>
+  <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+  <!-- 🚨 Keep only the permissions used in your app 🚨 -->
+```
+
+### for iOS
+
+Edit your app `Podfile` then run `pod install`
+
+`Podfile`
+
+```
+target 'YourAppProject' do
+
+  # add the below
+
+  permissions_path = '../node_modules/react-native-permissions/ios'
+  pod 'Permission-BluetoothPeripheral', :path => "#{permissions_path}/BluetoothPeripheral.podspec"
+  pod 'Permission-LocationWhenInUse', :path => "#{permissions_path}/LocationWhenInUse.podspec"
+  pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications.podspec"
+
+end
+```
+
+and edit your app `Info.plist`
+
+`Info.plist`
+
+```
+  <!-- 🚨 Keep only the permissions used in your app 🚨 -->
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>EDIT YOUR TEXT</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>EDIT YOUR TEXT</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>EDIT YOUR TEXT</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>EDIT YOUR TEXT</string>
+  <!-- 🚨 Keep only the permissions used in your app 🚨 -->
+```
