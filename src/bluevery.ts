@@ -51,8 +51,8 @@ export class Bluevery {
    */
 
   init(blueveryOptions?: BlueveryOptions) {
-    if (this.#initialized) {
-      throw Error('bluevery is already initialized.');
+    if (this.checkIsInitialized()) {
+      return;
     }
     if (blueveryOptions) {
       this.#core.setUserDefinedOptions(blueveryOptions);
