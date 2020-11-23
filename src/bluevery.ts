@@ -1,5 +1,6 @@
 import {Peripheral} from 'react-native-ble-manager';
 import promiseInterval from 'interval-promise';
+import autoBind from 'auto-bind';
 import {BlueveryCore as _BlueveryCore} from './blueveryCore';
 import {BlueveryState as _BlueveryState} from './blueveryState';
 import {
@@ -8,8 +9,8 @@ import {
   PeripheralInfo,
   ScanningSettings,
 } from './interface';
-import autoBind from 'auto-bind';
 import {applyOmoiyari} from './libs';
+import {DEFAULT_OMOIYARI_TIME} from './utils/constants';
 
 type ConstructorArgs = {
   BlueveryCore: typeof _BlueveryCore;
@@ -96,7 +97,9 @@ export class Bluevery {
         intervalLength,
         {iterations: iterations},
       );
-    const omoiyariIntervalScan = applyOmoiyari(intervalScan, {time: 1000});
+    const omoiyariIntervalScan = applyOmoiyari(intervalScan, {
+      time: DEFAULT_OMOIYARI_TIME,
+    });
     await omoiyariIntervalScan();
   }
 
