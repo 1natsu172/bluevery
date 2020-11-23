@@ -10,11 +10,13 @@ The ble communicate utility on react-native.
 $ yarn add bluevery
 ```
 
-and don't forget install peerDependencies
+and **don't forget** install peerDependencies
 
 **[See peerDependencies](./package.json)**
 
 ### for Android
+
+Edit your app `AndroidManifest.xml`
 
 `AndroidManifest.xml`
 
@@ -46,7 +48,7 @@ target 'YourAppProject' do
 end
 ```
 
-and edit your app `Info.plist`
+Edit your app `Info.plist`
 
 `Info.plist`
 
