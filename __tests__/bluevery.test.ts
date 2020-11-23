@@ -2,10 +2,16 @@ import {bluevery as truthExportedBluevery} from '../src';
 import {Bluevery} from '../src/bluevery';
 import {BlueveryCore} from '../src/blueveryCore';
 import {BlueveryState} from '../src/blueveryState';
+import * as omoiyarify from '../src/libs/omoiyarify';
 import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
 
 let bluevery: Bluevery;
+let spiedApplyOmoiyari: jest.SpyInstance;
 beforeEach(() => {
+  // cleanup spies
+  jest.restoreAllMocks();
+  spiedApplyOmoiyari = jest.spyOn(omoiyarify, 'applyOmoiyari');
+
   bluevery = new Bluevery({BlueveryCore, BlueveryState});
 });
 
@@ -64,17 +70,17 @@ describe('bluevery: commands APIs', () => {
   });
 
   describe('startScan', () => {
-    describe('interval', () => {
-      const scanFn = jest.fn();
-      const core = jest.fn().mockImplementation(() => ({
-        scan: scanFn,
-      }));
-      jest.useFakeTimers();
+    jest.useFakeTimers();
+    const scanFn = jest.fn();
+    const core = jest.fn().mockImplementation(() => ({
+      scan: scanFn,
+    }));
 
-      beforeEach(() => {
-        scanFn.mockClear();
-        bluevery = new Bluevery({BlueveryCore: core, BlueveryState});
-      });
+    beforeEach(() => {
+      scanFn.mockClear();
+      bluevery = new Bluevery({BlueveryCore: core, BlueveryState});
+    });
+    describe('interval', () => {
       test('should correct intervalLength', async () => {
         bluevery.startScan({
           scanOptions: {
@@ -145,6 +151,43 @@ describe('bluevery: commands APIs', () => {
         expect(scanFn).toHaveBeenCalledTimes(0);
         await flushPromisesAdvanceTimer(500);
         expect(scanFn).toHaveBeenCalledTimes(1);
+      });
+    });
+    describe('omoiyari', () => {
+      test('should call omoiyarify', () => {
+        bluevery.startScan({
+          scanOptions: {
+            scanningSettings: [[], 1, true],
+            intervalLength: 0,
+            iterations: 1,
+          },
+        });
+        jest.runAllTimers();
+        expect(spiedApplyOmoiyari).toBeCalledTimes(1);
+      });
+
+      test('should behave omoiyari with 1sec', async () => {
+        const subsequentProcessing = jest.fn();
+        bluevery
+          .startScan({
+            scanOptions: {
+              scanningSettings: [[], 1, true],
+              intervalLength: 0,
+              iterations: 1,
+            },
+          })
+          .then(subsequentProcessing);
+        // flush intervalScan loop
+        await flushPromisesAdvanceTimer(0);
+        // shoukd not yet called subsequentProcessing
+        expect(subsequentProcessing).toHaveBeenCalledTimes(0);
+        // flush omoiyari loop
+        await flushPromisesAdvanceTimer(1000).then(() =>
+          // omoiyari は nested な setTimeout になるので2回flushしないといけない
+          flushPromisesAdvanceTimer(0),
+        );
+        // called after being omoiyari
+        expect(subsequentProcessing).toHaveBeenCalledTimes(1);
       });
     });
   });

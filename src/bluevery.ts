@@ -9,6 +9,7 @@ import {
   ScanningSettings,
 } from './interface';
 import autoBind from 'auto-bind';
+import {applyOmoiyari} from './libs';
 
 type ConstructorArgs = {
   BlueveryCore: typeof _BlueveryCore;
@@ -83,17 +84,20 @@ export class Bluevery {
   }) {
     const {scanningSettings, intervalLength = 0, iterations = 1} = scanOptions;
 
-    await promiseInterval(
-      async () => {
-        await this.#core.scan({
-          scanningSettings,
-          discoverHandler,
-          matchFn,
-        });
-      },
-      intervalLength,
-      {iterations: iterations},
-    );
+    const intervalScan = () =>
+      promiseInterval(
+        async () => {
+          await this.#core.scan({
+            scanningSettings,
+            discoverHandler,
+            matchFn,
+          });
+        },
+        intervalLength,
+        {iterations: iterations},
+      );
+    const omoiyariIntervalScan = applyOmoiyari(intervalScan, {time: 1000});
+    await omoiyariIntervalScan();
   }
 
   connect() {
