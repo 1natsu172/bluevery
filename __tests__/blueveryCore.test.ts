@@ -6,6 +6,7 @@ import {
   requestPermission,
 } from '../src/libs';
 import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
+import BleManager from 'react-native-ble-manager';
 
 jest.mock('../src/libs', () => ({
   __esModule: true,
@@ -46,7 +47,7 @@ beforeEach(() => {
     // @ts-ignore
     .spyOn(BlueveryCore.prototype, 'requireCheckBeforeBleProcess')
     // @ts-ignore
-    .mockImplementation(async () => {});
+    .mockImplementation(async () => true);
   // note: The lack of mockimplementation is intentional.
   spiedCleanupScan = jest
     // @ts-ignore
@@ -215,6 +216,23 @@ describe('BlueveryCore', () => {
         blueveryCore.scan({scanningSettings: [[], 1]});
         await flushPromisesAdvanceTimer(1000);
         expect(spiedCleanupScan).toBeCalledTimes(1);
+      });
+    });
+    describe('check guard clause', () => {
+      describe('guard from requireCheckBeforeBleProcess', () => {
+        test('should guard if return false', async () => {
+          spiedRequireCheckBeforeBleProcess.mockResolvedValueOnce(false);
+          blueveryCore = new BlueveryCore({BlueveryState});
+          await flushPromisesAdvanceTimer(1000);
+          expect(BleManager.scan).not.toBeCalled();
+        });
+        test('should not guard return true', async () => {
+          spiedRequireCheckBeforeBleProcess.mockResolvedValueOnce(true);
+          blueveryCore = new BlueveryCore({BlueveryState});
+          blueveryCore.scan({scanningSettings: [[], 1]});
+          await flushPromisesAdvanceTimer(1000);
+          expect(BleManager.scan).toBeCalled();
+        });
       });
     });
   });

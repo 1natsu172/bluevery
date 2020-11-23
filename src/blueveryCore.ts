@@ -134,7 +134,7 @@ export class BlueveryCore {
     scanningSettings: ScanningSettings;
     discoverHandler?: (peripheralInfo: PeripheralInfo) => any;
     matchFn?: (peripheral: Peripheral) => boolean;
-  }) {
+  }): Promise<void | false> {
     if (!this.getState().scanning) {
       const peripheralInfoHandler = createPeripheralInfoHandler({
         setPeripheralToState: this.#state.setPeripheralToState,
@@ -150,7 +150,7 @@ export class BlueveryCore {
 
       const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
       if (isPassedRequireCheck === false) {
-        return;
+        return false;
       }
 
       this.#state.onScanning();
