@@ -149,7 +149,7 @@ export class BlueveryCore {
       );
 
       const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
-      if (isPassedRequireCheck) {
+      if (isPassedRequireCheck === false) {
         return;
       }
 
