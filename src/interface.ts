@@ -18,7 +18,10 @@ export type State = {
   managing: boolean;
   scanning: boolean;
   connecting: boolean;
+  checkingCommunicateWithPeripheral: boolean;
+  receivingForCharacteristicValue: boolean;
   peripherals: Map<PeripheralId, PeripheralInfo>;
+  characteristicValues: Array<unknown>;
   error: Error | undefined;
 };
 

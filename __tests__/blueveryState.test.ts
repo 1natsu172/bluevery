@@ -31,6 +31,9 @@ describe('BlueveryState', () => {
                 is: 'ungranted',
                 lack: ['ios.permission.BLUETOOTH_PERIPHERAL'],
               },
+              characteristicValues: [],
+              checkingCommunicateWithPeripheral: false,
+              receivingForCharacteristicValue: false,
             },
           });
           expect(blueveryState.getState().permissionGranted).toEqual({
@@ -131,6 +134,67 @@ describe('BlueveryState', () => {
       expect(blueveryState.getState().scanning).toBe(false);
     });
   });
+  describe('onConnecting', () => {
+    test('should change to on connecting of the State', () => {
+      expect(blueveryState.getState().connecting).toBe(false);
+      blueveryState.onConnecting();
+      expect(blueveryState.getState().connecting).toBe(true);
+    });
+  });
+  describe('offConnecting', () => {
+    test('should change to off connecting of the State', () => {
+      blueveryState.onConnecting();
+      expect(blueveryState.getState().connecting).toBe(true);
+      blueveryState.offConnecting();
+      expect(blueveryState.getState().connecting).toBe(false);
+    });
+  });
+  describe('onReceivingForCharacteristicValue', () => {
+    test('should change to on receivingForCharacteristicValue of the State', () => {
+      expect(blueveryState.getState().receivingForCharacteristicValue).toBe(
+        false,
+      );
+      blueveryState.onReceivingForCharacteristicValue();
+      expect(blueveryState.getState().receivingForCharacteristicValue).toBe(
+        true,
+      );
+    });
+  });
+  describe('offReceivingForCharacteristicValue', () => {
+    test('should change to off receivingForCharacteristicValue of the State', () => {
+      blueveryState.onReceivingForCharacteristicValue();
+      expect(blueveryState.getState().receivingForCharacteristicValue).toBe(
+        true,
+      );
+      blueveryState.offReceivingForCharacteristicValue();
+      expect(blueveryState.getState().receivingForCharacteristicValue).toBe(
+        false,
+      );
+    });
+  });
+  describe('onCheckingCommunicateWithPeripheral', () => {
+    test('should change to on checkingCommunicateWithPeripheral of the State', () => {
+      expect(blueveryState.getState().checkingCommunicateWithPeripheral).toBe(
+        false,
+      );
+      blueveryState.onCheckingCommunicateWithPeripheral();
+      expect(blueveryState.getState().checkingCommunicateWithPeripheral).toBe(
+        true,
+      );
+    });
+  });
+  describe('offCheckingCommunicateWithPeripheral', () => {
+    test('should change to off checkingCommunicateWithPeripheral of the State', () => {
+      blueveryState.onCheckingCommunicateWithPeripheral();
+      expect(blueveryState.getState().checkingCommunicateWithPeripheral).toBe(
+        true,
+      );
+      blueveryState.offCheckingCommunicateWithPeripheral();
+      expect(blueveryState.getState().checkingCommunicateWithPeripheral).toBe(
+        false,
+      );
+    });
+  });
   describe('setPermissionGranted', () => {
     test('should change to truthy(granted) permissionGranted of the State', () => {
       expect(blueveryState.getState().permissionGranted).toEqual({
@@ -176,5 +240,26 @@ describe('BlueveryState', () => {
     test.todo(
       `Refactor: don't need to Reflect, change the implementation. ref:https://github.com/cerebral/overmind/issues/419`,
     );
+  });
+  describe('setCharacteristicValues', () => {
+    test('should set Peripheral', () => {
+      blueveryState.setCharacteristicValues([1, 2, 3]);
+      expect(blueveryState.getState().characteristicValues[0]).toEqual([
+        1,
+        2,
+        3,
+      ]);
+    });
+    test('should set order by push', () => {
+      const values = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+      ];
+      values.forEach((value) => blueveryState.setCharacteristicValues(value));
+      blueveryState.getState().characteristicValues.forEach((value, i) => {
+        expect(value).toEqual(values[i]);
+      });
+    });
   });
 });

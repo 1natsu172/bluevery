@@ -13,10 +13,12 @@ export class BlueveryState {
     },
     managing: false,
     connecting: false,
+    checkingCommunicateWithPeripheral: false,
     scanning: false,
+    receivingForCharacteristicValue: false,
     error: undefined,
     peripherals: new Map(),
-    // notificationListeners: any[],
+    characteristicValues: [],
   };
   #stateTree: ProxyStateTree<State>;
   #mutationState: IMutationTree<State>;
@@ -77,6 +79,27 @@ export class BlueveryState {
     this.#mutationState.state.scanning = false;
   }
 
+  onConnecting() {
+    this.#mutationState.state.connecting = true;
+  }
+  offConnecting() {
+    this.#mutationState.state.connecting = false;
+  }
+
+  onReceivingForCharacteristicValue() {
+    this.#mutationState.state.receivingForCharacteristicValue = true;
+  }
+  offReceivingForCharacteristicValue() {
+    this.#mutationState.state.receivingForCharacteristicValue = false;
+  }
+
+  onCheckingCommunicateWithPeripheral() {
+    this.#mutationState.state.checkingCommunicateWithPeripheral = true;
+  }
+  offCheckingCommunicateWithPeripheral() {
+    this.#mutationState.state.checkingCommunicateWithPeripheral = false;
+  }
+
   setPermissionGranted() {
     this.#mutationState.state.permissionGranted = {
       is: 'granted',
@@ -96,5 +119,9 @@ export class BlueveryState {
       peripheralInfo.id,
       peripheralInfo,
     );
+  }
+
+  setCharacteristicValues(value: unknown) {
+    this.#mutationState.state.characteristicValues.push(value);
   }
 }
