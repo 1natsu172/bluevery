@@ -20,7 +20,7 @@ export type State = {
   connecting: boolean;
   checkingCommunicateWithPeripheral: boolean;
   receivingForCharacteristicValue: boolean;
-  peripherals: Map<PeripheralId, PeripheralInfo>;
+  peripherals: {[key in PeripheralId]: PeripheralInfo};
   characteristicValues: Array<unknown>;
   error: Error | undefined;
 };

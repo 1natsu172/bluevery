@@ -25,7 +25,7 @@ describe('BlueveryState', () => {
               connecting: false,
               error: undefined,
               managing: false,
-              peripherals: new Map(),
+              peripherals: {},
               scanning: false,
               permissionGranted: {
                 is: 'ungranted',
@@ -233,13 +233,10 @@ describe('BlueveryState', () => {
         name: 'testPeripheral1',
       };
       blueveryState.setPeripheralToState(dummyPeripheralInfo);
-      expect(Reflect.get(blueveryState.getState().peripherals, '1')).toEqual(
+      expect(blueveryState.getState().peripherals['1']).toEqual(
         dummyPeripheralInfo,
       );
     });
-    test.todo(
-      `Refactor: don't need to Reflect, change the implementation. ref:https://github.com/cerebral/overmind/issues/419`,
-    );
   });
   describe('setCharacteristicValues', () => {
     test('should set Peripheral', () => {

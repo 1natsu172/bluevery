@@ -17,7 +17,7 @@ export class BlueveryState {
     scanning: false,
     receivingForCharacteristicValue: false,
     error: undefined,
-    peripherals: new Map(),
+    peripherals: {},
     characteristicValues: [],
   };
   #stateTree: ProxyStateTree<State>;
@@ -114,11 +114,7 @@ export class BlueveryState {
   }
 
   setPeripheralToState(peripheralInfo: PeripheralInfo) {
-    Reflect.set(
-      this.#mutationState.state.peripherals,
-      peripheralInfo.id,
-      peripheralInfo,
-    );
+    this.#mutationState.state.peripherals[peripheralInfo.id] = peripheralInfo;
   }
 
   setCharacteristicValues(value: unknown) {
