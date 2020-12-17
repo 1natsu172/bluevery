@@ -93,28 +93,53 @@ describe('BlueveryCore', () => {
           lack: ['ios.permission.BLUETOOTH_PERIPHERAL'],
         });
       });
-      test('should record `permissionGranted`', async () => {
-        mockedCheckPermission.mockImplementationOnce(async () => [
-          [],
-          ['ios.permission.BLUETOOTH_PERIPHERAL'],
-        ]);
-        mockedRequestPermission.mockImplementationOnce(async () => [[], []]);
+      describe('record `permissionGranted` pattern', () => {
+        test('should record `granted` when 1st check has granted', async () => {
+          mockedCheckPermission.mockImplementationOnce(async () => [
+            ['ios.permission.BLUETOOTH_PERIPHERAL'],
+            [],
+          ]);
 
-        // unSpy checkAndRequestPermission because want to test with substance method
-        spiedCheckAndRequestPermission.mockRestore();
-        blueveryCore = new BlueveryCore({BlueveryState});
+          // unSpy checkAndRequestPermission because want to test with substance method
+          spiedCheckAndRequestPermission.mockRestore();
+          blueveryCore = new BlueveryCore({BlueveryState});
 
-        // @ts-ignore ts(2341) access to private
-        expect(blueveryCore.getState().permissionGranted).toEqual({
-          is: 'unknown',
-          lack: [],
+          // @ts-ignore ts(2341) access to private
+          expect(blueveryCore.getState().permissionGranted).toEqual({
+            is: 'unknown',
+            lack: [],
+          });
+          // @ts-ignore ts(2341) access to private
+          await blueveryCore.checkAndRequestPermission();
+          // @ts-ignore ts(2341) access to private
+          expect(blueveryCore.getState().permissionGranted).toEqual({
+            is: 'granted',
+            lack: [],
+          });
         });
-        // @ts-ignore ts(2341) access to private
-        await blueveryCore.checkAndRequestPermission();
-        // @ts-ignore ts(2341) access to private
-        expect(blueveryCore.getState().permissionGranted).toEqual({
-          is: 'granted',
-          lack: [],
+        test('should record `granted` when 1st check has ungranted then granted by 2nd requested', async () => {
+          mockedCheckPermission.mockImplementationOnce(async () => [
+            [],
+            ['ios.permission.BLUETOOTH_PERIPHERAL'],
+          ]);
+          mockedRequestPermission.mockImplementationOnce(async () => [[], []]);
+
+          // unSpy checkAndRequestPermission because want to test with substance method
+          spiedCheckAndRequestPermission.mockRestore();
+          blueveryCore = new BlueveryCore({BlueveryState});
+
+          // @ts-ignore ts(2341) access to private
+          expect(blueveryCore.getState().permissionGranted).toEqual({
+            is: 'unknown',
+            lack: [],
+          });
+          // @ts-ignore ts(2341) access to private
+          await blueveryCore.checkAndRequestPermission();
+          // @ts-ignore ts(2341) access to private
+          expect(blueveryCore.getState().permissionGranted).toEqual({
+            is: 'granted',
+            lack: [],
+          });
         });
       });
     });

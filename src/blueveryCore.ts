@@ -115,6 +115,7 @@ export class BlueveryCore {
       }
       return [granted, requestedThenGranted, requestedButUngranted];
     }
+    this.#state.setPermissionGranted();
     return [granted];
   }
 
