@@ -16,6 +16,8 @@ import {
   View,
   Text,
   StatusBar,
+  TouchableOpacity,
+  FlatList,
 } from 'react-native';
 
 import {
@@ -25,31 +27,64 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-import {bluevery} from 'bluevery';
+import {bluevery, PeripheralInfo, State as BlueveryState} from 'bluevery';
+import {useState} from 'react';
+import {useCallback} from 'react';
 
 declare const global: {HermesInternal: null | {}};
 
-const App = () => {
-  useEffect(() => {
-    if (!bluevery.checkIsInitialized()) {
-      bluevery.init();
-    }
-    bluevery.listeners.stateListener.on((state) => {
-      console.log('current state…', state);
-    });
-    bluevery.startScan({
-      scanOptions: {
-        scanningSettings: [[], 1, true],
-        intervalLength: 1000,
-        iterations: 5,
-      },
-      // matchFn: (p) => !!p.id.match(new RegExp(/^634/)),
-    });
+export const BP_MONITOR_NAME_AND = 'A&D_UA-651BLE';
+export const BP_SERVICE_UUID = '1810';
+/**
+ * BLE(GATT)のキャラクタリスティックUUID: タイムスタンプ
+ */
+export const BP_DATETIME_CHARECTERISTIC_UUID = '2a08';
+/**
+ * BLE(GATT)のキャラクタリスティックUUID: 血圧測定データ
+ */
+export const BP_MEASUREMENT_CHARECTERISTIC_UUID = '2a35';
 
-    // return () => {
-    //   cleanup
-    // }
+const App = () => {
+  const [bleState, setBleState] = useState<BlueveryState>();
+
+  useEffect(() => {
+    const blue = async () => {
+      if (!bluevery.checkIsInitialized()) {
+        bluevery.init();
+      }
+      bluevery.listeners.stateListener.on((state) => {
+        setBleState(JSON.parse(JSON.stringify(state)));
+      });
+      await bluevery.startScan({
+        scanOptions: {
+          // scanningSettings: [[BP_SERVICE_UUID], 1, true],
+          scanningSettings: [[], 1, true],
+          intervalLength: 1000,
+          iterations: 5,
+        },
+        // discoverHandler: (peripheral) => {
+        //   console.log('discovered peripheral', peripheral);
+        // },
+        // matchFn: (p) => !!p.id.match(new RegExp(/^BP_SERVICE_UUID/)),
+      });
+      // return () => {
+      //   cleanup
+      // }
+    };
+    blue();
   }, []);
+  const onSelectPeripheral = useCallback(
+    async (peripheralInfo: PeripheralInfo) => {
+      await bluevery.connect({
+        connectParams: {connectParams: [peripheralInfo.id]},
+        retrieveServicesParams: {retrieveServicesParams: [peripheralInfo.id]},
+        bondingParams: {
+          createBondParams: [peripheralInfo.id, peripheralInfo.id],
+        },
+      });
+    },
+    [],
+  );
 
   return (
     <>
@@ -64,6 +99,17 @@ const App = () => {
               <Text style={styles.footer}>Engine: Hermes</Text>
             </View>
           )}
+          <FlatList
+            ListEmptyComponent={() => <Text>no list</Text>}
+            data={bleState ? Object.values(bleState?.peripherals) : null}
+            renderItem={({item}) => (
+              <TouchableOpacity
+                key={item.id}
+                onPress={() => onSelectPeripheral(item)}>
+                <Text>{item.name}</Text>
+              </TouchableOpacity>
+            )}
+          />
           <View style={styles.body}>
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Step One</Text>
