@@ -100,6 +100,7 @@ export class Bluevery {
     const omoiyariIntervalScan = applyOmoiyari(intervalScan, {
       time: DEFAULT_OMOIYARI_TIME,
     });
+    this.#core.clearPeripheralsOfState();
     await omoiyariIntervalScan();
   }
 

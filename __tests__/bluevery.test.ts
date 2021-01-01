@@ -72,12 +72,14 @@ describe('bluevery: commands APIs', () => {
   describe('startScan', () => {
     jest.useFakeTimers();
     const scanFn = jest.fn();
-    const core = jest.fn().mockImplementation(() => ({
+    const clearPeripheralsOfStateFn = jest.fn();
+    const core = (jest.fn().mockImplementation(() => ({
       scan: scanFn,
-    }));
+      clearPeripheralsOfState: clearPeripheralsOfStateFn,
+    })) as unknown) as typeof BlueveryCore;
 
     beforeEach(() => {
-      scanFn.mockClear();
+      jest.clearAllMocks();
       bluevery = new Bluevery({BlueveryCore: core, BlueveryState});
     });
     describe('interval', () => {
@@ -188,6 +190,19 @@ describe('bluevery: commands APIs', () => {
         );
         // called after being omoiyari
         expect(subsequentProcessing).toHaveBeenCalledTimes(1);
+      });
+    });
+    describe('startScan: check calls', () => {
+      test('should call #core.clearPeripheralsOfState', async () => {
+        bluevery.startScan({
+          scanOptions: {
+            scanningSettings: [[], 1, true],
+            intervalLength: 0,
+            iterations: 1,
+          },
+        });
+        jest.runAllTimers();
+        expect(clearPeripheralsOfStateFn).toBeCalledTimes(1);
       });
     });
   });
