@@ -4,8 +4,8 @@ import {eventmit, Eventmitter} from 'eventmit';
 import autoBind from 'auto-bind';
 import {Permission} from 'react-native-permissions';
 
-export class BlueveryState {
-  #_initialState: State = {
+function createInitialState(overrideState?: Partial<State>): State {
+  return {
     bluetoothEnabled: false,
     permissionGranted: {
       is: 'unknown',
@@ -19,7 +19,12 @@ export class BlueveryState {
     error: undefined,
     peripherals: {},
     characteristicValues: [],
+    ...overrideState,
   };
+}
+
+export class BlueveryState {
+  #_savedInitialState: State;
   #stateTree: ProxyStateTree<State>;
   #mutationState: IMutationTree<State>;
   #trackState: ITrackStateTree<State>;
@@ -34,13 +39,14 @@ export class BlueveryState {
     onChangeStateHandler?: (...args: unknown[]) => unknown;
   }) {
     this.stateEmitter = eventmit<State>();
-    this.#stateTree = new ProxyStateTree(initialState || this.#_initialState);
+    this.#stateTree = new ProxyStateTree(createInitialState(initialState));
     this.#trackState = this.#stateTree.getTrackStateTree();
     this.#mutationState = this.#stateTree.getMutationTree();
     this.#mutationState.onMutation(() => {
       this.emitState();
       onChangeStateHandler && onChangeStateHandler();
     });
+    this.#_savedInitialState = createInitialState(initialState);
     autoBind(this);
   }
 
@@ -115,6 +121,9 @@ export class BlueveryState {
 
   setPeripheralToState(peripheralInfo: PeripheralInfo) {
     this.#mutationState.state.peripherals[peripheralInfo.id] = peripheralInfo;
+  }
+  clearPeripherals() {
+    this.#mutationState.state.peripherals = this.#_savedInitialState.peripherals;
   }
 
   setCharacteristicValues(value: unknown) {

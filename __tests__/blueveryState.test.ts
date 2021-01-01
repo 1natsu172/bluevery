@@ -238,6 +238,24 @@ describe('BlueveryState', () => {
       );
     });
   });
+  describe('clearPeripherals', () => {
+    test('should clear current Peripherals', () => {
+      const dummyPeripheralInfo: PeripheralInfo = {
+        id: '1',
+        rssi: 1,
+        advertising: {},
+        name: 'testPeripheral1',
+      };
+      blueveryState.setPeripheralToState(dummyPeripheralInfo);
+      expect(Object.values(blueveryState.getState().peripherals)).toHaveLength(
+        1,
+      );
+      blueveryState.clearPeripherals();
+      expect(Object.values(blueveryState.getState().peripherals)).toHaveLength(
+        0,
+      );
+    });
+  });
   describe('setCharacteristicValues', () => {
     test('should set Peripheral', () => {
       blueveryState.setCharacteristicValues([1, 2, 3]);
