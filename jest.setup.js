@@ -11,5 +11,7 @@ jest.mock('react-native-ble-manager', () => {
     start: jest.fn(async () => {}),
     scan: jest.fn(async () => {}),
     stopScan: jest.fn(async () => {}),
+    getConnectedPeripherals: jest.fn(async () => []),
+    getBondedPeripherals: jest.fn(async () => []),
   };
 });

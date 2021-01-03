@@ -1,4 +1,4 @@
-import {State, PeripheralInfo} from './interface';
+import {State, PeripheralInfo, PeripheralId} from './interface';
 import {IMutationTree, ITrackStateTree, ProxyStateTree} from 'proxy-state-tree';
 import {eventmit, Eventmitter} from 'eventmit';
 import autoBind from 'auto-bind';
@@ -18,6 +18,7 @@ function createInitialState(overrideState?: Partial<State>): State {
     receivingForCharacteristicValue: false,
     error: undefined,
     peripherals: {},
+    connectedPeripherals: {},
     characteristicValues: [],
     ...overrideState,
   };
@@ -51,7 +52,7 @@ export class BlueveryState {
   }
 
   /**
-   * premitive
+   * ↓ primitive
    */
   emitState() {
     this.stateEmitter.emit(this.getState());
@@ -59,6 +60,21 @@ export class BlueveryState {
 
   getState() {
     return this.#trackState.state;
+  }
+
+  /**
+   * reset to initial state
+   */
+  resetState() {
+    this.#mutationState.state = this.#_savedInitialState;
+  }
+
+  /**
+   * re-initialize state by new initial state
+   */
+  reInitState(newInitialState: State) {
+    this.#_savedInitialState = newInitialState;
+    this.#mutationState.state = newInitialState;
   }
 
   /**
@@ -124,6 +140,29 @@ export class BlueveryState {
   }
   clearPeripherals() {
     this.#mutationState.state.peripherals = this.#_savedInitialState.peripherals;
+  }
+
+  setPeripheralToConnectedPeripherals(peripheralInfo: PeripheralInfo) {
+    this.#mutationState.state.connectedPeripherals[
+      peripheralInfo.id
+    ] = peripheralInfo;
+  }
+  deletePeripheralFromConnectedPeripherals(peripheralId: PeripheralId) {
+    delete this.#mutationState.state.connectedPeripherals[peripheralId];
+  }
+
+  setPeripheralIsBonded(peripheralInfo: PeripheralInfo) {
+    const existedPeripheral = this.#trackState.state.connectedPeripherals[
+      peripheralInfo.id
+    ];
+    const processedPeripheral: PeripheralInfo = {
+      ...peripheralInfo,
+      ...existedPeripheral,
+      bonded: true,
+    };
+    this.#mutationState.state.connectedPeripherals[
+      peripheralInfo.id
+    ] = processedPeripheral;
   }
 
   setCharacteristicValues(value: unknown) {

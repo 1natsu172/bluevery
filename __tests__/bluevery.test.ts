@@ -27,10 +27,10 @@ describe('truthExportedBluevery', () => {
 
 describe('bluevery: primitive APIs', () => {
   describe('checkIsInitialized', () => {
-    test('should return isInitialized', () => {
+    test('should return isInitialized', async () => {
       const actual = bluevery.checkIsInitialized();
       expect(actual).toBe(false);
-      bluevery.init();
+      await bluevery.init();
       const actualThenInitialized = bluevery.checkIsInitialized();
       expect(actualThenInitialized).toBe(true);
     });
@@ -55,7 +55,7 @@ describe('bluevery: primitive APIs', () => {
   });
 
   describe('stopBluevery', () => {
-    test.skip('should reset bluevery completely ', () => {});
+    test.todo('should reset bluevery completely');
   });
 });
 

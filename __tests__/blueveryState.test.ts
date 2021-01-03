@@ -26,6 +26,7 @@ describe('BlueveryState', () => {
               error: undefined,
               managing: false,
               peripherals: {},
+              connectedPeripherals: {},
               scanning: false,
               permissionGranted: {
                 is: 'ungranted',
@@ -256,6 +257,75 @@ describe('BlueveryState', () => {
       );
     });
   });
+  describe('setPeripheralToConnectedPeripherals', () => {
+    test('should set peripheral to connectedPeripherals', () => {
+      const dummyPeripheralInfo: PeripheralInfo = {
+        id: '1',
+        rssi: 1,
+        advertising: {},
+        name: 'testConnectedPeripheral1',
+      };
+      blueveryState.setPeripheralToConnectedPeripherals(dummyPeripheralInfo);
+      expect(blueveryState.getState().connectedPeripherals['1']).toEqual(
+        dummyPeripheralInfo,
+      );
+    });
+  });
+  describe('deletePeripheralFromConnectedPeripherals', () => {
+    test('should delete peripheral from conectedPeripherals', () => {
+      const dummyPeripheralInfo: PeripheralInfo = {
+        id: '1',
+        rssi: 1,
+        advertising: {},
+        name: 'testWillDisconnectPeripheral1',
+      };
+      blueveryState.setPeripheralToConnectedPeripherals(dummyPeripheralInfo);
+      expect(blueveryState.getState().connectedPeripherals).toHaveProperty('1');
+      blueveryState.deletePeripheralFromConnectedPeripherals(
+        dummyPeripheralInfo.id,
+      );
+      expect(blueveryState.getState().connectedPeripherals).not.toHaveProperty(
+        '1',
+      );
+    });
+  });
+
+  describe('setPeripheralIsBonded', () => {
+    const dummyPeripheralInfo: PeripheralInfo = {
+      id: '1',
+      rssi: 1,
+      advertising: {},
+      name: 'testPeripheral1',
+    };
+    test('should set bonded property to peripheralInfo ', () => {
+      blueveryState.setPeripheralToConnectedPeripherals(dummyPeripheralInfo);
+      expect(blueveryState.getState().connectedPeripherals['1']).toHaveProperty(
+        'bonded',
+        undefined,
+      );
+      blueveryState.setPeripheralIsBonded(dummyPeripheralInfo);
+      expect(blueveryState.getState().connectedPeripherals['1']).toHaveProperty(
+        'bonded',
+        true,
+      );
+    });
+    test('should set peripheral if not already exist peripheral in connectedPeripherals', () => {
+      expect(blueveryState.getState().connectedPeripherals).not.toHaveProperty(
+        '1',
+      );
+      blueveryState.setPeripheralIsBonded(dummyPeripheralInfo);
+      expect(blueveryState.getState().connectedPeripherals).toHaveProperty('1');
+      expect(blueveryState.getState().connectedPeripherals).toHaveProperty(
+        '1.name',
+        'testPeripheral1',
+      );
+      expect(blueveryState.getState().connectedPeripherals).toHaveProperty(
+        '1.bonded',
+        true,
+      );
+    });
+  });
+
   describe('setCharacteristicValues', () => {
     test('should set Peripheral', () => {
       blueveryState.setCharacteristicValues([1, 2, 3]);
