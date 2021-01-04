@@ -3,6 +3,7 @@ import {IMutationTree, ITrackStateTree, ProxyStateTree} from 'proxy-state-tree';
 import {eventmit, Eventmitter} from 'eventmit';
 import autoBind from 'auto-bind';
 import {Permission} from 'react-native-permissions';
+import {Peripheral} from 'react-native-ble-manager';
 
 function createInitialState(overrideState?: Partial<State>): State {
   return {
@@ -12,14 +13,10 @@ function createInitialState(overrideState?: Partial<State>): State {
       lack: [],
     },
     managing: false,
-    connecting: false,
-    checkingCommunicateWithPeripheral: false,
     scanning: false,
-    receivingForCharacteristicValue: false,
     error: undefined,
-    peripherals: {},
-    connectedPeripherals: {},
-    characteristicValues: [],
+    scannedPeripherals: {},
+    managingPeripherals: {},
     ...overrideState,
   };
 }
@@ -63,6 +60,36 @@ export class BlueveryState {
   }
 
   /**
+   * @description safe setter of the undefined key-value
+   */
+  setPeripheralInfoToManagingPeripherals(
+    peripheralId: PeripheralId,
+    peripheralInfo: Partial<PeripheralInfo>,
+  ) {
+    const existedPeripheral = this.#trackState.state.managingPeripherals[
+      peripheralId
+    ];
+    const processedPeripheral: PeripheralInfo = {
+      ...existedPeripheral,
+      ...peripheralInfo,
+    };
+    this.#mutationState.state.managingPeripherals[
+      peripheralId
+    ] = processedPeripheral;
+  }
+
+  /**
+   * @description setProperty util method
+   */
+  private setManagingPeripheralInfoProperty<Key extends keyof PeripheralInfo>(
+    peripheralId: PeripheralId,
+    key: Key,
+    value: PeripheralInfo[Key],
+  ) {
+    this.setPeripheralInfoToManagingPeripherals(peripheralId, {[key]: value});
+  }
+
+  /**
    * reset to initial state
    */
   resetState() {
@@ -78,7 +105,7 @@ export class BlueveryState {
   }
 
   /**
-   * state change handlers
+   * ↓ state change handlers
    */
   onManaging() {
     this.#mutationState.state.managing = true;
@@ -101,25 +128,59 @@ export class BlueveryState {
     this.#mutationState.state.scanning = false;
   }
 
-  onConnecting() {
-    this.#mutationState.state.connecting = true;
+  setManagingPeripheralConnecting(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(
+      peripheralId,
+      'connect',
+      'connecting',
+    );
   }
-  offConnecting() {
-    this.#mutationState.state.connecting = false;
+  setManagingPeripheralConnected(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(
+      peripheralId,
+      'connect',
+      'connected',
+    );
+  }
+  setManagingPeripheralDisconnected(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(
+      peripheralId,
+      'connect',
+      'disconnected',
+    );
+  }
+  setManagingPeripheralFailedConnect(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(peripheralId, 'connect', 'failed');
   }
 
-  onReceivingForCharacteristicValue() {
-    this.#mutationState.state.receivingForCharacteristicValue = true;
+  onReceivingForCharacteristicValue(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(
+      peripheralId,
+      'receivingForCharacteristicValue',
+      true,
+    );
   }
-  offReceivingForCharacteristicValue() {
-    this.#mutationState.state.receivingForCharacteristicValue = false;
+  offReceivingForCharacteristicValue(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(
+      peripheralId,
+      'receivingForCharacteristicValue',
+      false,
+    );
   }
 
-  onCheckingCommunicateWithPeripheral() {
-    this.#mutationState.state.checkingCommunicateWithPeripheral = true;
+  onCheckingCommunicateWithPeripheral(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(
+      peripheralId,
+      'checkingCommunicate',
+      true,
+    );
   }
-  offCheckingCommunicateWithPeripheral() {
-    this.#mutationState.state.checkingCommunicateWithPeripheral = false;
+  offCheckingCommunicateWithPeripheral(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(
+      peripheralId,
+      'checkingCommunicate',
+      false,
+    );
   }
 
   setPermissionGranted() {
@@ -135,37 +196,24 @@ export class BlueveryState {
     };
   }
 
-  setPeripheralToState(peripheralInfo: PeripheralInfo) {
-    this.#mutationState.state.peripherals[peripheralInfo.id] = peripheralInfo;
+  setPeripheralToScannedPeripherals(peripheral: Peripheral) {
+    this.#mutationState.state.scannedPeripherals[peripheral.id] = peripheral;
   }
-  clearPeripherals() {
-    this.#mutationState.state.peripherals = this.#_savedInitialState.peripherals;
-  }
-
-  setPeripheralToConnectedPeripherals(peripheralInfo: PeripheralInfo) {
-    this.#mutationState.state.connectedPeripherals[
-      peripheralInfo.id
-    ] = peripheralInfo;
-  }
-  deletePeripheralFromConnectedPeripherals(peripheralId: PeripheralId) {
-    delete this.#mutationState.state.connectedPeripherals[peripheralId];
+  clearScannedPeripherals() {
+    this.#mutationState.state.scannedPeripherals = this.#_savedInitialState.scannedPeripherals;
   }
 
-  setPeripheralIsBonded(peripheralInfo: PeripheralInfo) {
-    const existedPeripheral = this.#trackState.state.connectedPeripherals[
-      peripheralInfo.id
-    ];
-    const processedPeripheral: PeripheralInfo = {
-      ...peripheralInfo,
-      ...existedPeripheral,
-      bonded: true,
-    };
-    this.#mutationState.state.connectedPeripherals[
-      peripheralInfo.id
-    ] = processedPeripheral;
+  setPeripheralToManagingPeripherals(peripheralInfo: PeripheralInfo) {
+    this.setPeripheralInfoToManagingPeripherals(
+      peripheralInfo.id,
+      peripheralInfo,
+    );
+  }
+  deletePeripheralFromManagingPeripherals(peripheralId: PeripheralId) {
+    delete this.#mutationState.state.managingPeripherals[peripheralId];
   }
 
-  setCharacteristicValues(value: unknown) {
-    this.#mutationState.state.characteristicValues.push(value);
+  setPeripheralIsBonded(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(peripheralId, 'bonded', true);
   }
 }

@@ -32,7 +32,6 @@ import {useState} from 'react';
 import {useCallback} from 'react';
 
 declare const global: {HermesInternal: null | {}};
-
 export const BP_MONITOR_NAME_AND = 'A&D_UA-651BLE';
 export const BP_SERVICE_UUID = '1810';
 /**
@@ -44,16 +43,38 @@ export const BP_DATETIME_CHARECTERISTIC_UUID = '2a08';
  */
 export const BP_MEASUREMENT_CHARECTERISTIC_UUID = '2a35';
 
+/**
+ * Dateを以下の形式のbyte arrayに変換する
+ * |year (16bit)|month(8bit)|day(8bit)|hours(8bit)|minutes(8bit)|seconds(8bit)|
+ */
+export const timeToByteArray = (d: Date) => {
+  const year = d.getFullYear();
+  const month = d.getMonth() + 1;
+  const day = d.getDate();
+  const hours = d.getHours();
+  const minutes = d.getMinutes();
+  const seconds = d.getSeconds();
+  const yearData = new Uint8Array(new Uint16Array([year]).buffer); // 16bit -> 8bit array
+
+  const otherData = new Uint8Array([month, day, hours, minutes, seconds]);
+  return [...Array.from(yearData), ...Array.from(otherData)];
+};
+
 const App = () => {
   const [bleState, setBleState] = useState<BlueveryState>();
 
   useEffect(() => {
     const blue = async () => {
       if (!bluevery.checkIsInitialized()) {
-        bluevery.init();
+        bluevery.init({
+          onDisconnectPeripheralHandler: (p) => {
+            console.log(`${p.peripheral} is dosconnected`);
+          },
+        });
       }
       bluevery.listeners.stateListener.on((state) => {
         setBleState(JSON.parse(JSON.stringify(state)));
+        console.log('state', JSON.parse(JSON.stringify(state)));
       });
       await bluevery.startScan({
         scanOptions: {
@@ -73,6 +94,43 @@ const App = () => {
     };
     blue();
   }, []);
+  const receiveCharacteristicValue = useCallback(
+    async (peripheralInfo: PeripheralInfo) => {
+      await bluevery.receiveCharacteristicValue({
+        scanParams: {
+          scanOptions: {
+            scanningSettings: [[], 1, true],
+          },
+        },
+        connectParams: {connectParams: [peripheralInfo.id]},
+        retrieveServicesParams: {retrieveServicesParams: [peripheralInfo.id]},
+        bondingParams: {
+          createBondParams: [peripheralInfo.id, peripheralInfo.id],
+        },
+        readValueParams: {
+          readValueParams: [
+            peripheralInfo.id,
+            BP_SERVICE_UUID,
+            BP_DATETIME_CHARECTERISTIC_UUID,
+          ],
+        },
+        writeValueParams: {
+          writeValueParams: [
+            peripheralInfo.id,
+            BP_SERVICE_UUID,
+            BP_DATETIME_CHARECTERISTIC_UUID,
+            timeToByteArray(new Date()),
+          ],
+        },
+        startNotificationParams: [
+          peripheralInfo.id,
+          BP_SERVICE_UUID,
+          BP_MEASUREMENT_CHARECTERISTIC_UUID,
+        ],
+      });
+    },
+    [],
+  );
   const onSelectPeripheral = useCallback(
     async (peripheralInfo: PeripheralInfo) => {
       await bluevery.connect({
@@ -82,8 +140,9 @@ const App = () => {
           createBondParams: [peripheralInfo.id, peripheralInfo.id],
         },
       });
+      await receiveCharacteristicValue(peripheralInfo);
     },
-    [],
+    [receiveCharacteristicValue],
   );
 
   return (
@@ -101,12 +160,14 @@ const App = () => {
           )}
           <FlatList
             ListEmptyComponent={() => <Text>no list</Text>}
-            data={bleState ? Object.values(bleState?.peripherals) : null}
+            data={bleState ? Object.values(bleState?.scannedPeripherals) : null}
             renderItem={({item}) => (
               <TouchableOpacity
+                style={{marginBottom: 10}}
                 key={item.id}
                 onPress={() => onSelectPeripheral(item)}>
-                <Text>{item.name}</Text>
+                <Text>{`${item.name}`}</Text>
+                <Text>{`${item.id}`}</Text>
               </TouchableOpacity>
             )}
           />

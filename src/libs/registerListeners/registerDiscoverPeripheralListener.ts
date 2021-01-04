@@ -4,14 +4,16 @@ import {Peripheral} from 'react-native-ble-manager';
 import {PeripheralInfo} from '../../interface';
 
 export const createPeripheralInfoHandler = ({
-  setPeripheralToState,
+  setPeripheralToScannedPeripherals,
   handlePeripheralInfo,
 }: {
-  setPeripheralToState: (peripheralInfo: PeripheralInfo) => unknown;
+  setPeripheralToScannedPeripherals: (
+    peripheralInfo: PeripheralInfo,
+  ) => unknown;
   handlePeripheralInfo?: (peripheralInfo: PeripheralInfo) => unknown;
 }) => (peripheralInfo: PeripheralInfo) => {
   // set peripheral to state.
-  setPeripheralToState(peripheralInfo);
+  setPeripheralToScannedPeripherals(peripheralInfo);
   // call passed handler by user.
   handlePeripheralInfo && handlePeripheralInfo(peripheralInfo);
 };

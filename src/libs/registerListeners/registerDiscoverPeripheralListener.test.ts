@@ -23,13 +23,11 @@ const samplePeripheralInfo: PeripheralInfo = {
   id: '42',
   rssi: 42,
   advertising: {isConnectable: true},
-  connected: true,
 };
 const sampleUnknownPeripheralInfo: PeripheralInfo = {
   id: '42',
   rssi: 42,
   advertising: {isConnectable: true},
-  connected: true,
 };
 
 beforeEach(() => {
@@ -37,24 +35,24 @@ beforeEach(() => {
 });
 
 describe('createPeripheralInfoHandler,', () => {
-  const setPeripheralToState = jest.fn();
+  const setPeripheralToScannedPeripherals = jest.fn();
   const handlePeripheralInfo = jest.fn();
 
   test('should call passed functions', () => {
     const handler = createPeripheralInfoHandler({
-      setPeripheralToState,
+      setPeripheralToScannedPeripherals,
       handlePeripheralInfo,
     });
     handler(samplePeripheralInfo);
-    expect(setPeripheralToState).toBeCalledTimes(1);
+    expect(setPeripheralToScannedPeripherals).toBeCalledTimes(1);
     expect(handlePeripheralInfo).toBeCalledTimes(1);
   });
   test('should handlePeripheralInfo is optional', () => {
     const handler = createPeripheralInfoHandler({
-      setPeripheralToState,
+      setPeripheralToScannedPeripherals,
     });
     handler(samplePeripheralInfo);
-    expect(setPeripheralToState).toBeCalledTimes(1);
+    expect(setPeripheralToScannedPeripherals).toBeCalledTimes(1);
     expect(handlePeripheralInfo).not.toBeCalled();
   });
 });

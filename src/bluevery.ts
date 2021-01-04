@@ -8,9 +8,18 @@ import {
   Listeners,
   PeripheralInfo,
   ScanningSettings,
+  StartNotificationParams,
 } from './interface';
-import {applyOmoiyari} from './libs';
+import {
+  applyOmoiyari,
+  BondingParams,
+  ConnectParams,
+  ReadValueParams,
+  RetrieveServicesParams,
+  WriteValueParams,
+} from './libs';
 import {DEFAULT_OMOIYARI_TIME} from './utils/constants';
+import delay from 'delay';
 
 type ConstructorArgs = {
   BlueveryCore: typeof _BlueveryCore;
@@ -50,13 +59,11 @@ export class Bluevery {
    * ↓ Commands API
    */
 
-  init(blueveryOptions?: BlueveryOptions) {
+  async init(blueveryOptions?: BlueveryOptions) {
     if (this.checkIsInitialized()) {
       return;
     }
-    if (blueveryOptions) {
-      this.#core.setUserDefinedOptions(blueveryOptions);
-    }
+    await this.#core.init(blueveryOptions);
     this.#initialized = true;
   }
 
@@ -100,19 +107,98 @@ export class Bluevery {
     const omoiyariIntervalScan = applyOmoiyari(intervalScan, {
       time: DEFAULT_OMOIYARI_TIME,
     });
-    this.#core.clearPeripheralsOfState();
+    this.#core.clearScannedPeripherals();
     await omoiyariIntervalScan();
   }
 
-  connect() {
-    return {
-      isConnecting: true,
-    };
+  async connect({
+    connectParams,
+    bondingParams,
+    retrieveServicesParams,
+  }: {
+    connectParams: ConnectParams;
+    retrieveServicesParams: RetrieveServicesParams;
+    bondingParams: BondingParams;
+  }) {
+    await this.#core.connect({
+      connectParams,
+      bondingParams,
+      retrieveServicesParams,
+    });
   }
 
-  receiveCharacteristicValue() {
-    return {
-      rawData: [],
-    };
+  async connectAndCheckCommunicate({
+    connectParams,
+    bondingParams,
+    retrieveServicesParams,
+    readValueParams,
+    writeValueParams,
+  }: {
+    connectParams: ConnectParams;
+    retrieveServicesParams: RetrieveServicesParams;
+    bondingParams: BondingParams;
+    writeValueParams: WriteValueParams;
+    readValueParams: ReadValueParams;
+  }) {
+    await this.#core.connect({
+      connectParams,
+      bondingParams,
+      retrieveServicesParams,
+    });
+    await this.#core.checkCommunicateWithPeripheral({
+      readValueParams,
+      writeValueParams,
+    });
   }
+
+  // FIXME: conditional typeにする
+  async receiveCharacteristicValue({
+    scanParams,
+    startNotificationParams,
+    connectParams,
+    retrieveServicesParams,
+    bondingParams,
+    writeValueParams,
+    readValueParams,
+    checkCommunicate = true,
+  }: {
+    scanParams: Parameters<InstanceType<typeof Bluevery>['startScan']>[0];
+    startNotificationParams: StartNotificationParams;
+    connectParams: ConnectParams;
+    retrieveServicesParams: RetrieveServicesParams;
+    bondingParams: BondingParams;
+    writeValueParams: WriteValueParams;
+    readValueParams: ReadValueParams;
+    checkCommunicate?: boolean;
+  }) {
+    const [targetPeripheralId] = connectParams.connectParams;
+
+    do {
+      await this.startScan(scanParams);
+    } while (
+      // receive対象のperipheralが見つからなければdoし続ける(見つかるまでscanを繰り返す)
+      this.#core.getState().scannedPeripherals[targetPeripheralId] === undefined
+    );
+
+    if (checkCommunicate) {
+      await this.connectAndCheckCommunicate({
+        connectParams,
+        bondingParams,
+        readValueParams,
+        retrieveServicesParams,
+        writeValueParams,
+      });
+    } else {
+      await this.connect({
+        connectParams,
+        bondingParams,
+        retrieveServicesParams,
+      });
+    }
+    await this.#core.startNotification({startNotificationParams});
+  }
+
+  async readValue() {}
+
+  async writeValue() {}
 }
