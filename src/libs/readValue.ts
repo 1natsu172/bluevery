@@ -34,7 +34,7 @@ export async function readValue(
   readValueParams: ReadValueParams,
 ) {
   const {retryParams} = readValueParams;
-  await promiseRetry(() => tryReadValueFn(readValueParams), {
+  return await promiseRetry(() => tryReadValueFn(readValueParams), {
     retries: 5,
     factor: 1,
     ...retryParams,
