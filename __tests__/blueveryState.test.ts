@@ -266,6 +266,18 @@ describe('BlueveryState', () => {
         ).toHaveProperty('bonded', true);
       });
     });
+    describe('managingPeripherals:receivingForCharacteristicValueListener', () => {
+      test('should set bonded property to peripheralInfo ', () => {
+        blueveryState.setPeripheralToManagingPeripherals(dummyPeripheralInfo);
+        expect(
+          blueveryState.getState().managingPeripherals['1'],
+        ).toHaveProperty('bonded', undefined);
+        blueveryState.setPeripheralIsBonded(dummyPeripheralInfo.id);
+        expect(
+          blueveryState.getState().managingPeripherals['1'],
+        ).toHaveProperty('bonded', true);
+      });
+    });
   });
 
   describe('setPermissionGranted', () => {
