@@ -1,4 +1,5 @@
 import {Eventmitter} from 'eventmit';
+import {EmitterSubscription} from 'react-native';
 import BleManager, {Peripheral} from 'react-native-ble-manager';
 import {Permission} from 'react-native-permissions';
 import {DisconnectedPeripheralHandler} from './libs';
@@ -30,6 +31,11 @@ export type State = {
 };
 
 export type Listeners = {stateListener: Eventmitter<State>};
+export type PublicListeners = {
+  [key in PeripheralId]: {
+    receivingForCharacteristicValueListener?: EmitterSubscription;
+  };
+};
 
 export type BlueveryEvents = 'didChangeBlueveryState';
 

@@ -17,6 +17,7 @@ import {
   State,
   StartNotificationParams,
   StopNotificationParams,
+  PublicListeners,
 } from './interface';
 import {
   checkBluetoothEnabled,
@@ -115,8 +116,8 @@ export class BlueveryCore {
    * @property listeners
    */
   #discoverPeripheralListener?: EmitterSubscription;
-  #notificationValueForCharacteristicListener?: EmitterSubscription;
   #disconnectPeripheralListener?: EmitterSubscription;
+  publicListeners: PublicListeners = {};
 
   setUserDefinedOptions(options: BlueveryOptions) {
     this.#userDefinedOptions = options;
@@ -309,8 +310,10 @@ export class BlueveryCore {
     /**
      * startNotificationが複数回呼ばれた場合listenerを一度破棄しておく
      */
-    if (this.#notificationValueForCharacteristicListener) {
-      this.#notificationValueForCharacteristicListener.remove();
+    if (this.publicListeners[peripheralId]) {
+      this.publicListeners[
+        peripheralId
+      ].receivingForCharacteristicValueListener?.remove();
       this.#state.offReceivingForCharacteristicValue(peripheralId);
     }
 
@@ -320,7 +323,9 @@ export class BlueveryCore {
         // TODO: リスナーのハンドラ実装する
       },
     );
-    this.#notificationValueForCharacteristicListener = notificationListener;
+    this.publicListeners[
+      peripheralId
+    ].receivingForCharacteristicValueListener = notificationListener;
     await BleManager.startNotification(...startNotificationParams);
     this.#state.onReceivingForCharacteristicValue(peripheralId);
   }
@@ -333,7 +338,9 @@ export class BlueveryCore {
     const [peripheralId] = stopNotificationParams;
     return Promise.all([
       BleManager.stopNotification(...stopNotificationParams),
-      this.#notificationValueForCharacteristicListener?.remove(),
+      this.publicListeners[
+        peripheralId
+      ].receivingForCharacteristicValueListener?.remove(),
       this.#state.offReceivingForCharacteristicValue(peripheralId),
     ]);
   }
