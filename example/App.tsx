@@ -27,8 +27,7 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-import {bluevery, PeripheralInfo, State as BlueveryState} from 'bluevery';
-import {useState} from 'react';
+import {bluevery, PeripheralInfo, useBlueveryState} from 'bluevery';
 import {useCallback} from 'react';
 
 declare const global: {HermesInternal: null | {}};
@@ -61,7 +60,8 @@ export const timeToByteArray = (d: Date) => {
 };
 
 const App = () => {
-  const [bleState, setBleState] = useState<BlueveryState>();
+  // const [bleState, setBleState] = useState<BlueveryState>();
+  const bleState = useBlueveryState();
 
   useEffect(() => {
     const blue = async () => {
@@ -72,10 +72,6 @@ const App = () => {
           },
         });
       }
-      bluevery.listeners.stateListener.on((state) => {
-        setBleState(JSON.parse(JSON.stringify(state)));
-        console.log('state', JSON.parse(JSON.stringify(state)));
-      });
       await bluevery.startScan({
         scanOptions: {
           // scanningSettings: [[BP_SERVICE_UUID], 1, true],

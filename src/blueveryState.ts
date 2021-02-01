@@ -1,6 +1,5 @@
 import {State, PeripheralInfo, PeripheralId} from './interface';
-import {IMutationTree, ITrackStateTree, ProxyStateTree} from 'proxy-state-tree';
-import {eventmit, Eventmitter} from 'eventmit';
+import {proxy, snapshot, subscribe} from 'valtio';
 import autoBind from 'auto-bind';
 import {Permission} from 'react-native-permissions';
 import {Peripheral} from 'react-native-ble-manager';
@@ -23,11 +22,8 @@ function createInitialState(overrideState?: Partial<State>): State {
 
 export class BlueveryState {
   #_savedInitialState: State;
-  #stateTree: ProxyStateTree<State>;
-  #mutationState: IMutationTree<State>;
-  #trackState: ITrackStateTree<State>;
-
-  stateEmitter: Eventmitter<State>;
+  mutationState: State;
+  #unsubscribeTheState: () => void;
 
   constructor({
     initialState,
@@ -36,14 +32,14 @@ export class BlueveryState {
     initialState?: State;
     onChangeStateHandler?: (...args: unknown[]) => unknown;
   }) {
-    this.stateEmitter = eventmit<State>();
-    this.#stateTree = new ProxyStateTree(createInitialState(initialState));
-    this.#trackState = this.#stateTree.getTrackStateTree();
-    this.#mutationState = this.#stateTree.getMutationTree();
-    this.#mutationState.onMutation(() => {
-      this.emitState();
-      onChangeStateHandler && onChangeStateHandler();
-    });
+    this.mutationState = proxy(createInitialState(initialState));
+    this.#unsubscribeTheState = subscribe(
+      this.mutationState,
+      () => {
+        onChangeStateHandler && onChangeStateHandler();
+      },
+      true,
+    );
     this.#_savedInitialState = createInitialState(initialState);
     autoBind(this);
   }
@@ -51,12 +47,8 @@ export class BlueveryState {
   /**
    * ↓ primitive
    */
-  emitState() {
-    this.stateEmitter.emit(this.getState());
-  }
-
   getState() {
-    return this.#trackState.state;
+    return snapshot(this.mutationState);
   }
 
   /**
@@ -66,16 +58,12 @@ export class BlueveryState {
     peripheralId: PeripheralId,
     peripheralInfo: Partial<PeripheralInfo>,
   ) {
-    const existedPeripheral = this.#trackState.state.managingPeripherals[
-      peripheralId
-    ];
+    const existedPeripheral = this.getState().managingPeripherals[peripheralId];
     const processedPeripheral: PeripheralInfo = {
       ...existedPeripheral,
       ...peripheralInfo,
     };
-    this.#mutationState.state.managingPeripherals[
-      peripheralId
-    ] = processedPeripheral;
+    this.mutationState.managingPeripherals[peripheralId] = processedPeripheral;
   }
 
   /**
@@ -93,7 +81,7 @@ export class BlueveryState {
    * reset to initial state
    */
   resetState() {
-    this.#mutationState.state = this.#_savedInitialState;
+    this.mutationState = this.#_savedInitialState;
   }
 
   /**
@@ -101,31 +89,31 @@ export class BlueveryState {
    */
   reInitState(newInitialState: State) {
     this.#_savedInitialState = newInitialState;
-    this.#mutationState.state = newInitialState;
+    this.mutationState = newInitialState;
   }
 
   /**
    * ↓ state change handlers
    */
   onManaging() {
-    this.#mutationState.state.managing = true;
+    this.mutationState.managing = true;
   }
   offManaging() {
-    this.#mutationState.state.managing = false;
+    this.mutationState.managing = false;
   }
 
   setBluetoothEnabled() {
-    this.#mutationState.state.bluetoothEnabled = true;
+    this.mutationState.bluetoothEnabled = true;
   }
   setBluetoothDisabled() {
-    this.#mutationState.state.bluetoothEnabled = false;
+    this.mutationState.bluetoothEnabled = false;
   }
 
   onScanning() {
-    this.#mutationState.state.scanning = true;
+    this.mutationState.scanning = true;
   }
   offScanning() {
-    this.#mutationState.state.scanning = false;
+    this.mutationState.scanning = false;
   }
 
   setManagingPeripheralConnecting(peripheralId: PeripheralId) {
@@ -184,23 +172,23 @@ export class BlueveryState {
   }
 
   setPermissionGranted() {
-    this.#mutationState.state.permissionGranted = {
+    this.mutationState.permissionGranted = {
       is: 'granted',
       lack: [],
     };
   }
   setPermissionUnGranted(lack: Permission[]) {
-    this.#mutationState.state.permissionGranted = {
+    this.mutationState.permissionGranted = {
       is: 'ungranted',
       lack,
     };
   }
 
   setPeripheralToScannedPeripherals(peripheral: Peripheral) {
-    this.#mutationState.state.scannedPeripherals[peripheral.id] = peripheral;
+    this.mutationState.scannedPeripherals[peripheral.id] = peripheral;
   }
   clearScannedPeripherals() {
-    this.#mutationState.state.scannedPeripherals = this.#_savedInitialState.scannedPeripherals;
+    this.mutationState.scannedPeripherals = this.#_savedInitialState.scannedPeripherals;
   }
 
   setPeripheralToManagingPeripherals(peripheralInfo: PeripheralInfo) {
@@ -210,7 +198,7 @@ export class BlueveryState {
     );
   }
   deletePeripheralFromManagingPeripherals(peripheralId: PeripheralId) {
-    delete this.#mutationState.state.managingPeripherals[peripheralId];
+    delete this.mutationState.managingPeripherals[peripheralId];
   }
 
   setPeripheralIsBonded(peripheralId: PeripheralId) {

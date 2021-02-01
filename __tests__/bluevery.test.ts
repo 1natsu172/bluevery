@@ -36,24 +36,6 @@ describe('bluevery: primitive APIs', () => {
     });
   });
 
-  describe('forceCheckState', () => {
-    const listenerHandler = jest.fn((state) => state);
-
-    afterAll(() => {
-      // cleanup listener.
-      bluevery.listeners.stateListener.offAll();
-    });
-
-    test('should emit on the state change.', () => {
-      bluevery.listeners.stateListener.on(listenerHandler);
-      bluevery.forceCheckState();
-      expect(listenerHandler).toHaveBeenCalledTimes(1);
-
-      bluevery.forceCheckState();
-      expect(listenerHandler).toHaveBeenCalledTimes(2);
-    });
-  });
-
   describe('stopBluevery', () => {
     test.todo('should reset bluevery completely');
   });

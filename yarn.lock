@@ -2952,11 +2952,6 @@ eventemitter3@^3.0.0:
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.2.tgz#2d3d48f9c346698fce83a85d7d664e98535df6e7"
   integrity sha512-tvtQIeLVHjDkJYnzf2dgVMxfuSGJeM/7UCG17TT4EumTfNtF+0nebF/4zWOIkCreAbtNqhGEboB6BWrwqNaw4Q==
 
-eventmit@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/eventmit/-/eventmit-1.1.0.tgz#dbfc4b7efa1acd0347ca87a51c3bb666e89957f4"
-  integrity sha512-H8+aEVjVGAvvlpEmNm4NnQu9yNEeV0RJfNoeTQizfj6LS+6wAvESFzHzubDkjw5I2HU+LA4eFe+jg2jEtbj1zw==
-
 exec-sh@^0.3.2:
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/exec-sh/-/exec-sh-0.3.4.tgz#3a018ceb526cc6f6df2bb504b2bfe8e3a4934ec5"
@@ -5913,6 +5908,11 @@ prop-types@^15.6.2, prop-types@^15.7.2:
     object-assign "^4.1.1"
     react-is "^16.8.1"
 
+proxy-compare@1.1.6:
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/proxy-compare/-/proxy-compare-1.1.6.tgz#dd7737be611a9d7142fae10dbc6d0ceb74ad6da0"
+  integrity sha512-V65euKrKgKjVyEh5+4nVlAf4dHJ6Q0cF77MCeZiJaOldAl9lndy/u270SJneHiz3UkVcSIhxfOKY7aFkrMyo5g==
+
 proxy-state-tree@^6.0.2:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/proxy-state-tree/-/proxy-state-tree-6.1.0.tgz#7a85eb89328e5973dc21f30b82062cf58186095e"
@@ -7253,6 +7253,13 @@ validate-npm-package-license@^3.0.1:
   dependencies:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
+
+valtio@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/valtio/-/valtio-0.6.2.tgz#7c33257f3abbad3af37ce0ba0b28ec0b31aac824"
+  integrity sha512-0hsuGK7qCwq70Z4aqV1t0soxNEnfumIiVD4xwfYSnKXhFSWNGegyTD0WHETkwVYxNv89kXWX6Qv+vevnZjFDLw==
+  dependencies:
+    proxy-compare "1.1.6"
 
 vary@~1.1.2:
   version "1.1.2"

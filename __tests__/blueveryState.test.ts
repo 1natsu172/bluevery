@@ -51,30 +51,6 @@ describe('BlueveryState', () => {
     });
   });
 
-  describe('emitState', () => {
-    let currentState;
-    beforeEach(() => {
-      currentState = undefined;
-      blueveryState.stateEmitter.on((state) => {
-        currentState = state;
-      });
-    });
-    afterEach(() => {
-      blueveryState.stateEmitter.offAll();
-    });
-    test('should emit state', () => {
-      expect(currentState).not.toEqual(expect.any(Object));
-      blueveryState.emitState();
-      expect(currentState).toEqual(expect.any(Object));
-    });
-    test('should support after the changed state', () => {
-      blueveryState.onScanning();
-      blueveryState.emitState();
-      expect(currentState).toEqual(
-        expect.objectContaining<Partial<State>>({scanning: true}),
-      );
-    });
-  });
   describe('getState', () => {
     test('should get state', () => {
       expect(blueveryState.getState()).toEqual(expect.any(Object));

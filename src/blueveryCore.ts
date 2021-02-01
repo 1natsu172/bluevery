@@ -8,7 +8,6 @@ import BleManager, {Peripheral} from 'react-native-ble-manager';
 import {Permission} from 'react-native-permissions';
 import promiseRetry from 'p-retry';
 import promiseTimeout from 'p-timeout';
-import {Eventmitter} from 'eventmit';
 import delay from 'delay';
 import {
   BlueveryOptions,
@@ -63,11 +62,11 @@ export class BlueveryCore {
 
   #userDefinedOptions: BlueveryOptions = {};
   #state: _BlueveryState;
-  stateEmitter: Eventmitter<State>;
+  __DO_NOT_DIRECT_USE_STATE__: State;
 
   constructor({BlueveryState}: ConstructorArgs) {
     this.#state = new BlueveryState({});
-    this.stateEmitter = this.#state.stateEmitter;
+    this.__DO_NOT_DIRECT_USE_STATE__ = this.#state.mutationState;
     autoBind(this);
   }
 
@@ -121,10 +120,6 @@ export class BlueveryCore {
 
   setUserDefinedOptions(options: BlueveryOptions) {
     this.#userDefinedOptions = options;
-  }
-
-  emitState(): void {
-    this.#state.emitState();
   }
 
   getState(): Readonly<State> {

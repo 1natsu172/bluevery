@@ -7,4 +7,6 @@
 //   // registerDiscoverPeripheralListener,
 // } from './registerDiscoverPeripheralListener';
 
-describe.skip('registerDiscoverPeripheralListener,', () => {});
+describe.skip('registerDiscoverPeripheralListener,', () => {
+  test.skip('');
+});

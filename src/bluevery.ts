@@ -5,10 +5,10 @@ import {BlueveryCore as _BlueveryCore} from './blueveryCore';
 import {BlueveryState as _BlueveryState} from './blueveryState';
 import {
   BlueveryOptions,
-  Listeners,
   PeripheralInfo,
   ScanningSettings,
   StartNotificationParams,
+  State,
 } from './interface';
 import {
   applyOmoiyari,
@@ -28,11 +28,11 @@ type ConstructorArgs = {
 
 export class Bluevery {
   #core: _BlueveryCore;
-  listeners: Listeners;
+  __DO_NOT_DIRECT_USE_STATE__: State;
 
   constructor({BlueveryCore, BlueveryState}: ConstructorArgs) {
     this.#core = new BlueveryCore({BlueveryState});
-    this.listeners = {stateListener: this.#core.stateEmitter};
+    this.__DO_NOT_DIRECT_USE_STATE__ = this.#core.__DO_NOT_DIRECT_USE_STATE__;
     autoBind(this);
   }
 
@@ -44,10 +44,6 @@ export class Bluevery {
 
   checkIsInitialized(): boolean {
     return this.#initialized;
-  }
-
-  forceCheckState() {
-    this.#core.emitState();
   }
 
   /**;
