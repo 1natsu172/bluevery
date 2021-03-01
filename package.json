@@ -20,7 +20,7 @@
     "p-cancelable": "^2.0.0",
     "p-retry": "^4.2.0",
     "p-tap": "^3.1.0",
-    "p-timeout": "^3.2.0",
+    "p-timeout": "^4.1.0",
     "proxy-state-tree": "^6.0.2",
     "react-native-ble-manager": "^7.3.1",
     "react-native-permissions": "^2.2.0",
