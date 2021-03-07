@@ -156,21 +156,6 @@ export class BlueveryState {
     );
   }
 
-  onCheckingCommunicateWithPeripheral(peripheralId: PeripheralId) {
-    this.setManagingPeripheralInfoProperty(
-      peripheralId,
-      'checkingCommunicate',
-      true,
-    );
-  }
-  offCheckingCommunicateWithPeripheral(peripheralId: PeripheralId) {
-    this.setManagingPeripheralInfoProperty(
-      peripheralId,
-      'checkingCommunicate',
-      false,
-    );
-  }
-
   setPermissionGranted() {
     this.mutationState.permissionGranted = {
       is: 'granted',

@@ -26,6 +26,7 @@ let spiedCheckAndRequestPermission: jest.SpyInstance;
 let spiedCheckBluetoothEnabled: jest.SpyInstance;
 let spiedRequireCheckBeforeBleProcess: jest.SpyInstance;
 let spiedCleanupScan: jest.SpyInstance;
+let spiedClearScannedPeripherals: jest.SpyInstance;
 beforeEach(() => {
   // cleanup mocks
   jest.clearAllMocks();
@@ -52,6 +53,9 @@ beforeEach(() => {
   spiedCleanupScan = jest
     // @ts-ignore
     .spyOn(BlueveryCore.prototype, 'cleanupScan');
+  spiedClearScannedPeripherals = jest
+    // @ts-ignore
+    .spyOn(BlueveryCore.prototype, 'clearScannedPeripherals');
 
   // note: need create instance after spyOn
   blueveryCore = new BlueveryCore({BlueveryState});
@@ -241,6 +245,12 @@ describe('BlueveryCore', () => {
         blueveryCore.scan({scanningSettings: [[], 1]});
         await flushPromisesAdvanceTimer(1000);
         expect(spiedCleanupScan).toBeCalledTimes(1);
+      });
+
+      test('should **not** call clearScannedPeripherals', async () => {
+        blueveryCore.scan({scanningSettings: [[], 1]});
+        await flushPromisesAdvanceTimer(1000);
+        expect(spiedClearScannedPeripherals).not.toBeCalled();
       });
     });
     describe('check guard clause', () => {

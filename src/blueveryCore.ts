@@ -6,8 +6,6 @@ import {
 } from 'react-native';
 import BleManager, {Peripheral} from 'react-native-ble-manager';
 import {Permission} from 'react-native-permissions';
-import promiseRetry from 'p-retry';
-import promiseTimeout from 'p-timeout';
 import delay from 'delay';
 import {
   BlueveryOptions,
@@ -278,6 +276,7 @@ export class BlueveryCore {
     this.state.setManagingPeripheralConnected(targetPeripheralId);
   }
 
+  // TODO 消す
   async checkCommunicateWithPeripheral({
     readValueParams,
     writeValueParams,
@@ -285,11 +284,11 @@ export class BlueveryCore {
     readValueParams: ReadValueParams;
     writeValueParams: WriteValueParams;
   }) {
-    const [peripheralId] = readValueParams.readValueParams;
-    this.state.onCheckingCommunicateWithPeripheral(peripheralId);
+    // const [peripheralId] = readValueParams.readValueParams;
+    // this.state.onCheckingCommunicateWithPeripheral(peripheralId);
     await writeValue(createTryWriteValueFn(BleManager.write), writeValueParams);
     await readValue(createTryReadValueFn(BleManager.read), readValueParams);
-    this.state.offCheckingCommunicateWithPeripheral(peripheralId);
+    // this.state.offCheckingCommunicateWithPeripheral(peripheralId);
   }
 
   /**

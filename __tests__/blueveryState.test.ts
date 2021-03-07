@@ -198,38 +198,7 @@ describe('BlueveryState', () => {
         });
       });
     });
-    describe('managingPeripheral:checkingCommunicate', () => {
-      describe('onCheckingCommunicateWithPeripheral', () => {
-        test('should change to on checkingCommunicateWithPeripheral of the State', () => {
-          expect(
-            blueveryState.getState().managingPeripherals['1']
-              .checkingCommunicate,
-          ).toBeUndefined();
-          blueveryState.onCheckingCommunicateWithPeripheral(
-            dummyPeripheralInfo.id,
-          );
-          expect(
-            blueveryState.getState().managingPeripherals['1']
-              .checkingCommunicate,
-          ).toBe(true);
-        });
-      });
-      describe('offCheckingCommunicateWithPeripheral', () => {
-        test('should change to off checkingCommunicateWithPeripheral of the State', () => {
-          expect(
-            blueveryState.getState().managingPeripherals['1']
-              .checkingCommunicate,
-          ).toBeUndefined();
-          blueveryState.offCheckingCommunicateWithPeripheral(
-            dummyPeripheralInfo.id,
-          );
-          expect(
-            blueveryState.getState().managingPeripherals['1']
-              .checkingCommunicate,
-          ).toBe(false);
-        });
-      });
-    });
+
     describe('managingPeripherals:bonded', () => {
       test('should set bonded property to peripheralInfo ', () => {
         blueveryState.setPeripheralToManagingPeripherals(dummyPeripheralInfo);

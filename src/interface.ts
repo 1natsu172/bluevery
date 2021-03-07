@@ -10,9 +10,8 @@ export type BlueveryOptions = {
 export type PeripheralId = string;
 export type PeripheralInfo = Peripheral & {
   connect?: 'connecting' | 'connected' | 'disconnected' | 'failed';
-  bonded?: boolean;
-  communicate?: 'reading' | 'writing';
-  checkingCommunicate?: boolean;
+  bonded?: 'unknown' | boolean;
+  communicate?: 'nonCommunicate' | 'reading' | 'writing';
   receivingForCharacteristicValue?: boolean;
 };
 

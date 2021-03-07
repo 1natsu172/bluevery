@@ -49,6 +49,7 @@ export class Bluevery {
   /**;
    * Force stop Bluevery's operation completely.
    */
+  // TODO: implements
   stopBluevery() {}
 
   /**
@@ -103,6 +104,8 @@ export class Bluevery {
     const omoiyariIntervalScan = applyOmoiyari(intervalScan, {
       time: DEFAULT_OMOIYARI_TIME,
     });
+
+    // Initialize the list before scan
     this.core.clearScannedPeripherals();
     await omoiyariIntervalScan();
   }
