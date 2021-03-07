@@ -27,7 +27,6 @@ import {
   createPeripheralInfoHandler,
   registerDidUpdateValueForCharacteristicListener,
   requestPermission,
-  applyOmoiyari,
   retrieveServices,
   RetrieveServicesParams,
   createTryRetrieveServicesFn,
@@ -48,7 +47,7 @@ import {
 } from './libs';
 import {BlueveryState as _BlueveryState} from './blueveryState';
 import autoBind from 'auto-bind';
-import {DEFAULT_OMOIYARI_TIME} from './utils/constants';
+import {DEFAULT_OMOIYARI_TIME} from './constants';
 
 type ConstructorArgs = {
   BlueveryState: typeof _BlueveryState;

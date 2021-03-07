@@ -2,7 +2,7 @@ import {bluevery as truthExportedBluevery} from '../src';
 import {Bluevery} from '../src/bluevery';
 import {BlueveryCore} from '../src/blueveryCore';
 import {BlueveryState} from '../src/blueveryState';
-import * as omoiyarify from '../src/libs/omoiyarify';
+import * as omoiyarify from '../src/utils/omoiyarify';
 import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
 
 let bluevery: Bluevery;

@@ -11,15 +11,14 @@ import {
   State,
 } from './interface';
 import {
-  applyOmoiyari,
   BondingParams,
   ConnectParams,
   ReadValueParams,
   RetrieveServicesParams,
   WriteValueParams,
 } from './libs';
-import {DEFAULT_OMOIYARI_TIME} from './utils/constants';
-import delay from 'delay';
+import {applyOmoiyari} from './utils';
+import {DEFAULT_OMOIYARI_TIME} from './constants';
 
 type ConstructorArgs = {
   BlueveryCore: typeof _BlueveryCore;
