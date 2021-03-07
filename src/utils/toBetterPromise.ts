@@ -12,16 +12,18 @@ type CancelableOptions = {
   shouldRejectOnCancel?: OnCancelFunction['shouldReject'];
 };
 
-type Options = {
+type BetterOptions = {
   retryOptions?: RetryOptions;
   timeoutOptions?: TimeoutOptions;
   cancelableOptions?: undefined;
 };
-type OptionsWithCancelable = {
+type BetterOptionsWithCancelable = {
   retryOptions?: RetryOptions;
   timeoutOptions?: TimeoutOptions;
   cancelableOptions: CancelableOptions;
 };
+
+export type ToBetterOptions = BetterOptions | BetterOptionsWithCancelable;
 
 export const toCancelablePromise = <ArgsType extends unknown[], ReturnValue>(
   fn: (...args: ArgsType) => PromiseLike<ReturnValue>,
@@ -66,21 +68,21 @@ export const toRetryPromise = <ArgsType extends unknown[], ReturnValue>(
  */
 export function toBetterPromise<ArgsType extends unknown[], ReturnValue>(
   fn: (...args: ArgsType) => PromiseLike<ReturnValue>,
-  options: Options,
+  options: BetterOptions,
 ): (...args: ArgsType) => PromiseLike<ReturnValue>;
 /**
  * overload type when cancelable
  */
 export function toBetterPromise<ArgsType extends unknown[], ReturnValue>(
   fn: (...args: ArgsType) => PromiseLike<ReturnValue>,
-  options: OptionsWithCancelable,
+  options: BetterOptionsWithCancelable,
 ): (...args: ArgsType) => pCancelable<ReturnValue>;
 /**
  * overload implement
  */
 export function toBetterPromise<ArgsType extends unknown[], ReturnValue>(
   fn: (...args: ArgsType) => PromiseLike<ReturnValue>,
-  options: Options | OptionsWithCancelable = {},
+  options: ToBetterOptions = {},
 ) {
   const {timeoutOptions, retryOptions, cancelableOptions} = options;
 
