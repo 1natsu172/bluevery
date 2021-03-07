@@ -95,7 +95,7 @@ describe('toTimeoutPromise', () => {
   });
 });
 
-describe.only('toBetterPromise', () => {
+describe('toBetterPromise', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     // clear mock count
@@ -105,7 +105,7 @@ describe.only('toBetterPromise', () => {
     (..._args: unknown[]) => new Promise((_resolve) => {}),
   );
   const mustRejectFn = jest.fn(() => Promise.reject(new Error('fixture')));
-  const mustResolveFn = jest.fn((...args: unknown[]) => Promise.resolve(args));
+  // const mustResolveFn = jest.fn((...args: unknown[]) => Promise.resolve(args));
   const delayPromiseFn = jest.fn(
     (...args: unknown[]) =>
       new Promise((resolve, reject) => {
@@ -127,7 +127,6 @@ describe.only('toBetterPromise', () => {
 
     const myPromise = betterPromise('lgtm');
 
-    // @ts-expect-error
     myPromise.cancel();
 
     await expect(myPromise).rejects.not.toBeInstanceOf(TimeoutError);

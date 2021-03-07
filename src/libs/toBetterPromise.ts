@@ -15,7 +15,12 @@ type CancelableOptions = {
 type Options = {
   retryOptions?: RetryOptions;
   timeoutOptions?: TimeoutOptions;
-  cancelableOptions?: CancelableOptions;
+  cancelableOptions?: undefined;
+};
+type OptionsWithCancelable = {
+  retryOptions?: RetryOptions;
+  timeoutOptions?: TimeoutOptions;
+  cancelableOptions: CancelableOptions;
 };
 
 export const toCancelablePromise = <ArgsType extends unknown[], ReturnValue>(
@@ -56,28 +61,46 @@ export const toRetryPromise = <ArgsType extends unknown[], ReturnValue>(
   };
 };
 
-// FIXME: 返り値がcancelableかどうかをconditionalな型にしたい
+/**
+ * overload type when nonCancelable
+ */
 export function toBetterPromise<ArgsType extends unknown[], ReturnValue>(
   fn: (...args: ArgsType) => PromiseLike<ReturnValue>,
-  {retryOptions, timeoutOptions, cancelableOptions}: Options = {},
+  options: Options,
+): (...args: ArgsType) => PromiseLike<ReturnValue>;
+/**
+ * overload type when cancelable
+ */
+export function toBetterPromise<ArgsType extends unknown[], ReturnValue>(
+  fn: (...args: ArgsType) => PromiseLike<ReturnValue>,
+  options: OptionsWithCancelable,
+): (...args: ArgsType) => pCancelable<ReturnValue>;
+/**
+ * overload implement
+ */
+export function toBetterPromise<ArgsType extends unknown[], ReturnValue>(
+  fn: (...args: ArgsType) => PromiseLike<ReturnValue>,
+  options: Options | OptionsWithCancelable = {},
 ) {
-  let pFn = fn;
+  const {timeoutOptions, retryOptions, cancelableOptions} = options;
+
+  let bFn = fn;
 
   if (timeoutOptions) {
-    pFn = toTimeoutPromise(pFn, timeoutOptions);
+    bFn = toTimeoutPromise(bFn, timeoutOptions);
   }
 
   if (retryOptions) {
-    pFn = toRetryPromise(pFn, retryOptions);
+    bFn = toRetryPromise(bFn, retryOptions);
   }
 
   if (cancelableOptions) {
-    pFn = toCancelablePromise(
-      pFn,
+    bFn = toCancelablePromise(
+      bFn,
       cancelableOptions.onCanceledHandler,
       cancelableOptions.shouldRejectOnCancel,
     );
   }
 
-  return pFn;
+  return bFn;
 }
