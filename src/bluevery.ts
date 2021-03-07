@@ -26,23 +26,24 @@ type ConstructorArgs = {
 };
 
 export class Bluevery {
-  #core: _BlueveryCore;
-  __DO_NOT_DIRECT_USE_STATE__: State;
+  private core: _BlueveryCore;
+  private __DO_NOT_DIRECT_USE_STATE__: State;
 
   constructor({BlueveryCore, BlueveryState}: ConstructorArgs) {
-    this.#core = new BlueveryCore({BlueveryState});
-    this.__DO_NOT_DIRECT_USE_STATE__ = this.#core.__DO_NOT_DIRECT_USE_STATE__;
+    this.core = new BlueveryCore({BlueveryState});
+    // @ts-expect-error
+    this.__DO_NOT_DIRECT_USE_STATE__ = this.core.__DO_NOT_DIRECT_USE_STATE__;
     autoBind(this);
   }
 
-  #initialized: boolean = false;
+  private initialized: boolean = false;
 
   /**
    * ↓ Primitive APIs
    */
 
   checkIsInitialized(): boolean {
-    return this.#initialized;
+    return this.initialized;
   }
 
   /**;
@@ -58,8 +59,8 @@ export class Bluevery {
     if (this.checkIsInitialized()) {
       return;
     }
-    await this.#core.init(blueveryOptions);
-    this.#initialized = true;
+    await this.core.init(blueveryOptions);
+    this.initialized = true;
   }
 
   async startScan({
@@ -90,7 +91,7 @@ export class Bluevery {
     const intervalScan = () =>
       promiseInterval(
         async () => {
-          await this.#core.scan({
+          await this.core.scan({
             scanningSettings,
             discoverHandler,
             matchFn,
@@ -102,7 +103,7 @@ export class Bluevery {
     const omoiyariIntervalScan = applyOmoiyari(intervalScan, {
       time: DEFAULT_OMOIYARI_TIME,
     });
-    this.#core.clearScannedPeripherals();
+    this.core.clearScannedPeripherals();
     await omoiyariIntervalScan();
   }
 
@@ -115,7 +116,7 @@ export class Bluevery {
     retrieveServicesParams: RetrieveServicesParams;
     bondingParams: BondingParams;
   }) {
-    await this.#core.connect({
+    await this.core.connect({
       connectParams,
       bondingParams,
       retrieveServicesParams,
@@ -135,12 +136,12 @@ export class Bluevery {
     writeValueParams: WriteValueParams;
     readValueParams: ReadValueParams;
   }) {
-    await this.#core.connect({
+    await this.core.connect({
       connectParams,
       bondingParams,
       retrieveServicesParams,
     });
-    await this.#core.checkCommunicateWithPeripheral({
+    await this.core.checkCommunicateWithPeripheral({
       readValueParams,
       writeValueParams,
     });
@@ -172,7 +173,7 @@ export class Bluevery {
       await this.startScan(scanParams);
     } while (
       // receive対象のperipheralが見つからなければdoし続ける(見つかるまでscanを繰り返す)
-      this.#core.getState().scannedPeripherals[targetPeripheralId] === undefined
+      this.core.getState().scannedPeripherals[targetPeripheralId] === undefined
     );
 
     if (checkCommunicate) {
@@ -190,7 +191,7 @@ export class Bluevery {
         retrieveServicesParams,
       });
     }
-    await this.#core.startNotification({startNotificationParams});
+    await this.core.startNotification({startNotificationParams});
   }
 
   async readValue() {}

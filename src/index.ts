@@ -6,6 +6,7 @@ import {createUseBlueveryState} from './stateProvider';
 export const bluevery = new Bluevery({BlueveryCore, BlueveryState});
 
 export const useBlueveryState = createUseBlueveryState(
+  // @ts-expect-error
   bluevery.__DO_NOT_DIRECT_USE_STATE__,
 );
 

@@ -59,13 +59,13 @@ const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 export class BlueveryCore {
   static originalBleManager = BleManager;
 
-  #userDefinedOptions: BlueveryOptions = {};
-  #state: _BlueveryState;
-  __DO_NOT_DIRECT_USE_STATE__: State;
+  private userDefinedOptions: BlueveryOptions = {};
+  private state: _BlueveryState;
+  private __DO_NOT_DIRECT_USE_STATE__: State;
 
   constructor({BlueveryState}: ConstructorArgs) {
-    this.#state = new BlueveryState({});
-    this.__DO_NOT_DIRECT_USE_STATE__ = this.#state.mutationState;
+    this.state = new BlueveryState({});
+    this.__DO_NOT_DIRECT_USE_STATE__ = this.state.mutationState;
     autoBind(this);
   }
 
@@ -79,14 +79,14 @@ export class BlueveryCore {
      */
     const handleDisconnectPeripheral = createHandleDisconnectPeripheral({
       onDisconnectPeripheral: (disconnectInfo) => {
-        this.#state.deletePeripheralFromManagingPeripherals(
+        this.state.deletePeripheralFromManagingPeripherals(
           disconnectInfo.peripheral,
         );
       },
       optionalOnDisconnectPeripheral:
         blueveryOptions?.onDisconnectPeripheralHandler,
     });
-    this.#disconnectPeripheralListener = registerDisconnectPeripheralListener(
+    this.disconnectPeripheralListener = registerDisconnectPeripheralListener(
       bleManagerEmitter,
       handleDisconnectPeripheral,
     );
@@ -96,15 +96,15 @@ export class BlueveryCore {
      */
     await BleManager.getConnectedPeripherals([]).then((peripherals) => {
       peripherals.forEach((peripheral) => {
-        this.#state.setPeripheralToManagingPeripherals(peripheral),
-          this.#state.setManagingPeripheralConnected(peripheral.id);
+        this.state.setPeripheralToManagingPeripherals(peripheral),
+          this.state.setManagingPeripheralConnected(peripheral.id);
       });
     });
     if (Platform.OS === 'android') {
       await BleManager.getBondedPeripherals().then((peripherals) => {
         peripherals.forEach((peripheral) => {
-          this.#state.setPeripheralToManagingPeripherals(peripheral);
-          this.#state.setPeripheralIsBonded(peripheral.id);
+          this.state.setPeripheralToManagingPeripherals(peripheral);
+          this.state.setPeripheralIsBonded(peripheral.id);
         });
       });
     }
@@ -113,20 +113,20 @@ export class BlueveryCore {
   /**
    * @property listeners
    */
-  #discoverPeripheralListener?: EmitterSubscription;
-  #disconnectPeripheralListener?: EmitterSubscription;
+  private discoverPeripheralListener?: EmitterSubscription;
+  private disconnectPeripheralListener?: EmitterSubscription;
   publicListeners: PublicListeners = {};
 
   setUserDefinedOptions(options: BlueveryOptions) {
-    this.#userDefinedOptions = options;
+    this.userDefinedOptions = options;
   }
 
   getState(): Readonly<State> {
-    return this.#state.getState();
+    return this.state.getState();
   }
 
   clearScannedPeripherals(): void {
-    this.#state.clearScannedPeripherals();
+    this.state.clearScannedPeripherals();
   }
 
   private async requireCheckBeforeBleProcess() {
@@ -154,9 +154,9 @@ export class BlueveryCore {
   private async checkBluetoothEnabled() {
     const isEnabled = await checkBluetoothEnabled();
     if (isEnabled) {
-      this.#state.setBluetoothEnabled();
+      this.state.setBluetoothEnabled();
     } else {
-      this.#state.setBluetoothDisabled();
+      this.state.setBluetoothDisabled();
     }
     return isEnabled;
   }
@@ -176,20 +176,20 @@ export class BlueveryCore {
       ] = await requestPermission(ungranted);
 
       if (requestedButUngranted.length) {
-        this.#state.setPermissionUnGranted(requestedButUngranted);
+        this.state.setPermissionUnGranted(requestedButUngranted);
       } else {
-        this.#state.setPermissionGranted();
+        this.state.setPermissionGranted();
       }
       return [granted, requestedThenGranted, requestedButUngranted];
     }
-    this.#state.setPermissionGranted();
+    this.state.setPermissionGranted();
     return [granted];
   }
 
   private async managing() {
     if (this.getState().managing === false) {
       await BleManager.start().then(() => {
-        this.#state.onManaging();
+        this.state.onManaging();
       });
     }
   }
@@ -205,7 +205,7 @@ export class BlueveryCore {
   }): Promise<void | false> {
     if (!this.getState().scanning) {
       const peripheralInfoHandler = createPeripheralInfoHandler({
-        setPeripheralToScannedPeripherals: this.#state
+        setPeripheralToScannedPeripherals: this.state
           .setPeripheralToScannedPeripherals,
         handlePeripheralInfo: discoverHandler,
       });
@@ -222,7 +222,7 @@ export class BlueveryCore {
         return false;
       }
 
-      this.#state.onScanning();
+      this.state.onScanning();
 
       const [, discoverPeripheralListener] = await Promise.all([
         // note: scan開始。promiseだがscan秒数待たないので後続処理でscan秒数を担保している
@@ -235,7 +235,7 @@ export class BlueveryCore {
           handleDiscoverPeripheral,
         ),
       ]);
-      this.#discoverPeripheralListener = discoverPeripheralListener;
+      this.discoverPeripheralListener = discoverPeripheralListener;
 
       // note: スキャン秒数の担保。指定秒数経ったらscan処理を終える
       const [, scanSeconds] = scanningSettings;
@@ -246,8 +246,8 @@ export class BlueveryCore {
   private cleanupScan() {
     return Promise.all([
       BleManager.stopScan(),
-      this.#discoverPeripheralListener?.remove(),
-      this.#state.offScanning(),
+      this.discoverPeripheralListener?.remove(),
+      this.state.offScanning(),
     ]);
   }
 
@@ -265,17 +265,17 @@ export class BlueveryCore {
     if (isPassedRequireCheck === false) {
       return false;
     }
-    this.#state.setManagingPeripheralConnecting(targetPeripheralId);
+    this.state.setManagingPeripheralConnecting(targetPeripheralId);
     await connect(createTryConnectFn(BleManager.connect), connectParams);
     await retrieveServices(
       createTryRetrieveServicesFn(BleManager.retrieveServices),
       retrieveServicesParams,
     );
     await bonding(createTryBondFn(BleManager.createBond), bondingParams);
-    this.#state.setPeripheralToManagingPeripherals(
+    this.state.setPeripheralToManagingPeripherals(
       this.getState().scannedPeripherals[targetPeripheralId],
     );
-    this.#state.setManagingPeripheralConnected(targetPeripheralId);
+    this.state.setManagingPeripheralConnected(targetPeripheralId);
   }
 
   async checkCommunicateWithPeripheral({
@@ -286,10 +286,10 @@ export class BlueveryCore {
     writeValueParams: WriteValueParams;
   }) {
     const [peripheralId] = readValueParams.readValueParams;
-    this.#state.onCheckingCommunicateWithPeripheral(peripheralId);
+    this.state.onCheckingCommunicateWithPeripheral(peripheralId);
     await writeValue(createTryWriteValueFn(BleManager.write), writeValueParams);
     await readValue(createTryReadValueFn(BleManager.read), readValueParams);
-    this.#state.offCheckingCommunicateWithPeripheral(peripheralId);
+    this.state.offCheckingCommunicateWithPeripheral(peripheralId);
   }
 
   /**
@@ -308,7 +308,7 @@ export class BlueveryCore {
       this.publicListeners[
         peripheralId
       ].receivingForCharacteristicValueListener?.remove();
-      this.#state.offReceivingForCharacteristicValue(peripheralId);
+      this.state.offReceivingForCharacteristicValue(peripheralId);
     }
 
     const notificationListener = registerDidUpdateValueForCharacteristicListener(
@@ -321,7 +321,7 @@ export class BlueveryCore {
       peripheralId
     ].receivingForCharacteristicValueListener = notificationListener;
     await BleManager.startNotification(...startNotificationParams);
-    this.#state.onReceivingForCharacteristicValue(peripheralId);
+    this.state.onReceivingForCharacteristicValue(peripheralId);
   }
 
   stopNotification({
@@ -335,7 +335,7 @@ export class BlueveryCore {
       this.publicListeners[
         peripheralId
       ].receivingForCharacteristicValueListener?.remove(),
-      this.#state.offReceivingForCharacteristicValue(peripheralId),
+      this.state.offReceivingForCharacteristicValue(peripheralId),
     ]);
   }
 }

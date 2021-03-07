@@ -21,9 +21,9 @@ function createInitialState(overrideState?: Partial<State>): State {
 }
 
 export class BlueveryState {
-  #_savedInitialState: State;
+  private _savedInitialState: State;
   mutationState: State;
-  #unsubscribeTheState: () => void;
+  private unsubscribeTheState: () => void;
 
   constructor({
     initialState,
@@ -33,14 +33,14 @@ export class BlueveryState {
     onChangeStateHandler?: (...args: unknown[]) => unknown;
   }) {
     this.mutationState = proxy(createInitialState(initialState));
-    this.#unsubscribeTheState = subscribe(
+    this.unsubscribeTheState = subscribe(
       this.mutationState,
       () => {
         onChangeStateHandler && onChangeStateHandler();
       },
-      true,
+      true, // reacted in sync
     );
-    this.#_savedInitialState = createInitialState(initialState);
+    this._savedInitialState = createInitialState(initialState);
     autoBind(this);
   }
 
@@ -81,14 +81,14 @@ export class BlueveryState {
    * reset to initial state
    */
   resetState() {
-    this.mutationState = this.#_savedInitialState;
+    this.mutationState = this._savedInitialState;
   }
 
   /**
    * re-initialize state by new initial state
    */
   reInitState(newInitialState: State) {
-    this.#_savedInitialState = newInitialState;
+    this._savedInitialState = newInitialState;
     this.mutationState = newInitialState;
   }
 
@@ -188,7 +188,7 @@ export class BlueveryState {
     this.mutationState.scannedPeripherals[peripheral.id] = peripheral;
   }
   clearScannedPeripherals() {
-    this.mutationState.scannedPeripherals = this.#_savedInitialState.scannedPeripherals;
+    this.mutationState.scannedPeripherals = this._savedInitialState.scannedPeripherals;
   }
 
   setPeripheralToManagingPeripherals(peripheralInfo: PeripheralInfo) {

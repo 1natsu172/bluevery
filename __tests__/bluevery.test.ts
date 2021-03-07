@@ -175,7 +175,7 @@ describe('bluevery: commands APIs', () => {
       });
     });
     describe('startScan: check calls', () => {
-      test('should call #core.clearScannedPeripherals', async () => {
+      test('should call core.clearScannedPeripherals', async () => {
         bluevery.startScan({
           scanOptions: {
             scanningSettings: [[], 1, true],
