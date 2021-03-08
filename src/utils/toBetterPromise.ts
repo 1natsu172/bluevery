@@ -78,6 +78,13 @@ export function toBetterPromise<ArgsType extends unknown[], ReturnValue>(
   options: BetterOptionsWithCancelable,
 ): (...args: ArgsType) => pCancelable<ReturnValue>;
 /**
+ * overload total variation
+ */
+export function toBetterPromise<ArgsType extends unknown[], ReturnValue>(
+  fn: (...args: ArgsType) => PromiseLike<ReturnValue>,
+  options: ToBetterOptions,
+): (...args: ArgsType) => PromiseLike<ReturnValue> | pCancelable<ReturnValue>;
+/**
  * overload implement
  */
 export function toBetterPromise<ArgsType extends unknown[], ReturnValue>(
