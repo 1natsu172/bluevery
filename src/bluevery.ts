@@ -9,14 +9,7 @@ import {
   PeripheralInfo,
   State,
 } from './interface';
-import {
-  BondingParams,
-  ConnectParams,
-  ReadValueParams,
-  RetrieveServicesParams,
-  WriteValueParams,
-} from './libs';
-import {applyOmoiyari} from './utils';
+import {applyOmoiyari, ToBetterOptions} from './utils';
 import {DEFAULT_OMOIYARI_TIME} from './constants';
 
 type ConstructorArgs = {
@@ -111,41 +104,30 @@ export class Bluevery {
 
   async connect({
     connectParams,
+    connectOptions,
     bondingParams,
+    bondingOptions,
     retrieveServicesParams,
+    retrieveServicesOptions,
   }: {
-    connectParams: ConnectParams;
-    retrieveServicesParams: RetrieveServicesParams;
-    bondingParams: BondingParams;
+    connectParams: BleManagerParams['connect'];
+    connectOptions: ToBetterOptions;
+    retrieveServicesParams: BleManagerParams['retrieveServices'];
+    /**
+     * @description retrieveServices with timeout
+     * @default timeoutMilliseconds = 2000ms
+     */
+    retrieveServicesOptions: ToBetterOptions;
+    bondingParams: BleManagerParams['createBond'];
+    bondingOptions: ToBetterOptions;
   }) {
     await this.core.connect({
       connectParams,
+      connectOptions,
       bondingParams,
+      bondingOptions,
       retrieveServicesParams,
-    });
-  }
-
-  async connectAndCheckCommunicate({
-    connectParams,
-    bondingParams,
-    retrieveServicesParams,
-    readValueParams,
-    writeValueParams,
-  }: {
-    connectParams: ConnectParams;
-    retrieveServicesParams: RetrieveServicesParams;
-    bondingParams: BondingParams;
-    writeValueParams: WriteValueParams;
-    readValueParams: ReadValueParams;
-  }) {
-    await this.core.connect({
-      connectParams,
-      bondingParams,
-      retrieveServicesParams,
-    });
-    await this.core.checkCommunicateWithPeripheral({
-      readValueParams,
-      writeValueParams,
+      retrieveServicesOptions,
     });
   }
 
@@ -154,22 +136,22 @@ export class Bluevery {
     scanParams,
     startNotificationParams,
     connectParams,
+    connectOptions,
     retrieveServicesParams,
+    retrieveServicesOptions,
     bondingParams,
-    writeValueParams,
-    readValueParams,
-    checkCommunicate = true,
+    bondingOptions,
   }: {
     scanParams: Parameters<InstanceType<typeof Bluevery>['startScan']>[0];
     startNotificationParams: BleManagerParams['startNotification'];
-    connectParams: ConnectParams;
-    retrieveServicesParams: RetrieveServicesParams;
-    bondingParams: BondingParams;
-    writeValueParams: WriteValueParams;
-    readValueParams: ReadValueParams;
-    checkCommunicate?: boolean;
+    connectParams: BleManagerParams['connect'];
+    connectOptions: ToBetterOptions;
+    retrieveServicesParams: BleManagerParams['retrieveServices'];
+    retrieveServicesOptions: ToBetterOptions;
+    bondingParams: BleManagerParams['createBond'];
+    bondingOptions: ToBetterOptions;
   }) {
-    const [targetPeripheralId] = connectParams.connectParams;
+    const [targetPeripheralId] = connectParams;
 
     do {
       await this.startScan(scanParams);
@@ -178,21 +160,15 @@ export class Bluevery {
       this.core.getState().scannedPeripherals[targetPeripheralId] === undefined
     );
 
-    if (checkCommunicate) {
-      await this.connectAndCheckCommunicate({
-        connectParams,
-        bondingParams,
-        readValueParams,
-        retrieveServicesParams,
-        writeValueParams,
-      });
-    } else {
-      await this.connect({
-        connectParams,
-        bondingParams,
-        retrieveServicesParams,
-      });
-    }
+    await this.connect({
+      connectParams,
+      connectOptions,
+      bondingParams,
+      bondingOptions,
+      retrieveServicesParams,
+      retrieveServicesOptions,
+    });
+
     await this.core.startNotification({startNotificationParams});
   }
 

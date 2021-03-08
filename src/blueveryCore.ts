@@ -23,15 +23,6 @@ import {
   createPeripheralInfoHandler,
   registerDidUpdateValueForCharacteristicListener,
   requestPermission,
-  retrieveServices,
-  RetrieveServicesParams,
-  createTryRetrieveServicesFn,
-  bonding,
-  BondingParams,
-  createTryBondFn,
-  connect,
-  createTryConnectFn,
-  ConnectParams,
   registerDisconnectPeripheralListener,
   createHandleDisconnectPeripheral,
 } from './libs';
@@ -248,25 +239,45 @@ export class BlueveryCore {
 
   async connect({
     connectParams,
+    connectOptions,
     retrieveServicesParams,
+    retrieveServicesOptions,
     bondingParams,
+    bondingOptions,
   }: {
-    connectParams: ConnectParams;
-    retrieveServicesParams: RetrieveServicesParams;
-    bondingParams: BondingParams;
+    connectParams: BleManagerParams['connect'];
+    connectOptions: ToBetterOptions;
+    retrieveServicesParams: BleManagerParams['retrieveServices'];
+    retrieveServicesOptions: ToBetterOptions;
+    bondingParams: BleManagerParams['createBond'];
+    bondingOptions: ToBetterOptions;
   }) {
-    const [targetPeripheralId] = connectParams.connectParams;
+    const [targetPeripheralId] = connectParams;
     const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
     if (isPassedRequireCheck === false) {
       return false;
     }
     this.state.setManagingPeripheralConnecting(targetPeripheralId);
-    await connect(createTryConnectFn(BleManager.connect), connectParams);
-    await retrieveServices(
-      createTryRetrieveServicesFn(BleManager.retrieveServices),
-      retrieveServicesParams,
+
+    const _connect = toBetterPromise(
+      toThrowErrorIfRejected(BleManager.connect),
+      connectOptions,
     );
-    await bonding(createTryBondFn(BleManager.createBond), bondingParams);
+
+    const _retrieveServices = toBetterPromise(
+      toThrowErrorIfRejected(BleManager.retrieveServices),
+      retrieveServicesOptions,
+    );
+
+    const _bonding = toBetterPromise(
+      toThrowErrorIfRejected(BleManager.createBond),
+      bondingOptions,
+    );
+
+    await _connect(...connectParams);
+    await _retrieveServices(...retrieveServicesParams);
+    await _bonding(...bondingParams);
+
     this.state.setPeripheralToManagingPeripherals(
       this.getState().scannedPeripherals[targetPeripheralId],
     );
