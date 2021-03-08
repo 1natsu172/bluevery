@@ -4,10 +4,9 @@ import autoBind from 'auto-bind';
 import {BlueveryCore as _BlueveryCore} from './blueveryCore';
 import {BlueveryState as _BlueveryState} from './blueveryState';
 import {
+  BleManagerParams,
   BlueveryOptions,
   PeripheralInfo,
-  ScanningSettings,
-  StartNotificationParams,
   State,
 } from './interface';
 import {
@@ -74,7 +73,7 @@ export class Bluevery {
        * @description
        * Important: The seconds setting is a second, not a millisecond!
        */
-      scanningSettings: ScanningSettings;
+      scanningSettings: BleManagerParams['scan'];
       /**
        * @description Important: this is millisecond. interval that scan between scan. default is `0` = no interval.
        */
@@ -162,7 +161,7 @@ export class Bluevery {
     checkCommunicate = true,
   }: {
     scanParams: Parameters<InstanceType<typeof Bluevery>['startScan']>[0];
-    startNotificationParams: StartNotificationParams;
+    startNotificationParams: BleManagerParams['startNotification'];
     connectParams: ConnectParams;
     retrieveServicesParams: RetrieveServicesParams;
     bondingParams: BondingParams;

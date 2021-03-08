@@ -10,11 +10,9 @@ import delay from 'delay';
 import {
   BlueveryOptions,
   PeripheralInfo,
-  ScanningSettings,
   State,
-  StartNotificationParams,
-  StopNotificationParams,
   PublicListeners,
+  BleManagerParams,
 } from './interface';
 import {
   checkBluetoothEnabled,
@@ -34,15 +32,14 @@ import {
   connect,
   createTryConnectFn,
   ConnectParams,
-  readValue,
-  createTryReadValueFn,
-  ReadValueParams,
-  writeValue,
-  createTryWriteValueFn,
-  WriteValueParams,
   registerDisconnectPeripheralListener,
   createHandleDisconnectPeripheral,
 } from './libs';
+import {
+  ToBetterOptions,
+  toBetterPromise,
+  toThrowErrorIfRejected,
+} from './utils';
 import {BlueveryState as _BlueveryState} from './blueveryState';
 import autoBind from 'auto-bind';
 import {DEFAULT_OMOIYARI_TIME} from './constants';
@@ -197,7 +194,7 @@ export class BlueveryCore {
     discoverHandler,
     matchFn,
   }: {
-    scanningSettings: ScanningSettings;
+    scanningSettings: BleManagerParams['scan'];
     discoverHandler?: (peripheralInfo: PeripheralInfo) => any;
     matchFn?: (peripheral: Peripheral) => boolean;
   }): Promise<void | false> {
@@ -276,19 +273,26 @@ export class BlueveryCore {
     this.state.setManagingPeripheralConnected(targetPeripheralId);
   }
 
-  // TODO 消す
-  async checkCommunicateWithPeripheral({
-    readValueParams,
-    writeValueParams,
-  }: {
-    readValueParams: ReadValueParams;
-    writeValueParams: WriteValueParams;
-  }) {
-    // const [peripheralId] = readValueParams.readValueParams;
-    // this.state.onCheckingCommunicateWithPeripheral(peripheralId);
-    await writeValue(createTryWriteValueFn(BleManager.write), writeValueParams);
-    await readValue(createTryReadValueFn(BleManager.read), readValueParams);
-    // this.state.offCheckingCommunicateWithPeripheral(peripheralId);
+  async writeValue(
+    writeValueParams: Parameters<typeof BleManager.write>,
+    toBetterOptions: ToBetterOptions,
+  ) {
+    const _writeValue = toBetterPromise(
+      toThrowErrorIfRejected(BleManager.write),
+      toBetterOptions,
+    );
+    return await _writeValue(...writeValueParams);
+  }
+
+  async readValue(
+    readValueParams: Parameters<typeof BleManager.read>,
+    toBetterOptions: ToBetterOptions,
+  ) {
+    const _readValue = toBetterPromise(
+      toThrowErrorIfRejected(BleManager.read),
+      toBetterOptions,
+    );
+    return await _readValue(...readValueParams);
   }
 
   /**
@@ -297,7 +301,7 @@ export class BlueveryCore {
   async startNotification({
     startNotificationParams,
   }: {
-    startNotificationParams: StartNotificationParams;
+    startNotificationParams: BleManagerParams['startNotification'];
   }) {
     const [peripheralId] = startNotificationParams;
     /**
@@ -326,7 +330,7 @@ export class BlueveryCore {
   stopNotification({
     stopNotificationParams,
   }: {
-    stopNotificationParams: StopNotificationParams;
+    stopNotificationParams: BleManagerParams['stopNotification'];
   }) {
     const [peripheralId] = stopNotificationParams;
     return Promise.all([

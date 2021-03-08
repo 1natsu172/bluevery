@@ -2,6 +2,7 @@ import {EmitterSubscription} from 'react-native';
 import BleManager, {Peripheral} from 'react-native-ble-manager';
 import {Permission} from 'react-native-permissions';
 import {DisconnectedPeripheralHandler} from './libs';
+import {MethodParamsRecord} from './utils/typeUtils/MethodParamsRecord';
 
 export type BlueveryOptions = {
   onDisconnectPeripheralHandler?: DisconnectedPeripheralHandler;
@@ -37,12 +38,7 @@ export type PublicListeners = {
 export type BlueveryEvents = 'didChangeBlueveryState';
 
 /**
- * options
+ * BleManager interface
  */
-export type ScanningSettings = Parameters<typeof BleManager.scan>;
-export type StartNotificationParams = Parameters<
-  typeof BleManager.startNotification
->;
-export type StopNotificationParams = Parameters<
-  typeof BleManager.stopNotification
->;
+export type TBleManager = typeof BleManager;
+export type BleManagerParams = MethodParamsRecord<TBleManager>;
