@@ -82,8 +82,8 @@ export class BlueveryCore {
      */
     await BleManager.getConnectedPeripherals([]).then((peripherals) => {
       peripherals.forEach((peripheral) => {
-        this.state.setPeripheralToManagingPeripherals(peripheral),
-          this.state.setManagingPeripheralConnected(peripheral.id);
+        this.state.setPeripheralToManagingPeripherals(peripheral);
+        this.state.setManagingPeripheralConnected(peripheral.id);
       });
     });
     if (Platform.OS === 'android') {
