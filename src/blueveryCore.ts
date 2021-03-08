@@ -274,7 +274,7 @@ export class BlueveryCore {
   }
 
   async writeValue(
-    writeValueParams: Parameters<typeof BleManager.write>,
+    writeValueParams: BleManagerParams['write'],
     toBetterOptions: ToBetterOptions,
   ) {
     const _writeValue = toBetterPromise(
@@ -285,7 +285,7 @@ export class BlueveryCore {
   }
 
   async readValue(
-    readValueParams: Parameters<typeof BleManager.read>,
+    readValueParams: BleManagerParams['read'],
     toBetterOptions: ToBetterOptions,
   ) {
     const _readValue = toBetterPromise(

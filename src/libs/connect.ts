@@ -1,12 +1,11 @@
 import BleManager from 'react-native-ble-manager';
 import promiseRetry, {Options as promiseRetryOptions} from 'p-retry';
+import {BleManagerParams} from '../interface';
 
-export type ConnectFn = (
-  ...args: Parameters<typeof BleManager.connect>
-) => Promise<void>;
+export type ConnectFn = (...args: BleManagerParams['connect']) => Promise<void>;
 
 export type ConnectParams = {
-  connectParams: Parameters<typeof BleManager.connect>;
+  connectParams: BleManagerParams['connect'];
   retryParams?: promiseRetryOptions;
 };
 

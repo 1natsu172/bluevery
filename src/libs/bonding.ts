@@ -1,13 +1,12 @@
 import {Platform} from 'react-native';
 import BleManager from 'react-native-ble-manager';
 import promiseRetry, {Options as promiseRetryOptions} from 'p-retry';
+import {BleManagerParams} from '../interface';
 
-export type BondFn = (
-  ...args: Parameters<typeof BleManager.createBond>
-) => Promise<void>;
+export type BondFn = (...args: BleManagerParams['createBond']) => Promise<void>;
 
 export type BondingParams = {
-  createBondParams: Parameters<typeof BleManager.createBond>;
+  createBondParams: BleManagerParams['createBond'];
   retryParams?: promiseRetryOptions;
 };
 

@@ -1,13 +1,14 @@
 import BleManager from 'react-native-ble-manager';
 import promiseTimeout from 'p-timeout';
 import promiseRetry, {Options as promiseRetryOptions} from 'p-retry';
+import {BleManagerParams} from '../interface';
 
 export type RetrieveServicesFn = (
-  ...args: Parameters<typeof BleManager.retrieveServices>
+  ...args: BleManagerParams['retrieveServices']
 ) => Promise<BleManager.PeripheralInfo>;
 
 export type RetrieveServicesParams = {
-  retrieveServicesParams: Parameters<typeof BleManager.retrieveServices>;
+  retrieveServicesParams: BleManagerParams['retrieveServices'];
   retryParams?: promiseRetryOptions;
   timeoutMilliseconds?: number;
 };
