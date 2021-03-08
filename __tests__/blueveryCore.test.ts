@@ -21,7 +21,7 @@ jest.mock('../src/libs', () => ({
  * prepare instances & spiedMethods
  */
 let blueveryCore: BlueveryCore;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 let spiedCheckAndRequestPermission: jest.SpyInstance;
 let spiedCheckBluetoothEnabled: jest.SpyInstance;
 let spiedRequireCheckBeforeBleProcess: jest.SpyInstance;
