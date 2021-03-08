@@ -131,7 +131,6 @@ export class Bluevery {
     });
   }
 
-  // FIXME: conditional typeにする
   async receiveCharacteristicValue({
     scanParams,
     startNotificationParams,
