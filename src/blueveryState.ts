@@ -189,4 +189,26 @@ export class BlueveryState {
   setPeripheralIsBonded(peripheralId: PeripheralId) {
     this.setManagingPeripheralInfoProperty(peripheralId, 'bonded', true);
   }
+
+  setPeripheralCommunicateIsNon(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(
+      peripheralId,
+      'communicate',
+      'nonCommunicate',
+    );
+  }
+  setPeripheralCommunicateIsReading(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(
+      peripheralId,
+      'communicate',
+      'reading',
+    );
+  }
+  setPeripheralCommunicateIsWriting(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(
+      peripheralId,
+      'communicate',
+      'writing',
+    );
+  }
 }

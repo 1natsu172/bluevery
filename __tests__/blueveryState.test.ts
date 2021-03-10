@@ -211,6 +211,7 @@ describe('BlueveryState', () => {
         ).toHaveProperty('bonded', true);
       });
     });
+
     describe('managingPeripherals:receivingForCharacteristicValueListener', () => {
       test('should set bonded property to peripheralInfo ', () => {
         blueveryState.setPeripheralToManagingPeripherals(dummyPeripheralInfo);
@@ -221,6 +222,36 @@ describe('BlueveryState', () => {
         expect(
           blueveryState.getState().managingPeripherals['1'],
         ).toHaveProperty('bonded', true);
+      });
+    });
+
+    describe('managingPeripherals:communicate', () => {
+      test('should set reading the communicate property to peripheralInfo ', () => {
+        expect(
+          blueveryState.getState().managingPeripherals['1'],
+        ).toHaveProperty('communicate', undefined);
+        blueveryState.setPeripheralCommunicateIsReading(dummyPeripheralInfo.id);
+        expect(
+          blueveryState.getState().managingPeripherals['1'],
+        ).toHaveProperty('communicate', 'reading');
+      });
+      test('should set writing the communicate property to peripheralInfo ', () => {
+        expect(
+          blueveryState.getState().managingPeripherals['1'],
+        ).toHaveProperty('communicate', undefined);
+        blueveryState.setPeripheralCommunicateIsWriting(dummyPeripheralInfo.id);
+        expect(
+          blueveryState.getState().managingPeripherals['1'],
+        ).toHaveProperty('communicate', 'writing');
+      });
+      test('should set nonCommnicate the communicate property to peripheralInfo ', () => {
+        expect(
+          blueveryState.getState().managingPeripherals['1'],
+        ).toHaveProperty('communicate', undefined);
+        blueveryState.setPeripheralCommunicateIsNon(dummyPeripheralInfo.id);
+        expect(
+          blueveryState.getState().managingPeripherals['1'],
+        ).toHaveProperty('communicate', 'nonCommunicate');
       });
     });
   });
