@@ -5,6 +5,12 @@ import {PeripheralInfo, State} from '../src/interface';
  * prepare instances & spiedMethods
  */
 let blueveryState: BlueveryState;
+const dummyPeripheralInfo: PeripheralInfo = {
+  id: '1',
+  rssi: 1,
+  advertising: {},
+  name: 'testPeripheral1',
+};
 beforeEach(() => {
   // cleanup mocks
   jest.clearAllMocks();
@@ -108,17 +114,33 @@ describe('BlueveryState', () => {
     });
   });
   describe('managingPeripheral', () => {
-    const dummyPeripheralInfo: PeripheralInfo = {
-      id: '1',
-      rssi: 1,
-      advertising: {},
-      name: 'testPeripheral1',
-    };
     beforeEach(() => {
+      // Set dummy PeripheralInfo to ManagingPeripherals
       blueveryState.setPeripheralInfoToManagingPeripherals(
         dummyPeripheralInfo.id,
         dummyPeripheralInfo,
       );
+    });
+    describe('setPeripheralToManagingPeripherals', () => {
+      test('should set peripheral to managingPeripherals', () => {
+        blueveryState.setPeripheralToManagingPeripherals(dummyPeripheralInfo);
+        expect(blueveryState.getState().managingPeripherals['1']).toEqual(
+          dummyPeripheralInfo,
+        );
+      });
+    });
+    describe('deletePeripheralFromManagingPeripherals', () => {
+      test('should delete peripheral from conectedPeripherals', () => {
+        expect(blueveryState.getState().managingPeripherals).toHaveProperty(
+          '1',
+        );
+        blueveryState.deletePeripheralFromManagingPeripherals(
+          dummyPeripheralInfo.id,
+        );
+        expect(blueveryState.getState().managingPeripherals).not.toHaveProperty(
+          '1',
+        );
+      });
     });
     describe('managingPeripheral:connect', () => {
       describe('setManagingPeripheralConnecting', () => {
@@ -201,7 +223,6 @@ describe('BlueveryState', () => {
 
     describe('managingPeripherals:bonded', () => {
       test('should set bonded property to peripheralInfo ', () => {
-        blueveryState.setPeripheralToManagingPeripherals(dummyPeripheralInfo);
         expect(
           blueveryState.getState().managingPeripherals['1'],
         ).toHaveProperty('bonded', undefined);
@@ -214,7 +235,6 @@ describe('BlueveryState', () => {
 
     describe('managingPeripherals:receivingForCharacteristicValueListener', () => {
       test('should set bonded property to peripheralInfo ', () => {
-        blueveryState.setPeripheralToManagingPeripherals(dummyPeripheralInfo);
         expect(
           blueveryState.getState().managingPeripherals['1'],
         ).toHaveProperty('bonded', undefined);
@@ -287,12 +307,6 @@ describe('BlueveryState', () => {
   });
   describe('setPeripheralToScannedPeripherals', () => {
     test('should set Peripheral', () => {
-      const dummyPeripheralInfo: PeripheralInfo = {
-        id: '1',
-        rssi: 1,
-        advertising: {},
-        name: 'testPeripheral1',
-      };
       blueveryState.setPeripheralToScannedPeripherals(dummyPeripheralInfo);
       expect(blueveryState.getState().scannedPeripherals['1']).toEqual(
         dummyPeripheralInfo,
@@ -301,12 +315,6 @@ describe('BlueveryState', () => {
   });
   describe('clearScannedPeripherals', () => {
     test('should clear current Peripherals', () => {
-      const dummyPeripheralInfo: PeripheralInfo = {
-        id: '1',
-        rssi: 1,
-        advertising: {},
-        name: 'testPeripheral1',
-      };
       blueveryState.setPeripheralToScannedPeripherals(dummyPeripheralInfo);
       expect(
         Object.values(blueveryState.getState().scannedPeripherals),
@@ -315,38 +323,6 @@ describe('BlueveryState', () => {
       expect(
         Object.values(blueveryState.getState().scannedPeripherals),
       ).toHaveLength(0);
-    });
-  });
-  describe('setPeripheralToManagingPeripherals', () => {
-    test('should set peripheral to managingPeripherals', () => {
-      const dummyPeripheralInfo: PeripheralInfo = {
-        id: '1',
-        rssi: 1,
-        advertising: {},
-        name: 'testConnectedPeripheral1',
-      };
-      blueveryState.setPeripheralToManagingPeripherals(dummyPeripheralInfo);
-      expect(blueveryState.getState().managingPeripherals['1']).toEqual(
-        dummyPeripheralInfo,
-      );
-    });
-  });
-  describe('deletePeripheralFromManagingPeripherals', () => {
-    test('should delete peripheral from conectedPeripherals', () => {
-      const dummyPeripheralInfo: PeripheralInfo = {
-        id: '1',
-        rssi: 1,
-        advertising: {},
-        name: 'testWillDisconnectPeripheral1',
-      };
-      blueveryState.setPeripheralToManagingPeripherals(dummyPeripheralInfo);
-      expect(blueveryState.getState().managingPeripherals).toHaveProperty('1');
-      blueveryState.deletePeripheralFromManagingPeripherals(
-        dummyPeripheralInfo.id,
-      );
-      expect(blueveryState.getState().managingPeripherals).not.toHaveProperty(
-        '1',
-      );
     });
   });
 });
