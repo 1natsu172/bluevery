@@ -4,7 +4,7 @@ import autoBind from 'auto-bind';
 import {Permission} from 'react-native-permissions';
 import {Peripheral} from 'react-native-ble-manager';
 
-function createInitialState(overrideState?: Partial<State>): State {
+export function createInitialState(overrideState?: Partial<State>): State {
   return {
     bluetoothEnabled: false,
     permissionGranted: {
@@ -30,13 +30,14 @@ export class BlueveryState {
     onChangeStateHandler,
   }: {
     initialState?: State;
-    onChangeStateHandler?: (...args: unknown[]) => unknown;
+    onChangeStateHandler?: (state: State) => unknown;
   }) {
     this.mutationState = proxy(createInitialState(initialState));
     this.unsubscribeTheState = subscribe(
       this.mutationState,
       () => {
-        onChangeStateHandler && onChangeStateHandler();
+        onChangeStateHandler &&
+          onChangeStateHandler(snapshot(this.mutationState));
       },
       true, // reacted in sync
     );

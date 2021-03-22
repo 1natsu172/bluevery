@@ -37,6 +37,8 @@ import {DEFAULT_OMOIYARI_TIME} from './constants';
 
 type ConstructorArgs = {
   BlueveryState: typeof _BlueveryState;
+  initialState?: State;
+  onChangeStateHandler?: (state: State) => unknown;
 };
 
 const BleManagerModule = NativeModules.BleManager;
@@ -49,8 +51,12 @@ export class BlueveryCore {
   private state: _BlueveryState;
   private __DO_NOT_DIRECT_USE_STATE__: State;
 
-  constructor({BlueveryState}: ConstructorArgs) {
-    this.state = new BlueveryState({});
+  constructor({
+    BlueveryState,
+    initialState,
+    onChangeStateHandler,
+  }: ConstructorArgs) {
+    this.state = new BlueveryState({initialState, onChangeStateHandler});
     this.__DO_NOT_DIRECT_USE_STATE__ = this.state.mutationState;
     autoBind(this);
   }
