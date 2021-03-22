@@ -53,11 +53,11 @@ export class BlueveryState {
   }
 
   /**
-   * @description safe setter of the undefined key-value
+   * @description setter that peripheralInfo of managingPeripherals
    */
   setPeripheralInfoToManagingPeripherals(
     peripheralId: PeripheralId,
-    peripheralInfo: Partial<PeripheralInfo>,
+    peripheralInfo: PeripheralInfo,
   ) {
     const existedPeripheral = this.getState().managingPeripherals[peripheralId];
     const processedPeripheral: PeripheralInfo = {
@@ -68,14 +68,25 @@ export class BlueveryState {
   }
 
   /**
-   * @description setProperty util method
+   * @description safe property setter that the undefined key-value of managingPeripherals
    */
   private setManagingPeripheralInfoProperty<Key extends keyof PeripheralInfo>(
     peripheralId: PeripheralId,
     key: Key,
     value: PeripheralInfo[Key],
   ) {
-    this.setPeripheralInfoToManagingPeripherals(peripheralId, {[key]: value});
+    const existedPeripheral = this.getState().managingPeripherals[peripheralId];
+    if (!existedPeripheral) {
+      throw new Error(`${peripheralId} is not found in managingPeripherals`);
+    }
+    const processedPeripheral: PeripheralInfo = {
+      ...existedPeripheral,
+      [key]: value,
+    };
+    this.setPeripheralInfoToManagingPeripherals(
+      peripheralId,
+      processedPeripheral,
+    );
   }
 
   /**

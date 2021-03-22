@@ -275,6 +275,16 @@ export class BlueveryCore {
     if (isPassedRequireCheck === false) {
       return false;
     }
+
+    // FIXME: selector化したい
+    const peripheral = this.getState().scannedPeripherals[targetPeripheralId];
+    if (!peripheral) {
+      throw new Error(
+        `${targetPeripheralId} is not found in scannedPeripherals`,
+      );
+    }
+    this.state.setPeripheralToManagingPeripherals(peripheral);
+
     this.state.setManagingPeripheralConnecting(targetPeripheralId);
 
     const _connect = toBetterPromise(
@@ -296,9 +306,6 @@ export class BlueveryCore {
     await _retrieveServices(...retrieveServicesParams);
     await _bonding(...bondingParams);
 
-    this.state.setPeripheralToManagingPeripherals(
-      this.getState().scannedPeripherals[targetPeripheralId],
-    );
     this.state.setManagingPeripheralConnected(targetPeripheralId);
   }
 

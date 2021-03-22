@@ -24,8 +24,8 @@ export type State = {
   };
   managing: boolean;
   scanning: boolean;
-  scannedPeripherals: {[key in PeripheralId]: Peripheral};
-  managingPeripherals: {[key in PeripheralId]: PeripheralInfo};
+  scannedPeripherals: {[key in PeripheralId]?: Peripheral};
+  managingPeripherals: {[key in PeripheralId]?: PeripheralInfo};
   error: Error | undefined;
 };
 
