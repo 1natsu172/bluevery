@@ -3,6 +3,7 @@ import promiseInterval from 'interval-promise';
 import autoBind from 'auto-bind';
 import {BlueveryCore as _BlueveryCore} from './blueveryCore';
 import {BlueveryState as _BlueveryState} from './blueveryState';
+import {BlueveryListeners as _BlueveryListeners} from './blueveryListeners';
 import {
   BleManagerParams,
   BlueveryOptions,
@@ -15,14 +16,19 @@ import {DEFAULT_OMOIYARI_TIME} from './constants';
 type ConstructorArgs = {
   BlueveryCore: typeof _BlueveryCore;
   BlueveryState: typeof _BlueveryState;
+  BlueveryListeners: typeof _BlueveryListeners;
 };
 
 export class Bluevery {
   private core: _BlueveryCore;
   private __DO_NOT_DIRECT_USE_STATE__: State;
 
-  constructor({BlueveryCore, BlueveryState}: ConstructorArgs) {
-    this.core = new BlueveryCore({BlueveryState});
+  constructor({
+    BlueveryCore,
+    BlueveryState,
+    BlueveryListeners,
+  }: ConstructorArgs) {
+    this.core = new BlueveryCore({BlueveryState, BlueveryListeners});
     // @ts-expect-error
     this.__DO_NOT_DIRECT_USE_STATE__ = this.core.__DO_NOT_DIRECT_USE_STATE__;
     autoBind(this);

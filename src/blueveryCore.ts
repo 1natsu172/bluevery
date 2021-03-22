@@ -1,9 +1,4 @@
-import {
-  NativeModules,
-  NativeEventEmitter,
-  EmitterSubscription,
-  Platform,
-} from 'react-native';
+import {NativeModules, NativeEventEmitter, Platform} from 'react-native';
 import BleManager, {Peripheral} from 'react-native-ble-manager';
 import {Permission} from 'react-native-permissions';
 import delay from 'delay';
@@ -11,7 +6,6 @@ import {
   BlueveryOptions,
   PeripheralInfo,
   State,
-  PublicListeners,
   BleManagerParams,
   PeripheralId,
 } from './interface';
@@ -33,11 +27,13 @@ import {
   toThrowErrorIfRejected,
 } from './utils';
 import {BlueveryState as _BlueveryState} from './blueveryState';
+import {BlueveryListeners as _BlueveryListeners} from './blueveryListeners';
 import autoBind from 'auto-bind';
 import {DEFAULT_OMOIYARI_TIME} from './constants';
 
 type ConstructorArgs = {
   BlueveryState: typeof _BlueveryState;
+  BlueveryListeners: typeof _BlueveryListeners;
   initialState?: State;
   onChangeStateHandler?: (state: State) => unknown;
 };
@@ -50,15 +46,18 @@ export class BlueveryCore {
 
   private userDefinedOptions: BlueveryOptions = {};
   private state: _BlueveryState;
+  private listeners: _BlueveryListeners;
   private __DO_NOT_DIRECT_USE_STATE__: State;
 
   constructor({
     BlueveryState,
+    BlueveryListeners,
     initialState,
     onChangeStateHandler,
   }: ConstructorArgs) {
     this.state = new BlueveryState({initialState, onChangeStateHandler});
     this.__DO_NOT_DIRECT_USE_STATE__ = this.state.mutationState;
+    this.listeners = new BlueveryListeners();
     autoBind(this);
   }
 
@@ -79,9 +78,13 @@ export class BlueveryCore {
       optionalOnDisconnectPeripheral:
         blueveryOptions?.onDisconnectPeripheralHandler,
     });
-    this.disconnectPeripheralListener = registerDisconnectPeripheralListener(
-      bleManagerEmitter,
-      handleDisconnectPeripheral,
+    // TODO: removeの処理実装する
+    this.listeners.setAnyInternalSubscription(
+      'disconnectPeripheralListener',
+      registerDisconnectPeripheralListener(
+        bleManagerEmitter,
+        handleDisconnectPeripheral,
+      ),
     );
 
     /**
@@ -106,9 +109,8 @@ export class BlueveryCore {
   /**
    * @property listeners
    */
-  private discoverPeripheralListener?: EmitterSubscription;
-  private disconnectPeripheralListener?: EmitterSubscription;
-  publicListeners: PublicListeners = {};
+  // private discoverPeripheralListener?: EmitterSubscription;
+  // private disconnectPeripheralListener?: EmitterSubscription;
 
   setUserDefinedOptions(options: BlueveryOptions) {
     this.userDefinedOptions = options;
@@ -234,7 +236,10 @@ export class BlueveryCore {
           handleDiscoverPeripheral,
         ),
       ]);
-      this.discoverPeripheralListener = discoverPeripheralListener;
+      this.listeners.setAnyInternalSubscription(
+        'discoverPeripheralListener',
+        discoverPeripheralListener,
+      );
 
       // note: スキャン秒数の担保。指定秒数経ったらscan処理を終える
       const [, scanSeconds] = scanningSettings;
@@ -245,7 +250,7 @@ export class BlueveryCore {
   private cleanupScan() {
     return Promise.all([
       BleManager.stopScan(),
-      this.discoverPeripheralListener?.remove(),
+      this.listeners.internalListeners.discoverPeripheralListener?.remove(),
       this.state.offScanning(),
     ]);
   }
@@ -369,10 +374,10 @@ export class BlueveryCore {
     /**
      * startNotificationが複数回呼ばれた場合listenerを一度破棄しておく
      */
-    if (this.publicListeners[peripheralId]) {
-      this.publicListeners[
+    if (this.listeners.publicListeners[peripheralId]) {
+      this.listeners.publicListeners[
         peripheralId
-      ].receivingForCharacteristicValueListener?.remove();
+      ]?.receivingForCharacteristicValueListener?.remove();
       this.state.offReceivingForCharacteristicValue(peripheralId);
     }
 
@@ -382,9 +387,11 @@ export class BlueveryCore {
         // TODO: リスナーのハンドラ実装する
       },
     );
-    this.publicListeners[
-      peripheralId
-    ].receivingForCharacteristicValueListener = notificationListener;
+    this.listeners.setAnyPublicSubscription(
+      peripheralId,
+      'receivingForCharacteristicValueListener',
+      notificationListener,
+    );
     await BleManager.startNotification(...startNotificationParams);
     this.state.onReceivingForCharacteristicValue(peripheralId);
   }
@@ -397,9 +404,9 @@ export class BlueveryCore {
     const [peripheralId] = stopNotificationParams;
     return Promise.all([
       BleManager.stopNotification(...stopNotificationParams),
-      this.publicListeners[
+      this.listeners.publicListeners[
         peripheralId
-      ].receivingForCharacteristicValueListener?.remove(),
+      ]?.receivingForCharacteristicValueListener?.remove(),
       this.state.offReceivingForCharacteristicValue(peripheralId),
     ]);
   }

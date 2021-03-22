@@ -2,6 +2,7 @@ import {bluevery as truthExportedBluevery} from '../src';
 import {Bluevery} from '../src/bluevery';
 import {BlueveryCore} from '../src/blueveryCore';
 import {BlueveryState} from '../src/blueveryState';
+import {BlueveryListeners} from '../src/blueveryListeners';
 import * as omoiyarify from '../src/utils/omoiyarify';
 import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
 
@@ -12,7 +13,7 @@ beforeEach(() => {
   jest.restoreAllMocks();
   spiedApplyOmoiyari = jest.spyOn(omoiyarify, 'applyOmoiyari');
 
-  bluevery = new Bluevery({BlueveryCore, BlueveryState});
+  bluevery = new Bluevery({BlueveryCore, BlueveryState, BlueveryListeners});
 });
 
 describe('truthExportedBluevery', () => {
@@ -62,7 +63,11 @@ describe('bluevery: commands APIs', () => {
 
     beforeEach(() => {
       jest.clearAllMocks();
-      bluevery = new Bluevery({BlueveryCore: core, BlueveryState});
+      bluevery = new Bluevery({
+        BlueveryCore: core,
+        BlueveryState,
+        BlueveryListeners,
+      });
     });
     describe('interval', () => {
       test('should correct intervalLength', async () => {
@@ -197,7 +202,11 @@ describe('bluevery: commands APIs', () => {
 
     beforeEach(() => {
       jest.clearAllMocks();
-      bluevery = new Bluevery({BlueveryCore: core, BlueveryState});
+      bluevery = new Bluevery({
+        BlueveryCore: core,
+        BlueveryState,
+        BlueveryListeners,
+      });
     });
 
     describe('writeValue: positive pattern', () => {
@@ -233,7 +242,11 @@ describe('bluevery: commands APIs', () => {
 
     beforeEach(() => {
       jest.clearAllMocks();
-      bluevery = new Bluevery({BlueveryCore: core, BlueveryState});
+      bluevery = new Bluevery({
+        BlueveryCore: core,
+        BlueveryState,
+        BlueveryListeners,
+      });
     });
 
     describe('readValue: positive pattern', () => {

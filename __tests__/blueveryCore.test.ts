@@ -1,5 +1,6 @@
 import {BlueveryCore} from '../src/blueveryCore';
 import {BlueveryState, createInitialState} from '../src/blueveryState';
+import {BlueveryListeners} from '../src/blueveryListeners';
 import {
   checkBluetoothEnabled,
   checkPermission,
@@ -71,7 +72,7 @@ beforeEach(() => {
   );
 
   // note: need create instance after spyOn
-  blueveryCore = new BlueveryCore({BlueveryState});
+  blueveryCore = new BlueveryCore({BlueveryState, BlueveryListeners});
 });
 
 describe('BlueveryCore', () => {
@@ -95,7 +96,7 @@ describe('BlueveryCore', () => {
 
         // unSpy checkAndRequestPermission because want to test with substance method
         spiedCheckAndRequestPermission.mockRestore();
-        blueveryCore = new BlueveryCore({BlueveryState});
+        blueveryCore = new BlueveryCore({BlueveryState, BlueveryListeners});
 
         // @ts-ignore ts(2341) access to private
         expect(blueveryCore.getState().permissionGranted).toEqual({
@@ -119,7 +120,7 @@ describe('BlueveryCore', () => {
 
           // unSpy checkAndRequestPermission because want to test with substance method
           spiedCheckAndRequestPermission.mockRestore();
-          blueveryCore = new BlueveryCore({BlueveryState});
+          blueveryCore = new BlueveryCore({BlueveryState, BlueveryListeners});
 
           // @ts-ignore ts(2341) access to private
           expect(blueveryCore.getState().permissionGranted).toEqual({
@@ -143,7 +144,7 @@ describe('BlueveryCore', () => {
 
           // unSpy checkAndRequestPermission because want to test with substance method
           spiedCheckAndRequestPermission.mockRestore();
-          blueveryCore = new BlueveryCore({BlueveryState});
+          blueveryCore = new BlueveryCore({BlueveryState, BlueveryListeners});
 
           // @ts-ignore ts(2341) access to private
           expect(blueveryCore.getState().permissionGranted).toEqual({
@@ -165,7 +166,7 @@ describe('BlueveryCore', () => {
     test('should be managing', async () => {
       // unSpy requireCheckBeforeBleProcess because want to test with substance method
       spiedRequireCheckBeforeBleProcess.mockRestore();
-      blueveryCore = new BlueveryCore({BlueveryState});
+      blueveryCore = new BlueveryCore({BlueveryState, BlueveryListeners});
 
       // @ts-ignore ts(2341) access to private
       expect(blueveryCore.getState().managing).toBe(false);
@@ -183,7 +184,7 @@ describe('BlueveryCore', () => {
         ]);
         // unSpy requireCheckBeforeBleProcess because want to test with substance method
         spiedRequireCheckBeforeBleProcess.mockRestore();
-        blueveryCore = new BlueveryCore({BlueveryState});
+        blueveryCore = new BlueveryCore({BlueveryState, BlueveryListeners});
 
         // @ts-ignore ts(2341) access to private
         const ret = await blueveryCore.requireCheckBeforeBleProcess();
@@ -193,7 +194,7 @@ describe('BlueveryCore', () => {
         spiedCheckBluetoothEnabled.mockResolvedValueOnce(false);
         // unSpy requireCheckBeforeBleProcess because want to test with substance method
         spiedRequireCheckBeforeBleProcess.mockRestore();
-        blueveryCore = new BlueveryCore({BlueveryState});
+        blueveryCore = new BlueveryCore({BlueveryState, BlueveryListeners});
 
         // @ts-ignore ts(2341) access to private
         const ret = await blueveryCore.requireCheckBeforeBleProcess();
@@ -205,6 +206,7 @@ describe('BlueveryCore', () => {
   describe('checkThePeripheralIsManaging', () => {
     beforeEach(() => {
       blueveryCore = new BlueveryCore({
+        BlueveryListeners,
         BlueveryState,
         initialState: createInitialState({
           managingPeripherals: {['1']: dummyPeripheralInfo('1')},
@@ -235,7 +237,7 @@ describe('BlueveryCore', () => {
       test('the result is enabled', async () => {
         // unSpy
         spiedCheckBluetoothEnabled.mockRestore();
-        blueveryCore = new BlueveryCore({BlueveryState});
+        blueveryCore = new BlueveryCore({BlueveryState, BlueveryListeners});
 
         mockedCheckBluetoothEnabled.mockImplementationOnce(async () => true);
         // @ts-ignore ts(2341) access to private
@@ -247,7 +249,7 @@ describe('BlueveryCore', () => {
       test('the result is disabled', async () => {
         // unSpy
         spiedCheckBluetoothEnabled.mockRestore();
-        blueveryCore = new BlueveryCore({BlueveryState});
+        blueveryCore = new BlueveryCore({BlueveryState, BlueveryListeners});
 
         mockedCheckBluetoothEnabled.mockImplementationOnce(async () => false);
         // @ts-ignore ts(2341) access to private
@@ -295,13 +297,13 @@ describe('BlueveryCore', () => {
       describe('guard from requireCheckBeforeBleProcess', () => {
         test('should guard if return false', async () => {
           spiedRequireCheckBeforeBleProcess.mockResolvedValueOnce(false);
-          blueveryCore = new BlueveryCore({BlueveryState});
+          blueveryCore = new BlueveryCore({BlueveryState, BlueveryListeners});
           await flushPromisesAdvanceTimer(1000);
           expect(BleManager.scan).not.toBeCalled();
         });
         test('should not guard return true', async () => {
           spiedRequireCheckBeforeBleProcess.mockResolvedValueOnce(true);
-          blueveryCore = new BlueveryCore({BlueveryState});
+          blueveryCore = new BlueveryCore({BlueveryState, BlueveryListeners});
           blueveryCore.scan({scanningSettings: [[], 1]});
           await flushPromisesAdvanceTimer(1000);
           expect(BleManager.scan).toBeCalled();
@@ -313,6 +315,7 @@ describe('BlueveryCore', () => {
   describe('writeValue', () => {
     beforeEach(() => {
       blueveryCore = new BlueveryCore({
+        BlueveryListeners,
         BlueveryState,
         initialState: createInitialState({
           managingPeripherals: {['1']: dummyPeripheralInfo('1')},
@@ -330,6 +333,7 @@ describe('BlueveryCore', () => {
     test('should change communicate status', async () => {
       const spyCommunicateStatus = jest.fn();
       blueveryCore = new BlueveryCore({
+        BlueveryListeners,
         BlueveryState,
         initialState: createInitialState({
           managingPeripherals: {['1']: dummyPeripheralInfo('1')},
@@ -368,6 +372,7 @@ describe('BlueveryCore', () => {
   describe('readValue', () => {
     beforeEach(() => {
       blueveryCore = new BlueveryCore({
+        BlueveryListeners,
         BlueveryState,
         initialState: createInitialState({
           managingPeripherals: {['1']: dummyPeripheralInfo('1')},
@@ -385,6 +390,7 @@ describe('BlueveryCore', () => {
     test('should change communicate status', async () => {
       const spyCommunicateStatus = jest.fn();
       blueveryCore = new BlueveryCore({
+        BlueveryListeners,
         BlueveryState,
         initialState: createInitialState({
           managingPeripherals: {['1']: dummyPeripheralInfo('1')},

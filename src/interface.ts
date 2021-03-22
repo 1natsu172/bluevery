@@ -29,10 +29,15 @@ export type State = {
   error: Error | undefined;
 };
 
+export type PublicSubscriptions = {
+  receivingForCharacteristicValueListener?: EmitterSubscription;
+};
 export type PublicListeners = {
-  [key in PeripheralId]: {
-    receivingForCharacteristicValueListener?: EmitterSubscription;
-  };
+  [key in PeripheralId]?: PublicSubscriptions;
+};
+export type InternalListeners = {
+  discoverPeripheralListener?: EmitterSubscription;
+  disconnectPeripheralListener?: EmitterSubscription;
 };
 
 export type BlueveryEvents = 'didChangeBlueveryState';
