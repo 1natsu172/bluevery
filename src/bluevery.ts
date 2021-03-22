@@ -171,7 +171,21 @@ export class Bluevery {
     await this.core.startNotification({startNotificationParams});
   }
 
-  async readValue() {}
+  async readValue(
+    readValueParams: BleManagerParams['read'],
+    options: ToBetterOptions = {
+      retryOptions: {factor: 1, retries: 4},
+    },
+  ) {
+    return await this.core.readValue(readValueParams, options);
+  }
 
-  async writeValue() {}
+  async writeValue(
+    writeValueParams: BleManagerParams['write'],
+    options: ToBetterOptions = {
+      retryOptions: {factor: 1, retries: 4},
+    },
+  ) {
+    return await this.core.writeValue(writeValueParams, options);
+  }
 }

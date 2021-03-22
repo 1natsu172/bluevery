@@ -188,4 +188,70 @@ describe('bluevery: commands APIs', () => {
       });
     });
   });
+
+  describe('writeValue', () => {
+    const writeValueFn = jest.fn(() => 'wrote to peripheral');
+    const core = (jest.fn().mockImplementation(() => ({
+      writeValue: writeValueFn,
+    })) as unknown) as typeof BlueveryCore;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      bluevery = new Bluevery({BlueveryCore: core, BlueveryState});
+    });
+
+    describe('writeValue: positive pattern', () => {
+      test('should return value if exist', async () => {
+        const wrote = await bluevery.writeValue([
+          'dummyPid',
+          'dummySUuid',
+          'dummyCharaValue',
+          'this is data',
+        ]);
+        expect(wrote).toBe('wrote to peripheral');
+      });
+    });
+
+    describe('writeValue: check calls', () => {
+      test('should call core#writeValue', async () => {
+        await bluevery.writeValue([
+          'dummyPid',
+          'dummySUuid',
+          'dummyCharaValue',
+          'this is data',
+        ]);
+        expect(writeValueFn).toBeCalled();
+      });
+    });
+  });
+
+  describe('readValue', () => {
+    const readValueFn = jest.fn(() => 'read to peripheral');
+    const core = (jest.fn().mockImplementation(() => ({
+      readValue: readValueFn,
+    })) as unknown) as typeof BlueveryCore;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      bluevery = new Bluevery({BlueveryCore: core, BlueveryState});
+    });
+
+    describe('readValue: positive pattern', () => {
+      test('should return value if exist', async () => {
+        const read = await bluevery.readValue([
+          'dummyPid',
+          'dummySUuid',
+          'dummyCharaValue',
+        ]);
+        expect(read).toBe('read to peripheral');
+      });
+    });
+
+    describe('readValue: check calls', () => {
+      test('should call core#readValue', async () => {
+        await bluevery.readValue(['dummyPid', 'dummySUuid', 'dummyCharaValue']);
+        expect(readValueFn).toBeCalled();
+      });
+    });
+  });
 });

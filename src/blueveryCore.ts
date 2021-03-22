@@ -292,24 +292,56 @@ export class BlueveryCore {
 
   async writeValue(
     writeValueParams: BleManagerParams['write'],
-    toBetterOptions: ToBetterOptions,
+    options: ToBetterOptions,
   ) {
+    const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
+    if (isPassedRequireCheck === false) {
+      return false;
+    }
+
     const _writeValue = toBetterPromise(
       toThrowErrorIfRejected(BleManager.write),
-      toBetterOptions,
+      options,
     );
-    return await _writeValue(...writeValueParams);
+
+    const [peripheralId] = writeValueParams;
+    let returnValue;
+    try {
+      this.state.setPeripheralCommunicateIsWriting(peripheralId);
+      returnValue = await _writeValue(...writeValueParams);
+    } catch (error) {
+      throw error;
+    } finally {
+      this.state.setPeripheralCommunicateIsNon(peripheralId);
+      return returnValue;
+    }
   }
 
   async readValue(
     readValueParams: BleManagerParams['read'],
-    toBetterOptions: ToBetterOptions,
+    options: ToBetterOptions,
   ) {
+    const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
+    if (isPassedRequireCheck === false) {
+      return false;
+    }
+
     const _readValue = toBetterPromise(
       toThrowErrorIfRejected(BleManager.read),
-      toBetterOptions,
+      options,
     );
-    return await _readValue(...readValueParams);
+
+    const [peripheralId] = readValueParams;
+    let returnValue;
+    try {
+      this.state.setPeripheralCommunicateIsReading(peripheralId);
+      returnValue = await _readValue(...readValueParams);
+    } catch (error) {
+      throw error;
+    } finally {
+      this.state.setPeripheralCommunicateIsNon(peripheralId);
+      return returnValue;
+    }
   }
 
   /**

@@ -1,5 +1,5 @@
 import {BlueveryCore} from '../src/blueveryCore';
-import {BlueveryState} from '../src/blueveryState';
+import {BlueveryState, createInitialState} from '../src/blueveryState';
 import {
   checkBluetoothEnabled,
   checkPermission,
@@ -16,6 +16,13 @@ jest.mock('../src/libs', () => ({
   checkPermission: jest.fn(),
   requestPermission: jest.fn(),
 }));
+
+const dummyPeripheralInfo = (id: string) => ({
+  id: id,
+  rssi: Number(id),
+  advertising: {},
+  name: `testPeripheral${id}`,
+});
 
 /**
  * prepare instances & spiedMethods
@@ -269,6 +276,95 @@ describe('BlueveryCore', () => {
           expect(BleManager.scan).toBeCalled();
         });
       });
+    });
+  });
+
+  describe('writeValue', () => {
+    test('should return if value exists', async () => {
+      const ret = await blueveryCore.writeValue(
+        ['1', 'dummySUUID', 'dummyCharaUUID', 'this is dummy data'],
+        {},
+      );
+      expect(ret).toStrictEqual([[1], [2], [3]]);
+    });
+
+    test('should change communicate status', async () => {
+      const spyCommunicateStatus = jest.fn();
+      blueveryCore = new BlueveryCore({
+        BlueveryState,
+        initialState: createInitialState({
+          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
+        }),
+        onChangeStateHandler: (state) => {
+          spyCommunicateStatus(state.managingPeripherals['1'].communicate);
+          // first called
+          expect(spyCommunicateStatus.mock.calls[0][0]).toBe('writing');
+        },
+      });
+      // check initial status
+      expect(blueveryCore.getState().managingPeripherals['1'].communicate).toBe(
+        undefined,
+      );
+      await blueveryCore.writeValue(
+        ['1', 'dummySUUID', 'dummyCharaUUID', 'this is dummy data'],
+        {},
+      );
+      // finally status
+      expect(blueveryCore.getState().managingPeripherals['1'].communicate).toBe(
+        'nonCommunicate',
+      );
+    });
+
+    test('writeValue: check calls', async () => {
+      await blueveryCore.writeValue(
+        ['dummyPid', 'dummySUUID', 'dummyCharaUUID', 'this is dummy data'],
+        {},
+      );
+      expect(BleManager.write).toBeCalled();
+      expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
+    });
+  });
+
+  describe('readValue', () => {
+    test('should return if value exists', async () => {
+      const ret = await blueveryCore.readValue(
+        ['1', 'dummySUUID', 'dummyCharaUUID'],
+        {},
+      );
+      expect(ret).toStrictEqual([[1], [2], [3]]);
+    });
+
+    test('should change communicate status', async () => {
+      const spyCommunicateStatus = jest.fn();
+      blueveryCore = new BlueveryCore({
+        BlueveryState,
+        initialState: createInitialState({
+          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
+        }),
+        onChangeStateHandler: (state) => {
+          spyCommunicateStatus(state.managingPeripherals['1'].communicate);
+          // first called
+          expect(spyCommunicateStatus.mock.calls[0][0]).toBe('reading');
+        },
+      });
+      // check initial status
+      expect(blueveryCore.getState().managingPeripherals['1'].communicate).toBe(
+        undefined,
+      );
+      await blueveryCore.readValue(['1', 'dummySUUID', 'dummyCharaUUID'], {});
+      // finally status
+      expect(blueveryCore.getState().managingPeripherals['1'].communicate).toBe(
+        'nonCommunicate',
+      );
+    });
+
+    test('readValue: check calls', async () => {
+      await blueveryCore.readValue(
+        ['dummyPid', 'dummySUUID', 'dummyCharaUUID'],
+        {},
+      );
+      expect(BleManager.read).toBeCalled();
+      expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
     });
   });
 });
