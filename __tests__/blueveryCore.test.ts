@@ -367,6 +367,19 @@ describe('BlueveryCore', () => {
       expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
       expect(spiedCheckThePeripheralIsManaging).toBeCalled();
     });
+
+    test('writeValue: should throw if error occured', async () => {
+      // @ts-expect-error
+      BleManager.write.mockImplementationOnce(async () => {
+        throw new Error('fixture error');
+      });
+
+      const _write = blueveryCore.writeValue(
+        ['1', 'dummySUUID', 'dummyCharaUUID', 'this is dummy data'],
+        {},
+      );
+      await expect(_write).rejects.toThrow('fixture error');
+    });
   });
 
   describe('readValue', () => {
@@ -417,6 +430,19 @@ describe('BlueveryCore', () => {
       expect(BleManager.read).toBeCalled();
       expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
       expect(spiedCheckThePeripheralIsManaging).toBeCalled();
+    });
+
+    test('readValue: should throw if error occured', async () => {
+      // @ts-expect-error
+      BleManager.read.mockImplementationOnce(async () => {
+        throw new Error('fixture error');
+      });
+
+      const _read = blueveryCore.readValue(
+        ['1', 'dummySUUID', 'dummyCharaUUID'],
+        {},
+      );
+      await expect(_read).rejects.toThrow('fixture error');
     });
   });
 });

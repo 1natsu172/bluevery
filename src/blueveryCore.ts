@@ -321,15 +321,13 @@ export class BlueveryCore {
       options,
     );
 
-    let returnValue;
     try {
       this.state.setPeripheralCommunicateIsWriting(peripheralId);
-      returnValue = await _writeValue(...writeValueParams);
+      return await _writeValue(...writeValueParams);
     } catch (error) {
       throw error;
     } finally {
       this.state.setPeripheralCommunicateIsNon(peripheralId);
-      return returnValue;
     }
   }
 
@@ -351,15 +349,13 @@ export class BlueveryCore {
       options,
     );
 
-    let returnValue;
     try {
       this.state.setPeripheralCommunicateIsReading(peripheralId);
-      returnValue = await _readValue(...readValueParams);
+      return await _readValue(...readValueParams);
     } catch (error) {
       throw error;
     } finally {
       this.state.setPeripheralCommunicateIsNon(peripheralId);
-      return returnValue;
     }
   }
 
