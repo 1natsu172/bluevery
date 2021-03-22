@@ -13,6 +13,7 @@ import {
   State,
   PublicListeners,
   BleManagerParams,
+  PeripheralId,
 } from './interface';
 import {
   checkBluetoothEnabled,
@@ -141,6 +142,12 @@ export class BlueveryCore {
      * check passed.
      */
     return true;
+  }
+
+  private checkThePeripheralIsManaging(peripheralId: PeripheralId) {
+    if (!this.getState().managingPeripherals[peripheralId]) {
+      throw new Error(`${peripheralId} is not found in managingPeripherals`);
+    }
   }
 
   private async checkBluetoothEnabled() {
@@ -294,17 +301,20 @@ export class BlueveryCore {
     writeValueParams: BleManagerParams['write'],
     options: ToBetterOptions,
   ) {
+    const [peripheralId] = writeValueParams;
+
     const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
     if (isPassedRequireCheck === false) {
       return false;
     }
+
+    this.checkThePeripheralIsManaging(peripheralId);
 
     const _writeValue = toBetterPromise(
       toThrowErrorIfRejected(BleManager.write),
       options,
     );
 
-    const [peripheralId] = writeValueParams;
     let returnValue;
     try {
       this.state.setPeripheralCommunicateIsWriting(peripheralId);
@@ -321,17 +331,20 @@ export class BlueveryCore {
     readValueParams: BleManagerParams['read'],
     options: ToBetterOptions,
   ) {
+    const [peripheralId] = readValueParams;
+
     const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
     if (isPassedRequireCheck === false) {
       return false;
     }
+
+    this.checkThePeripheralIsManaging(peripheralId);
 
     const _readValue = toBetterPromise(
       toThrowErrorIfRejected(BleManager.read),
       options,
     );
 
-    const [peripheralId] = readValueParams;
     let returnValue;
     try {
       this.state.setPeripheralCommunicateIsReading(peripheralId);

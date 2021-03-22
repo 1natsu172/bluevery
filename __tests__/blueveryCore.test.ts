@@ -32,6 +32,7 @@ let blueveryCore: BlueveryCore;
 let spiedCheckAndRequestPermission: jest.SpyInstance;
 let spiedCheckBluetoothEnabled: jest.SpyInstance;
 let spiedRequireCheckBeforeBleProcess: jest.SpyInstance;
+let spiedCheckThePeripheralIsManaging: jest.SpyInstance;
 let spiedCleanupScan: jest.SpyInstance;
 let spiedClearScannedPeripherals: jest.SpyInstance;
 beforeEach(() => {
@@ -63,6 +64,11 @@ beforeEach(() => {
   spiedClearScannedPeripherals = jest
     // @ts-ignore
     .spyOn(BlueveryCore.prototype, 'clearScannedPeripherals');
+  spiedCheckThePeripheralIsManaging = jest.spyOn(
+    BlueveryCore.prototype,
+    // @ts-expect-error
+    'checkThePeripheralIsManaging',
+  );
 
   // note: need create instance after spyOn
   blueveryCore = new BlueveryCore({BlueveryState});
@@ -196,6 +202,31 @@ describe('BlueveryCore', () => {
     });
   });
 
+  describe('checkThePeripheralIsManaging', () => {
+    beforeEach(() => {
+      blueveryCore = new BlueveryCore({
+        BlueveryState,
+        initialState: createInitialState({
+          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
+        }),
+      });
+    });
+    test('should not throw if the peripheral is managing', () => {
+      expect(() =>
+        // @ts-expect-error
+        blueveryCore.checkThePeripheralIsManaging('1'),
+      ).not.toThrow();
+    });
+    test('should throw if the peripheral is not managing', () => {
+      expect(() =>
+        // @ts-expect-error
+        blueveryCore.checkThePeripheralIsManaging(
+          'maybe not managing peripheral0001',
+        ),
+      ).toThrow();
+    });
+  });
+
   describe('checkBluetoothEnabled', () => {
     const mockedCheckBluetoothEnabled = checkBluetoothEnabled as jest.MockedFunction<
       typeof checkBluetoothEnabled
@@ -280,6 +311,14 @@ describe('BlueveryCore', () => {
   });
 
   describe('writeValue', () => {
+    beforeEach(() => {
+      blueveryCore = new BlueveryCore({
+        BlueveryState,
+        initialState: createInitialState({
+          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
+        }),
+      });
+    });
     test('should return if value exists', async () => {
       const ret = await blueveryCore.writeValue(
         ['1', 'dummySUUID', 'dummyCharaUUID', 'this is dummy data'],
@@ -317,15 +356,24 @@ describe('BlueveryCore', () => {
 
     test('writeValue: check calls', async () => {
       await blueveryCore.writeValue(
-        ['dummyPid', 'dummySUUID', 'dummyCharaUUID', 'this is dummy data'],
+        ['1', 'dummySUUID', 'dummyCharaUUID', 'this is dummy data'],
         {},
       );
       expect(BleManager.write).toBeCalled();
       expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
+      expect(spiedCheckThePeripheralIsManaging).toBeCalled();
     });
   });
 
   describe('readValue', () => {
+    beforeEach(() => {
+      blueveryCore = new BlueveryCore({
+        BlueveryState,
+        initialState: createInitialState({
+          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
+        }),
+      });
+    });
     test('should return if value exists', async () => {
       const ret = await blueveryCore.readValue(
         ['1', 'dummySUUID', 'dummyCharaUUID'],
@@ -359,12 +407,10 @@ describe('BlueveryCore', () => {
     });
 
     test('readValue: check calls', async () => {
-      await blueveryCore.readValue(
-        ['dummyPid', 'dummySUUID', 'dummyCharaUUID'],
-        {},
-      );
+      await blueveryCore.readValue(['1', 'dummySUUID', 'dummyCharaUUID'], {});
       expect(BleManager.read).toBeCalled();
       expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
+      expect(spiedCheckThePeripheralIsManaging).toBeCalled();
     });
   });
 });
