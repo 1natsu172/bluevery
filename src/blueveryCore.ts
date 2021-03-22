@@ -106,12 +106,6 @@ export class BlueveryCore {
     }
   }
 
-  /**
-   * @property listeners
-   */
-  // private discoverPeripheralListener?: EmitterSubscription;
-  // private disconnectPeripheralListener?: EmitterSubscription;
-
   setUserDefinedOptions(options: BlueveryOptions) {
     this.userDefinedOptions = options;
   }
