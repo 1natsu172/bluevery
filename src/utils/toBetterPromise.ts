@@ -69,7 +69,7 @@ export const toRetryPromise = <ArgsType extends unknown[], ReturnValue>(
 export function toBetterPromise<ArgsType extends unknown[], ReturnValue>(
   fn: (...args: ArgsType) => PromiseLike<ReturnValue>,
   options: BetterOptions,
-): (...args: ArgsType) => PromiseLike<ReturnValue>;
+): (...args: ArgsType) => Promise<ReturnValue>;
 /**
  * overload type when cancelable
  */
@@ -83,7 +83,7 @@ export function toBetterPromise<ArgsType extends unknown[], ReturnValue>(
 export function toBetterPromise<ArgsType extends unknown[], ReturnValue>(
   fn: (...args: ArgsType) => PromiseLike<ReturnValue>,
   options: ToBetterOptions,
-): (...args: ArgsType) => PromiseLike<ReturnValue> | pCancelable<ReturnValue>;
+): (...args: ArgsType) => Promise<ReturnValue> | pCancelable<ReturnValue>;
 /**
  * overload implement
  */

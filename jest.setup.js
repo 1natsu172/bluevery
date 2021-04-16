@@ -15,5 +15,12 @@ jest.mock('react-native-ble-manager', () => {
     getBondedPeripherals: jest.fn(async () => []),
     read: jest.fn(async () => [[1], [2], [3]]),
     write: jest.fn(async () => [[1], [2], [3]]),
+    checkState: jest.fn(() => {
+      const NativeEventEmitter = require('react-native').NativeEventEmitter;
+      const nativeEventEmitter = new NativeEventEmitter();
+      nativeEventEmitter.emit('BleManagerDidUpdateState', {
+        state: 'on',
+      });
+    }),
   };
 });

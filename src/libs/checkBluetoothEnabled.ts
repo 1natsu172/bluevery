@@ -1,6 +1,6 @@
 import BleManager from 'react-native-ble-manager';
 import {NativeModules, NativeEventEmitter} from 'react-native';
-import promiseRetry from 'p-retry';
+import {toBetterPromise, ToBetterOptions} from '../utils/toBetterPromise';
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -15,30 +15,24 @@ export const getBluetoothPowerState = async (): Promise<
       'BleManagerDidUpdateState',
       ({state}: {state: BluetoothPowerState}) => {
         listener.remove();
-        if (state === 'unknown') {
+        if (state === 'on' || state === 'off') {
+          resolve(state);
+        } else {
           reject(new Error(state));
         }
-        resolve(state);
       },
     );
     BleManager.checkState();
   });
 };
 
-export async function checkBluetoothEnabled(): Promise<boolean> {
-  const powerState: BluetoothPowerState = await promiseRetry(
-    getBluetoothPowerState,
-    {
-      retries: 5,
-      onFailedAttempt: (error) => {
-        console.log(
-          `getBluetoothPowerState failed: ${error.attemptNumber}, rest of ${error.retriesLeft}`,
-        );
-      },
-    },
-  ).catch(
-    (): BluetoothPowerState => {
-      return 'unknown';
+export async function checkBluetoothEnabled(
+  betterOptions: ToBetterOptions = {retryOptions: {factor: 1, retries: 5}},
+): Promise<boolean> {
+  const getPowerState = toBetterPromise(getBluetoothPowerState, betterOptions);
+  const powerState: BluetoothPowerState = await getPowerState().catch(
+    (error: BluetoothPowerState): BluetoothPowerState => {
+      return error;
     },
   );
   if (powerState === 'on') {
