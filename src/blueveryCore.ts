@@ -8,6 +8,7 @@ import {
   State,
   BleManagerParams,
   PeripheralId,
+  PublicHandlers,
 } from './interface';
 import {
   checkBluetoothEnabled,
@@ -364,8 +365,10 @@ export class BlueveryCore {
    */
   async startNotification({
     startNotificationParams,
+    receiveCharacteristicHandler,
   }: {
     startNotificationParams: BleManagerParams['startNotification'];
+    receiveCharacteristicHandler: PublicHandlers['HandleDidUpdateValueForCharacteristic'];
   }) {
     const [peripheralId] = startNotificationParams;
     /**
@@ -380,9 +383,7 @@ export class BlueveryCore {
 
     const notificationListener = registerDidUpdateValueForCharacteristicListener(
       bleManagerEmitter,
-      ({value}) => {
-        // TODO: リスナーのハンドラ実装する
-      },
+      receiveCharacteristicHandler,
     );
     this.listeners.setAnyPublicSubscription(
       peripheralId,

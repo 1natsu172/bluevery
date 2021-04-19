@@ -9,6 +9,7 @@ import {
   BlueveryOptions,
   PeripheralInfo,
   State,
+  PublicHandlers,
 } from './interface';
 import {applyOmoiyari, ToBetterOptions} from './utils';
 import {DEFAULT_OMOIYARI_TIME} from './constants';
@@ -139,22 +140,24 @@ export class Bluevery {
 
   async receiveCharacteristicValue({
     scanParams,
-    startNotificationParams,
     connectParams,
     connectOptions,
     retrieveServicesParams,
     retrieveServicesOptions,
     bondingParams,
     bondingOptions,
+    startNotificationParams,
+    receiveCharacteristicHandler,
   }: {
     scanParams: Parameters<InstanceType<typeof Bluevery>['startScan']>[0];
-    startNotificationParams: BleManagerParams['startNotification'];
     connectParams: BleManagerParams['connect'];
     connectOptions: ToBetterOptions;
     retrieveServicesParams: BleManagerParams['retrieveServices'];
     retrieveServicesOptions: ToBetterOptions;
     bondingParams: BleManagerParams['createBond'];
     bondingOptions: ToBetterOptions;
+    startNotificationParams: BleManagerParams['startNotification'];
+    receiveCharacteristicHandler: PublicHandlers['HandleDidUpdateValueForCharacteristic'];
   }) {
     const [targetPeripheralId] = connectParams;
 
@@ -174,7 +177,10 @@ export class Bluevery {
       retrieveServicesOptions,
     });
 
-    await this.core.startNotification({startNotificationParams});
+    await this.core.startNotification({
+      startNotificationParams,
+      receiveCharacteristicHandler,
+    });
   }
 
   async readValue(

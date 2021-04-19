@@ -1,7 +1,10 @@
 import {EmitterSubscription} from 'react-native';
 import BleManager, {Peripheral} from 'react-native-ble-manager';
 import {Permission} from 'react-native-permissions';
-import {DisconnectedPeripheralHandler} from './libs';
+import {
+  DisconnectedPeripheralHandler,
+  HandleDidUpdateValueForCharacteristic,
+} from './libs';
 import {MethodParamsRecord} from './utils/typeUtils/MethodParamsRecord';
 
 export type BlueveryOptions = {
@@ -39,6 +42,10 @@ export type InternalListeners = {
   discoverPeripheralListener?: EmitterSubscription;
   disconnectPeripheralListener?: EmitterSubscription;
 };
+
+export interface PublicHandlers {
+  HandleDidUpdateValueForCharacteristic: HandleDidUpdateValueForCharacteristic;
+}
 
 export type BlueveryEvents = 'didChangeBlueveryState';
 
