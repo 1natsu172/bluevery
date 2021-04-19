@@ -6,7 +6,7 @@ import {
 } from 'react-native-permissions';
 import {requestPermission} from './requestPermission';
 
-// FIXME react-native-permissions公式のmock実装が間違っているのでパッチしている。
+// Memo: react-native-permissions公式のmock実装が間違っているし(reduceの第2引数忘れ)、DENIEDのパターンも欲しいので独自に当てている。
 (requestMultiple as jest.MockedFunction<
   typeof requestMultiple
 >).mockImplementation(async (permissions: Permission[]) =>
