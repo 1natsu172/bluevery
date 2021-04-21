@@ -445,4 +445,74 @@ describe('BlueveryCore', () => {
       await expect(_read).rejects.toThrow('fixture error');
     });
   });
+
+  describe('conect', () => {
+    beforeEach(() => {
+      blueveryCore = new BlueveryCore({
+        BlueveryListeners,
+        BlueveryState,
+        initialState: createInitialState({
+          scannedPeripherals: {['1']: dummyPeripheralInfo('1')},
+        }),
+      });
+    });
+
+    test('connect: should be change connect of state the managing peripheral', async () => {
+      const spyConnectState = jest.fn();
+      blueveryCore = new BlueveryCore({
+        BlueveryListeners,
+        BlueveryState,
+        initialState: createInitialState({
+          scannedPeripherals: {['1']: dummyPeripheralInfo('1')},
+          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
+        }),
+        onChangeStateHandler: (state) => {
+          spyConnectState(state.managingPeripherals['1'].connect);
+        },
+      });
+      // check initial status
+      expect(blueveryCore.getState().managingPeripherals['1'].connect).toBe(
+        undefined,
+      );
+      await blueveryCore.connect({
+        bondingParams: ['1', ''],
+        bondingOptions: {},
+        connectParams: ['1'],
+        connectOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
+
+      expect(spyConnectState.mock.calls[0][0]).toBe(undefined);
+      expect(spyConnectState.mock.calls[1][0]).toBe('connecting');
+      expect(spyConnectState.mock.calls[2][0]).toBe('connected');
+    });
+
+    test('connect: should be throw if not found peripheral in scannedPeripherals', async () => {
+      const connecting = blueveryCore.connect({
+        bondingParams: ['1', ''],
+        bondingOptions: {},
+        connectParams: ['2'],
+        connectOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
+      await expect(connecting).rejects.toThrow();
+    });
+
+    test('connect: check calls', async () => {
+      await blueveryCore.connect({
+        bondingParams: ['1', ''],
+        bondingOptions: {},
+        connectParams: ['1'],
+        connectOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
+      expect(BleManager.connect).toBeCalled();
+      expect(BleManager.retrieveServices).toBeCalled();
+      expect(BleManager.createBond).toBeCalled();
+      expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
+    });
+  });
 });

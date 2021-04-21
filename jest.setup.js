@@ -22,5 +22,8 @@ jest.mock('react-native-ble-manager', () => {
         state: 'on',
       });
     }),
+    connect: jest.fn(),
+    retrieveServices: jest.fn(),
+    createBond: jest.fn(),
   };
 });
