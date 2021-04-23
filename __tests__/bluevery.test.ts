@@ -13,7 +13,11 @@ beforeEach(() => {
   jest.restoreAllMocks();
   spiedApplyOmoiyari = jest.spyOn(omoiyarify, 'applyOmoiyari');
 
-  bluevery = new Bluevery({BlueveryCore, BlueveryState, BlueveryListeners});
+  bluevery = new Bluevery({
+    BlueveryCore,
+    BlueveryState,
+    blueveryListeners: new BlueveryListeners(),
+  });
 });
 
 describe('truthExportedBluevery', () => {
@@ -66,7 +70,7 @@ describe('bluevery: commands APIs', () => {
       bluevery = new Bluevery({
         BlueveryCore: core,
         BlueveryState,
-        BlueveryListeners,
+        blueveryListeners: new BlueveryListeners(),
       });
     });
     describe('interval', () => {
@@ -205,7 +209,7 @@ describe('bluevery: commands APIs', () => {
       bluevery = new Bluevery({
         BlueveryCore: core,
         BlueveryState,
-        BlueveryListeners,
+        blueveryListeners: new BlueveryListeners(),
       });
     });
 
@@ -245,7 +249,7 @@ describe('bluevery: commands APIs', () => {
       bluevery = new Bluevery({
         BlueveryCore: core,
         BlueveryState,
-        BlueveryListeners,
+        blueveryListeners: new BlueveryListeners(),
       });
     });
 

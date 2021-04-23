@@ -17,7 +17,7 @@ import {DEFAULT_OMOIYARI_TIME} from './constants';
 type ConstructorArgs = {
   BlueveryCore: typeof _BlueveryCore;
   BlueveryState: typeof _BlueveryState;
-  BlueveryListeners: typeof _BlueveryListeners;
+  blueveryListeners: InstanceType<typeof _BlueveryListeners>;
 };
 
 export class Bluevery {
@@ -27,9 +27,9 @@ export class Bluevery {
   constructor({
     BlueveryCore,
     BlueveryState,
-    BlueveryListeners,
+    blueveryListeners,
   }: ConstructorArgs) {
-    this.core = new BlueveryCore({BlueveryState, BlueveryListeners});
+    this.core = new BlueveryCore({BlueveryState, blueveryListeners});
     // @ts-expect-error
     this.__DO_NOT_DIRECT_USE_STATE__ = this.core.__DO_NOT_DIRECT_USE_STATE__;
     autoBind(this);

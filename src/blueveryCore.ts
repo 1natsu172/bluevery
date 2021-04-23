@@ -34,7 +34,7 @@ import {DEFAULT_OMOIYARI_TIME} from './constants';
 
 type ConstructorArgs = {
   BlueveryState: typeof _BlueveryState;
-  BlueveryListeners: typeof _BlueveryListeners;
+  blueveryListeners: InstanceType<typeof _BlueveryListeners>;
   initialState?: State;
   onChangeStateHandler?: (state: State) => unknown;
 };
@@ -52,13 +52,13 @@ export class BlueveryCore {
 
   constructor({
     BlueveryState,
-    BlueveryListeners,
+    blueveryListeners,
     initialState,
     onChangeStateHandler,
   }: ConstructorArgs) {
     this.state = new BlueveryState({initialState, onChangeStateHandler});
     this.__DO_NOT_DIRECT_USE_STATE__ = this.state.mutationState;
-    this.listeners = new BlueveryListeners();
+    this.listeners = blueveryListeners;
     autoBind(this);
   }
 

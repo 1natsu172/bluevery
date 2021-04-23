@@ -7,7 +7,7 @@ import {createUseBlueveryState} from './stateProvider';
 export const bluevery = new Bluevery({
   BlueveryCore,
   BlueveryState,
-  BlueveryListeners,
+  blueveryListeners: new BlueveryListeners(),
 });
 
 export const useBlueveryState = createUseBlueveryState(
