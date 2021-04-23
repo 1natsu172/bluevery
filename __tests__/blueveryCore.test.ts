@@ -549,4 +549,81 @@ describe('BlueveryCore', () => {
       expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
     });
   });
+
+  describe('startNotification', () => {
+    test('startNotification: should be reset the previous listener, if there is one', async () => {
+      const mockRemoveFn = jest.fn();
+      const spyReceivingCharaValueState = jest.fn();
+
+      const blueveryListeners = new BlueveryListeners();
+      blueveryListeners.setAnyPublicSubscription(
+        '1',
+        'receivingForCharacteristicValueListener',
+        ({remove: mockRemoveFn} as unknown) as EmitterSubscription,
+      );
+      blueveryCore = new BlueveryCore({
+        BlueveryState,
+        blueveryListeners,
+        initialState: createInitialState({
+          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
+        }),
+        onChangeStateHandler: (state) => {
+          spyReceivingCharaValueState(
+            state.managingPeripherals['1'].receivingForCharacteristicValue,
+          );
+        },
+      });
+      await blueveryCore.startNotification({
+        startNotificationParams: ['1', 'test', 'test'],
+        receiveCharacteristicHandler: () => {},
+      });
+      expect(mockRemoveFn).toBeCalled();
+      expect(spyReceivingCharaValueState.mock.calls[0][0]).toBe(false);
+    });
+
+    test('startNotification: should be receiving characteristic value', async () => {
+      const spyReceivingCharaValueState = jest.fn();
+
+      const blueveryListeners = new BlueveryListeners();
+      blueveryCore = new BlueveryCore({
+        BlueveryState,
+        blueveryListeners,
+        initialState: createInitialState({
+          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
+        }),
+        onChangeStateHandler: (state) => {
+          spyReceivingCharaValueState(
+            state.managingPeripherals['1'].receivingForCharacteristicValue,
+          );
+        },
+      });
+      await blueveryCore.startNotification({
+        startNotificationParams: ['1', 'test', 'test'],
+        receiveCharacteristicHandler: () => {},
+      });
+      expect(
+        blueveryListeners.publicListeners['1']
+          .receivingForCharacteristicValueListener,
+      ).not.toBeUndefined();
+      expect(spyReceivingCharaValueState.mock.calls[0][0]).toBe(true);
+    });
+    test('startNotification: connect: check calls', async () => {
+      const blueveryListeners = new BlueveryListeners();
+      blueveryCore = new BlueveryCore({
+        BlueveryState,
+        blueveryListeners,
+        initialState: createInitialState({
+          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
+        }),
+      });
+      await blueveryCore.startNotification({
+        startNotificationParams: ['1', 'test', 'test'],
+        receiveCharacteristicHandler: () => {},
+      });
+
+      expect(BleManager.startNotification).toBeCalled();
+    });
+  });
+
+  describe('stopNotification', () => {});
 });
