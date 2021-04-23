@@ -26,5 +26,6 @@ jest.mock('react-native-ble-manager', () => {
     retrieveServices: jest.fn(),
     createBond: jest.fn(),
     startNotification: jest.fn(),
+    stopNotification: jest.fn(),
   };
 });

@@ -625,5 +625,36 @@ describe('BlueveryCore', () => {
     });
   });
 
-  describe('stopNotification', () => {});
+  describe('stopNotification', () => {
+    test('should be clean the satrting notification', async () => {
+      const mockRemoveFn = jest.fn();
+      const spyReceivingCharaValueState = jest.fn();
+
+      const blueveryListeners = new BlueveryListeners();
+      blueveryListeners.setAnyPublicSubscription(
+        '1',
+        'receivingForCharacteristicValueListener',
+        ({remove: mockRemoveFn} as unknown) as EmitterSubscription,
+      );
+      blueveryCore = new BlueveryCore({
+        BlueveryState,
+        blueveryListeners,
+        initialState: createInitialState({
+          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
+        }),
+        onChangeStateHandler: (state) => {
+          spyReceivingCharaValueState(
+            state.managingPeripherals['1'].receivingForCharacteristicValue,
+          );
+        },
+      });
+      await blueveryCore.stopNotification({
+        stopNotificationParams: ['1', 'test,', 'test'],
+      });
+
+      expect(BleManager.stopNotification).toBeCalled();
+      expect(mockRemoveFn).toBeCalled();
+      expect(spyReceivingCharaValueState.mock.calls[0][0]).toBe(false);
+    });
+  });
 });
