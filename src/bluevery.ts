@@ -183,6 +183,14 @@ export class Bluevery {
     });
   }
 
+  async stopReceiveCharacteristicValue({
+    stopNotificationParams,
+  }: {
+    stopNotificationParams: BleManagerParams['stopNotification'];
+  }) {
+    return await this.core.stopNotification({stopNotificationParams});
+  }
+
   async readValue(
     readValueParams: BleManagerParams['read'],
     options: ToBetterOptions = {

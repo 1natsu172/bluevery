@@ -271,4 +271,37 @@ describe('bluevery: commands APIs', () => {
       });
     });
   });
+
+  describe('connect', () => {
+    test.todo('should ', () => {});
+  });
+
+  describe('receiveCharacteristicValue', () => {
+    test.todo('should ', () => {});
+  });
+
+  describe('stopReceiveCharacteristicValue', () => {
+    const stopNotificationFn = jest.fn();
+    const core = (jest.fn().mockImplementation(() => ({
+      stopNotification: stopNotificationFn,
+    })) as unknown) as typeof BlueveryCore;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      bluevery = new Bluevery({
+        BlueveryCore: core,
+        BlueveryState,
+        blueveryListeners: new BlueveryListeners(),
+      });
+    });
+
+    describe('stopNotification: check calls', () => {
+      test('should call core#stopNotification', async () => {
+        await bluevery.stopReceiveCharacteristicValue({
+          stopNotificationParams: ['1', 'test', 'test'],
+        });
+        expect(stopNotificationFn).toBeCalled();
+      });
+    });
+  });
 });
