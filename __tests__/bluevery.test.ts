@@ -273,11 +273,88 @@ describe('bluevery: commands APIs', () => {
   });
 
   describe('connect', () => {
-    test.todo('should ', () => {});
+    test.todo('should ');
   });
 
   describe('receiveCharacteristicValue', () => {
-    test.todo('should ', () => {});
+    const connectFn = jest.fn();
+    let startScanFn = jest.fn();
+    let spiedStartNotification: jest.SpyInstance;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      //cleanup spys
+      jest.restoreAllMocks();
+
+      spiedStartNotification = jest
+        .spyOn(BlueveryCore.prototype, 'startNotification')
+        .mockImplementation(async () => {});
+
+      bluevery = new Bluevery({
+        BlueveryCore,
+        BlueveryState,
+        blueveryListeners: new BlueveryListeners(),
+      });
+      bluevery.connect = connectFn;
+      bluevery.startScan = startScanFn;
+    });
+
+    test('should be repeat the scan until find the target peripheral', async () => {
+      /**
+       * do...whileのテストのために動的にstateが変わるのを再現している
+       */
+      const createMockScanFn = (callCount: number, foundTiming: number) =>
+        jest.fn(async () => {
+          callCount += 1;
+          if (callCount >= foundTiming) {
+            // @ts-expect-error
+            bluevery.core.state.setPeripheralToScannedPeripherals({
+              id: '1',
+            });
+          }
+        });
+      startScanFn = createMockScanFn(0, 3);
+      bluevery.startScan = startScanFn;
+
+      await bluevery.receiveCharacteristicValue({
+        bondingOptions: {},
+        bondingParams: ['1', 'test'],
+        connectOptions: {},
+        connectParams: ['1'],
+        receiveCharacteristicHandler: () => {},
+        retrieveServicesOptions: {},
+        retrieveServicesParams: ['1'],
+        scanParams: {scanOptions: {scanningSettings: [['1'], 1]}},
+        startNotificationParams: ['1', 'test', 'test'],
+      });
+
+      expect(startScanFn.mock.calls.length).toBeGreaterThanOrEqual(3);
+    });
+
+    describe('receiveCharacteristicValue: check calls', () => {
+      beforeEach(async () => {
+        await bluevery.receiveCharacteristicValue({
+          bondingOptions: {},
+          bondingParams: ['1', 'test'],
+          connectOptions: {},
+          connectParams: ['1'],
+          receiveCharacteristicHandler: () => {},
+          retrieveServicesOptions: {},
+          retrieveServicesParams: ['1'],
+          scanParams: {scanOptions: {scanningSettings: [['1'], 1]}},
+          startNotificationParams: ['1', 'test', 'test'],
+        });
+      });
+      test('should call startScan', async () => {
+        expect(startScanFn).toBeCalled();
+      });
+      test('should call connect', async () => {
+        expect(connectFn).toBeCalled();
+      });
+      test('should call startNotification', async () => {
+        expect(spiedStartNotification).toBeCalled();
+      });
+    });
   });
 
   describe('stopReceiveCharacteristicValue', () => {
