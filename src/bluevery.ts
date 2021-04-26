@@ -1,6 +1,7 @@
 import {Peripheral} from 'react-native-ble-manager';
 import promiseInterval from 'interval-promise';
 import autoBind from 'auto-bind';
+import deepmerge from 'deepmerge';
 import {BlueveryCore as _BlueveryCore} from './blueveryCore';
 import {BlueveryState as _BlueveryState} from './blueveryState';
 import {BlueveryListeners as _BlueveryListeners} from './blueveryListeners';
@@ -111,23 +112,11 @@ export class Bluevery {
 
   async connect({
     connectParams,
-    // Note: connectはiOSで失敗してもタイムアウトしないので、タイムアウトするようにする
-    connectOptions = {
-      retryOptions: {factor: 1, retries: 4},
-      timeoutOptions: {timeoutMilliseconds: 8000},
-    },
+    connectOptions,
     bondingParams,
-    // Note: 無限にbondingして返ってこないケースがあるので、タイムアウトするようにする
-    bondingOptions = {
-      retryOptions: {factor: 1, retries: 4},
-      timeoutOptions: {timeoutMilliseconds: 10000},
-    },
+    bondingOptions,
     retrieveServicesParams,
-    // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
-    retrieveServicesOptions = {
-      retryOptions: {factor: 1, retries: 4},
-      timeoutOptions: {timeoutMilliseconds: 5000},
-    },
+    retrieveServicesOptions,
   }: {
     connectParams: BleManagerParams['connect'];
     /**
@@ -151,19 +140,43 @@ export class Bluevery {
      */
     bondingOptions?: ToBetterOptions;
   }) {
+    // Note: connectはiOSで失敗してもタイムアウトしないので、タイムアウトするようにする
+    const _connectOptions = deepmerge<ToBetterOptions>(
+      {
+        retryOptions: {factor: 1, retries: 4},
+        timeoutOptions: {timeoutMilliseconds: 8000},
+      },
+      connectOptions || {},
+    );
+    // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
+    const _retrieveServicesOptions = deepmerge<ToBetterOptions>(
+      {
+        retryOptions: {factor: 1, retries: 4},
+        timeoutOptions: {timeoutMilliseconds: 5000},
+      },
+      retrieveServicesOptions || {},
+    );
+    // Note: 無限にbondingして返ってこないケースがあるので、タイムアウトするようにする
+    const _bondingOptions = deepmerge<ToBetterOptions>(
+      {
+        retryOptions: {factor: 1, retries: 4},
+        timeoutOptions: {timeoutMilliseconds: 10000},
+      },
+      bondingOptions || {},
+    );
+
     await this.core.connect({
       connectParams,
-      connectOptions,
+      connectOptions: _connectOptions,
       bondingParams,
-      bondingOptions,
+      bondingOptions: _bondingOptions,
       retrieveServicesParams,
-      retrieveServicesOptions,
+      retrieveServicesOptions: _retrieveServicesOptions,
     });
   }
 
   /**
    * NOTE: connect, retrieveServices, bondingはconnectメソッドで必要なのでオプションのデフォルト指定がないので意図的
-   * FIXME: オプションのデフォルト指定に関して本当にこれでいいか、あとで考えてほしい。マージの概念ないと厳しいか？
    */
   async receiveCharacteristicValue({
     scanParams,
@@ -221,20 +234,28 @@ export class Bluevery {
   // TODO: read前にretrieveServicesのコールが必要だが実装で吸収するか考える
   async readValue(
     readValueParams: BleManagerParams['read'],
-    options: ToBetterOptions = {
-      retryOptions: {factor: 1, retries: 4},
-    },
+    options?: ToBetterOptions,
   ) {
-    return await this.core.readValue(readValueParams, options);
+    const _options = deepmerge<ToBetterOptions>(
+      {
+        retryOptions: {factor: 1, retries: 4},
+      },
+      options || {},
+    );
+    return await this.core.readValue(readValueParams, _options);
   }
 
   // TODO: write前にretrieveServicesのコールが必要だが実装で吸収するか考える
   async writeValue(
     writeValueParams: BleManagerParams['write'],
-    options: ToBetterOptions = {
-      retryOptions: {factor: 1, retries: 4},
-    },
+    options?: ToBetterOptions,
   ) {
-    return await this.core.writeValue(writeValueParams, options);
+    const _options = deepmerge<ToBetterOptions>(
+      {
+        retryOptions: {factor: 1, retries: 4},
+      },
+      options || {},
+    );
+    return await this.core.writeValue(writeValueParams, _options);
   }
 }
