@@ -111,22 +111,22 @@ export class Bluevery {
 
   async connect({
     connectParams,
-    connectOptions,
+    connectOptions = {retryOptions: {factor: 1, retries: 4}},
     bondingParams,
-    bondingOptions,
+    bondingOptions = {retryOptions: {factor: 1, retries: 4}},
     retrieveServicesParams,
-    retrieveServicesOptions,
+    retrieveServicesOptions = {retryOptions: {factor: 1, retries: 4}},
   }: {
     connectParams: BleManagerParams['connect'];
-    connectOptions: ToBetterOptions;
+    connectOptions?: ToBetterOptions;
     retrieveServicesParams: BleManagerParams['retrieveServices'];
     /**
      * @description retrieveServices with timeout
      * @default timeoutMilliseconds = 2000ms
      */
-    retrieveServicesOptions: ToBetterOptions;
+    retrieveServicesOptions?: ToBetterOptions;
     bondingParams: BleManagerParams['createBond'];
-    bondingOptions: ToBetterOptions;
+    bondingOptions?: ToBetterOptions;
   }) {
     await this.core.connect({
       connectParams,
@@ -141,21 +141,21 @@ export class Bluevery {
   async receiveCharacteristicValue({
     scanParams,
     connectParams,
-    connectOptions,
+    connectOptions = {retryOptions: {factor: 1, retries: 4}},
     retrieveServicesParams,
-    retrieveServicesOptions,
+    retrieveServicesOptions = {retryOptions: {factor: 1, retries: 4}},
     bondingParams,
-    bondingOptions,
+    bondingOptions = {retryOptions: {factor: 1, retries: 4}},
     startNotificationParams,
     receiveCharacteristicHandler,
   }: {
     scanParams: Parameters<InstanceType<typeof Bluevery>['startScan']>[0];
     connectParams: BleManagerParams['connect'];
-    connectOptions: ToBetterOptions;
+    connectOptions?: ToBetterOptions;
     retrieveServicesParams: BleManagerParams['retrieveServices'];
-    retrieveServicesOptions: ToBetterOptions;
+    retrieveServicesOptions?: ToBetterOptions;
     bondingParams: BleManagerParams['createBond'];
-    bondingOptions: ToBetterOptions;
+    bondingOptions?: ToBetterOptions;
     startNotificationParams: BleManagerParams['startNotification'];
     receiveCharacteristicHandler: PublicHandlers['HandleDidUpdateValueForCharacteristic'];
   }) {

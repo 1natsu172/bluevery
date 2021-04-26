@@ -317,15 +317,12 @@ describe('bluevery: commands APIs', () => {
       bluevery.startScan = startScanFn;
 
       await bluevery.receiveCharacteristicValue({
-        bondingOptions: {},
-        bondingParams: ['1', 'test'],
-        connectOptions: {},
-        connectParams: ['1'],
-        receiveCharacteristicHandler: () => {},
-        retrieveServicesOptions: {},
-        retrieveServicesParams: ['1'],
         scanParams: {scanOptions: {scanningSettings: [['1'], 1]}},
+        retrieveServicesParams: ['1'],
+        connectParams: ['1'],
+        bondingParams: ['1', 'test'],
         startNotificationParams: ['1', 'test', 'test'],
+        receiveCharacteristicHandler: () => {},
       });
 
       expect(startScanFn.mock.calls.length).toBeGreaterThanOrEqual(3);
@@ -334,15 +331,12 @@ describe('bluevery: commands APIs', () => {
     describe('receiveCharacteristicValue: check calls', () => {
       beforeEach(async () => {
         await bluevery.receiveCharacteristicValue({
-          bondingOptions: {},
-          bondingParams: ['1', 'test'],
-          connectOptions: {},
-          connectParams: ['1'],
-          receiveCharacteristicHandler: () => {},
-          retrieveServicesOptions: {},
-          retrieveServicesParams: ['1'],
           scanParams: {scanOptions: {scanningSettings: [['1'], 1]}},
+          retrieveServicesParams: ['1'],
+          connectParams: ['1'],
+          bondingParams: ['1', 'test'],
           startNotificationParams: ['1', 'test', 'test'],
+          receiveCharacteristicHandler: () => {},
         });
       });
       test('should call startScan', async () => {
