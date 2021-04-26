@@ -273,7 +273,33 @@ describe('bluevery: commands APIs', () => {
   });
 
   describe('connect', () => {
-    test.todo('should ');
+    const connectFn = jest.fn();
+    const core = (jest.fn().mockImplementation(() => ({
+      connect: connectFn,
+    })) as unknown) as typeof BlueveryCore;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      bluevery = new Bluevery({
+        BlueveryCore: core,
+        BlueveryState,
+        blueveryListeners: new BlueveryListeners(),
+      });
+    });
+
+    describe('connect: check calls', () => {
+      beforeEach(async () => {
+        await bluevery.connect({
+          retrieveServicesParams: ['1'],
+          connectParams: ['1'],
+          bondingParams: ['1', 'test'],
+        });
+      });
+
+      test('should call core#connect', async () => {
+        expect(connectFn).toBeCalled();
+      });
+    });
   });
 
   describe('receiveCharacteristicValue', () => {
