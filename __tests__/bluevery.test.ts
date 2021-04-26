@@ -48,12 +48,27 @@ describe('bluevery: primitive APIs', () => {
 
 describe('bluevery: commands APIs', () => {
   describe('init', () => {
-    test.skip('can only init once', () => {
-      bluevery.init();
-      expect(() => bluevery.init()).toBe(undefined);
+    const initFn = jest.fn();
+    const core = (jest.fn().mockImplementation(() => ({
+      init: initFn,
+    })) as unknown) as typeof BlueveryCore;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      bluevery = new Bluevery({
+        BlueveryCore: core,
+        BlueveryState,
+        blueveryListeners: new BlueveryListeners(),
+      });
+    });
+    test('can only init once', async () => {
+      await bluevery.init();
+      const secondTryInit = await bluevery.init();
+      expect(secondTryInit).toBe(undefined);
+      expect(initFn).toHaveBeenCalledTimes(1);
     });
 
-    test.skip('setting userDefinedOptions', () => {});
+    test.todo('setting userDefinedOptions');
   });
 
   describe('startScan', () => {
