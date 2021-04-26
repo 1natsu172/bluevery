@@ -111,21 +111,44 @@ export class Bluevery {
 
   async connect({
     connectParams,
-    connectOptions = {retryOptions: {factor: 1, retries: 4}},
+    // Note: connectはiOSで失敗してもタイムアウトしないので、タイムアウトするようにする
+    connectOptions = {
+      retryOptions: {factor: 1, retries: 4},
+      timeoutOptions: {timeoutMilliseconds: 8000},
+    },
     bondingParams,
-    bondingOptions = {retryOptions: {factor: 1, retries: 4}},
+    // Note: 無限にbondingして返ってこないケースがあるので、タイムアウトするようにする
+    bondingOptions = {
+      retryOptions: {factor: 1, retries: 4},
+      timeoutOptions: {timeoutMilliseconds: 10000},
+    },
     retrieveServicesParams,
-    retrieveServicesOptions = {retryOptions: {factor: 1, retries: 4}},
+    // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
+    retrieveServicesOptions = {
+      retryOptions: {factor: 1, retries: 4},
+      timeoutOptions: {timeoutMilliseconds: 5000},
+    },
   }: {
     connectParams: BleManagerParams['connect'];
+    /**
+     * @description connect must have timeout
+     * @default timeoutMilliseconds = 8000ms
+     */
     connectOptions?: ToBetterOptions;
     retrieveServicesParams: BleManagerParams['retrieveServices'];
     /**
-     * @description retrieveServices with timeout
-     * @default timeoutMilliseconds = 2000ms
+     * @description retrieveServices must have timeout
+     * @default timeoutMilliseconds = 5000ms
      */
     retrieveServicesOptions?: ToBetterOptions;
+    /**
+     * @description [Android only]
+     */
     bondingParams: BleManagerParams['createBond'];
+    /**
+     * @description bonding must have timeout
+     * @default timeoutMilliseconds = 10000ms
+     */
     bondingOptions?: ToBetterOptions;
   }) {
     await this.core.connect({
@@ -138,14 +161,18 @@ export class Bluevery {
     });
   }
 
+  /**
+   * NOTE: connect, retrieveServices, bondingはconnectメソッドで必要なのでオプションのデフォルト指定がないので意図的
+   * FIXME: オプションのデフォルト指定に関して本当にこれでいいか、あとで考えてほしい。マージの概念ないと厳しいか？
+   */
   async receiveCharacteristicValue({
     scanParams,
     connectParams,
-    connectOptions = {retryOptions: {factor: 1, retries: 4}},
+    connectOptions,
     retrieveServicesParams,
-    retrieveServicesOptions = {retryOptions: {factor: 1, retries: 4}},
+    retrieveServicesOptions,
     bondingParams,
-    bondingOptions = {retryOptions: {factor: 1, retries: 4}},
+    bondingOptions,
     startNotificationParams,
     receiveCharacteristicHandler,
   }: {
@@ -191,6 +218,7 @@ export class Bluevery {
     return await this.core.stopNotification({stopNotificationParams});
   }
 
+  // TODO: read前にretrieveServicesのコールが必要だが実装で吸収するか考える
   async readValue(
     readValueParams: BleManagerParams['read'],
     options: ToBetterOptions = {
@@ -200,6 +228,7 @@ export class Bluevery {
     return await this.core.readValue(readValueParams, options);
   }
 
+  // TODO: write前にretrieveServicesのコールが必要だが実装で吸収するか考える
   async writeValue(
     writeValueParams: BleManagerParams['write'],
     options: ToBetterOptions = {

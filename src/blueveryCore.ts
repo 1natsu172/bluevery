@@ -345,6 +345,7 @@ export class BlueveryCore {
 
     this.checkThePeripheralIsManaging(peripheralId);
 
+    // FIXME: readの関数をDIできるようにしてほしい。read自体は成功しているが空配列で返ってくるケースがあり、そういうときにretryできる実装に今はなっていない。
     const _readValue = toBetterPromise(
       toThrowErrorIfRejected(BleManager.read),
       options,
