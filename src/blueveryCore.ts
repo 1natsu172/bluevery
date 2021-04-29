@@ -47,8 +47,8 @@ export class BlueveryCore {
 
   private userDefinedOptions: BlueveryOptions = {};
   private state: _BlueveryState;
-  private listeners: _BlueveryListeners;
   private __DO_NOT_DIRECT_USE_STATE__: State;
+  listeners: _BlueveryListeners;
 
   constructor({
     BlueveryState,

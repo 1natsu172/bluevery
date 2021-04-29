@@ -5,6 +5,7 @@ import {BlueveryState} from '../src/blueveryState';
 import {BlueveryListeners} from '../src/blueveryListeners';
 import * as omoiyarify from '../src/utils/omoiyarify';
 import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
+import {EmitterSubscription} from 'react-native';
 
 let bluevery: Bluevery;
 let spiedApplyOmoiyari: jest.SpyInstance;
@@ -42,7 +43,39 @@ describe('bluevery: primitive APIs', () => {
   });
 
   describe('stopBluevery', () => {
-    test.todo('should reset bluevery completely');
+    test('should rebluevery completely', () => {
+      const blueveryListeners = new BlueveryListeners();
+      const mockPublicSubscriptions = [jest.fn(), jest.fn(), jest.fn()];
+      const mockInternalSubscriptions = [jest.fn(), jest.fn(), jest.fn()];
+      mockPublicSubscriptions.forEach((subscription, index) => {
+        blueveryListeners.setAnyPublicSubscription(
+          index.toString(),
+          // @ts-expect-error
+          `test${index}`,
+          ({remove: subscription} as unknown) as EmitterSubscription,
+        );
+      });
+      mockInternalSubscriptions.forEach((subscription, index) => {
+        // @ts-expect-error
+        blueveryListeners.setAnyInternalSubscription(`test${index}`, ({
+          remove: subscription,
+        } as unknown) as EmitterSubscription);
+      });
+
+      bluevery = new Bluevery({
+        BlueveryCore,
+        BlueveryState,
+        blueveryListeners,
+      });
+      bluevery.stopBluevery();
+
+      mockPublicSubscriptions.forEach((subscription) =>
+        expect(subscription).toBeCalled(),
+      );
+      mockInternalSubscriptions.forEach((subscription) =>
+        expect(subscription).toBeCalled(),
+      );
+    });
   });
 });
 
@@ -50,6 +83,7 @@ describe('bluevery: commands APIs', () => {
   describe('init', () => {
     const initFn = jest.fn();
     const core = (jest.fn().mockImplementation(() => ({
+      listeners: {publicListeners: {}},
       init: initFn,
     })) as unknown) as typeof BlueveryCore;
 
@@ -76,6 +110,7 @@ describe('bluevery: commands APIs', () => {
     const scanFn = jest.fn();
     const clearScannedPeripheralsFn = jest.fn();
     const core = (jest.fn().mockImplementation(() => ({
+      listeners: {publicListeners: {}},
       scan: scanFn,
       clearScannedPeripherals: clearScannedPeripheralsFn,
     })) as unknown) as typeof BlueveryCore;
@@ -216,6 +251,7 @@ describe('bluevery: commands APIs', () => {
   describe('writeValue', () => {
     const writeValueFn = jest.fn(() => 'wrote to peripheral');
     const core = (jest.fn().mockImplementation(() => ({
+      listeners: {publicListeners: {}},
       writeValue: writeValueFn,
     })) as unknown) as typeof BlueveryCore;
 
@@ -256,6 +292,7 @@ describe('bluevery: commands APIs', () => {
   describe('readValue', () => {
     const readValueFn = jest.fn(() => 'read to peripheral');
     const core = (jest.fn().mockImplementation(() => ({
+      listeners: {publicListeners: {}},
       readValue: readValueFn,
     })) as unknown) as typeof BlueveryCore;
 
@@ -290,6 +327,7 @@ describe('bluevery: commands APIs', () => {
   describe('connect', () => {
     const connectFn = jest.fn();
     const core = (jest.fn().mockImplementation(() => ({
+      listeners: {publicListeners: {}},
       connect: connectFn,
     })) as unknown) as typeof BlueveryCore;
 
@@ -395,6 +433,7 @@ describe('bluevery: commands APIs', () => {
   describe('stopReceiveCharacteristicValue', () => {
     const stopNotificationFn = jest.fn();
     const core = (jest.fn().mockImplementation(() => ({
+      listeners: {publicListeners: {}},
       stopNotification: stopNotificationFn,
     })) as unknown) as typeof BlueveryCore;
 

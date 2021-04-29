@@ -11,6 +11,7 @@ import {
   PeripheralInfo,
   State,
   PublicHandlers,
+  PublicListeners,
 } from './interface';
 import {applyOmoiyari, ToBetterOptions} from './utils';
 import {DEFAULT_OMOIYARI_TIME} from './constants';
@@ -24,6 +25,7 @@ type ConstructorArgs = {
 export class Bluevery {
   private core: _BlueveryCore;
   private __DO_NOT_DIRECT_USE_STATE__: State;
+  publicListeners: PublicListeners;
 
   constructor({
     BlueveryCore,
@@ -31,6 +33,7 @@ export class Bluevery {
     blueveryListeners,
   }: ConstructorArgs) {
     this.core = new BlueveryCore({BlueveryState, blueveryListeners});
+    this.publicListeners = this.core.listeners.publicListeners;
     // @ts-expect-error
     this.__DO_NOT_DIRECT_USE_STATE__ = this.core.__DO_NOT_DIRECT_USE_STATE__;
     autoBind(this);
@@ -49,8 +52,9 @@ export class Bluevery {
   /**;
    * Force stop Bluevery's operation completely.
    */
-  // TODO: implements
-  stopBluevery() {}
+  stopBluevery() {
+    this.core.listeners.removeAllSubscriptions();
+  }
 
   /**
    * ↓ Commands API

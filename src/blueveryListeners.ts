@@ -26,4 +26,17 @@ export class BlueveryListeners {
   ) {
     _set(this.internalListeners, `${key}`, value);
   }
+
+  removeAllSubscriptions() {
+    Object.values(this.internalListeners).forEach((listener) => {
+      listener?.remove();
+    });
+    Object.values(this.publicListeners).forEach((subscriptions) => {
+      if (subscriptions) {
+        Object.values(subscriptions).forEach((listener) => {
+          listener?.remove();
+        });
+      }
+    });
+  }
 }
