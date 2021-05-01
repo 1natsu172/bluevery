@@ -23,7 +23,6 @@
     "p-retry": "^4.2.0",
     "p-tap": "^3.1.0",
     "p-timeout": "^5.0.0",
-    "proxy-state-tree": "^6.0.2",
     "react-native-ble-manager": "^7.3.1",
     "react-native-permissions": "^2.2.0",
     "valtio": "^1.0.0"

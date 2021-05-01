@@ -3869,11 +3869,6 @@ is-number@^7.0.0:
   resolved "https://registry.yarnpkg.com/is-number/-/is-number-7.0.0.tgz#7535345b896734d5f80c4d06c50955527a14f12b"
   integrity sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==
 
-is-plain-obj@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/is-plain-obj/-/is-plain-obj-1.1.0.tgz#71a50c8429dfca773c92a390a4a03b39fcd51d3e"
-  integrity sha1-caUMhCnfync8kqOQpKA7OfzVHT4=
-
 is-plain-object@^2.0.3, is-plain-object@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-2.0.4.tgz#2c163b3fafb1b606d9d17928f05c2a1c38e07677"
@@ -5928,13 +5923,6 @@ proxy-compare@1.1.6:
   resolved "https://registry.yarnpkg.com/proxy-compare/-/proxy-compare-1.1.6.tgz#dd7737be611a9d7142fae10dbc6d0ceb74ad6da0"
   integrity sha512-V65euKrKgKjVyEh5+4nVlAf4dHJ6Q0cF77MCeZiJaOldAl9lndy/u270SJneHiz3UkVcSIhxfOKY7aFkrMyo5g==
 
-proxy-state-tree@^6.0.2:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/proxy-state-tree/-/proxy-state-tree-6.1.0.tgz#7a85eb89328e5973dc21f30b82062cf58186095e"
-  integrity sha512-3vXW9NBjWutNakrRA4Wpy8EQ4knjjmGY583vQQxIR3xsvJ2iuUrGh5jSG+aVoccW0qWKNzaPdGAxpQXaQNdXrQ==
-  dependencies:
-    is-plain-obj "^1.1.0"
-
 pseudomap@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/pseudomap/-/pseudomap-1.0.2.tgz#f052a28da70e618917ef0a8ac34c1ae5a68286b3"
@@ -7270,9 +7258,9 @@ validate-npm-package-license@^3.0.1:
     spdx-expression-parse "^3.0.0"
 
 valtio@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/valtio/-/valtio-1.0.0.tgz#8c905c9cfc4ec1283a146975631d7b0a8c3ba6a8"
-  integrity sha512-wT3+O4vxgLvIob0IHbzZuXDoE4pYy3jh3BaW75UVKx1knd/2xGegbJUqAYczXOdeAzKfsrU9nhD5ZUjwggu4Ng==
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/valtio/-/valtio-1.0.4.tgz#facc9c4e4fb1afb7a5503d72051356a3d1ca061f"
+  integrity sha512-hdnNFwoQNJXTHGI43i+X6l+cNB5K+hmg66RNzclQZf8JtvRSvqpRE/o5LP8ITHI1fu7sgk29ofVxBmp+vUwF4g==
   dependencies:
     proxy-compare "1.1.6"
 
