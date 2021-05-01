@@ -85,12 +85,19 @@ describe('BlueveryState', () => {
     });
   });
 
-  //   describe('reInitState', () => {
-  //   test('should ', () => {
+  describe('reInitState', () => {
+    test('should be reInit to the current state', () => {
+      const firstInitState = blueveryState.getState();
 
-  //   })
+      const willReInitedState = {...firstInitState, bluetoothEnabled: true};
+      blueveryState.reInitState(willReInitedState);
 
-  // })
+      const reInitedState = blueveryState.getState();
+
+      expect(reInitedState).not.toEqual(firstInitState);
+      expect(reInitedState).toEqual(willReInitedState);
+    });
+  });
 
   describe('onManaging', () => {
     test('should change to on managing of the State', () => {
