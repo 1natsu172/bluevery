@@ -68,6 +68,30 @@ describe('BlueveryState', () => {
       );
     });
   });
+
+  describe('resetState', () => {
+    test('should be reset to the initial state. ', () => {
+      const initState = blueveryState.getState();
+      blueveryState.onScanning();
+      const mutatedState = blueveryState.getState();
+
+      expect(initState).not.toEqual(mutatedState);
+
+      blueveryState.resetState();
+
+      const resetedState = blueveryState.getState();
+
+      expect(initState).toEqual(resetedState);
+    });
+  });
+
+  //   describe('reInitState', () => {
+  //   test('should ', () => {
+
+  //   })
+
+  // })
+
   describe('onManaging', () => {
     test('should change to on managing of the State', () => {
       expect(blueveryState.getState().managing).toBe(false);

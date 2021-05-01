@@ -93,7 +93,7 @@ export class BlueveryState {
    * reset to initial state
    */
   resetState() {
-    this.mutationState = this._savedInitialState;
+    this.mutationState = proxy(this._savedInitialState);
   }
 
   /**
