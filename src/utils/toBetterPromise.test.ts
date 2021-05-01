@@ -7,6 +7,7 @@ import {
   toTimeoutPromise,
   toBetterPromise,
 } from './toBetterPromise';
+import {flushPromisesAdvanceTimersToNextTimer} from '../../__tests__/__utils__/flushPromisesAdvanceTimersToNextTimer';
 
 beforeEach(() => {});
 
@@ -60,9 +61,7 @@ describe('toRetryPromise', () => {
       retries: 2,
       factor: 1,
       onFailedAttempt: () => {
-        new Promise((resolve) => setImmediate(resolve)).then(() =>
-          jest.advanceTimersToNextTimer(),
-        );
+        flushPromisesAdvanceTimersToNextTimer();
       },
     });
     const triedFn = willBeRetryFn();
@@ -159,11 +158,7 @@ describe('toBetterPromise', () => {
 
   test('should be retry by timeout', async () => {
     const onFailed = jest.fn(() => {
-      // micro-task hack on jest
-      new Promise((resolve) => setImmediate(resolve)).then(() => {
-        jest.advanceTimersToNextTimer();
-        jest.advanceTimersByTime(1000);
-      });
+      flushPromisesAdvanceTimersToNextTimer(1000);
     });
 
     const betterPromise = toBetterPromise(mustPendingFn, {
@@ -187,10 +182,7 @@ describe('toBetterPromise', () => {
 
   test('should be retry by original reject', async () => {
     const onFailed = jest.fn(() => {
-      // micro-task hack on jest
-      new Promise((resolve) => setImmediate(resolve)).then(() => {
-        jest.advanceTimersToNextTimer();
-      });
+      flushPromisesAdvanceTimersToNextTimer();
     });
 
     const betterPromise = toBetterPromise(mustRejectFn, {

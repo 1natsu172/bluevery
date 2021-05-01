@@ -1,4 +1,3 @@
-import {PlatformOSType, Platform} from 'react-native';
 import {
   PERMISSIONS,
   RESULTS,
@@ -6,6 +5,7 @@ import {
   checkMultiple,
 } from 'react-native-permissions';
 import {checkPermission} from './checkPermission';
+import {mockPlatform} from '../../__tests__/__utils__/mockPlatform';
 
 // Memo: react-native-permissions公式のmock実装が間違っているし(reduceの第2引数忘れ)、DENIEDのパターンも欲しいので独自に当てている。
 const mockCheckMultiple = (
@@ -27,21 +27,6 @@ const mockCheckMultiple = (
   (checkMultiple as jest.MockedFunction<
     typeof checkMultiple
   >).mockImplementation(mockedImplement);
-};
-
-/**
- * mock util for Platform
- */
-const mockPlatform = (OS: PlatformOSType, version: number | string) => {
-  jest.resetModules();
-  jest.doMock(
-    'react-native/Libraries/Utilities/Platform',
-    (): Partial<typeof Platform> => ({
-      OS: OS as 'ios',
-      select: (objs) => objs[OS],
-      Version: version || undefined,
-    }),
-  );
 };
 
 describe('checkPermission', () => {

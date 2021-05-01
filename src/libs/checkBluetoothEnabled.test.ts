@@ -1,5 +1,6 @@
 import {NativeEventEmitter} from 'react-native';
 import BleManager from 'react-native-ble-manager';
+import {flushPromisesAdvanceTimersToNextTimer} from '../../__tests__/__utils__/flushPromisesAdvanceTimersToNextTimer';
 import {
   getBluetoothPowerState,
   checkBluetoothEnabled,
@@ -48,10 +49,7 @@ describe('checkBluetoothEnabled', () => {
 
   describe('should be return false, when othor than on', () => {
     const onFailed = jest.fn(() => {
-      // micro-task hack on jest
-      new Promise((resolve) => setImmediate(resolve)).then(() => {
-        jest.advanceTimersToNextTimer();
-      });
+      flushPromisesAdvanceTimersToNextTimer();
     });
 
     test('should be return false when state is off', async () => {
