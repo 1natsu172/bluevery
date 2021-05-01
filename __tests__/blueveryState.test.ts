@@ -191,7 +191,7 @@ describe('BlueveryState', () => {
       });
 
       describe('setManagingPeripheralConnecting', () => {
-        test('should change to on connecting of the State', () => {
+        test('should change to connecting of the State', () => {
           expect(
             blueveryState.getState().managingPeripherals['1'].connect,
           ).toBeUndefined();
@@ -202,36 +202,40 @@ describe('BlueveryState', () => {
         });
       });
       describe('setManagingPeripheralConnected', () => {
-        test('should change to off connecting of the State', () => {
+        test('should change to connected of the State', () => {
           expect(
             blueveryState.getState().managingPeripherals['1'].connect,
           ).toBeUndefined();
-          blueveryState.setManagingPeripheralConnecting(dummyPeripheralInfo.id);
+          blueveryState.setManagingPeripheralConnected(dummyPeripheralInfo.id);
           expect(
             blueveryState.getState().managingPeripherals['1'].connect,
-          ).toBe('connecting');
+          ).toBe('connected');
         });
       });
       describe('setManagingPeripheralDisconnected', () => {
-        test('should change to off connecting of the State', () => {
+        test('should change to disconnected of the State', () => {
           expect(
             blueveryState.getState().managingPeripherals['1'].connect,
           ).toBeUndefined();
-          blueveryState.setManagingPeripheralConnecting(dummyPeripheralInfo.id);
+          blueveryState.setManagingPeripheralDisconnected(
+            dummyPeripheralInfo.id,
+          );
           expect(
             blueveryState.getState().managingPeripherals['1'].connect,
-          ).toBe('connecting');
+          ).toBe('disconnected');
         });
       });
       describe('setManagingPeripheralFailedConnect', () => {
-        test('should change to off connecting of the State', () => {
+        test('should change to failed of the State', () => {
           expect(
             blueveryState.getState().managingPeripherals['1'].connect,
           ).toBeUndefined();
-          blueveryState.setManagingPeripheralConnecting(dummyPeripheralInfo.id);
+          blueveryState.setManagingPeripheralFailedConnect(
+            dummyPeripheralInfo.id,
+          );
           expect(
             blueveryState.getState().managingPeripherals['1'].connect,
-          ).toBe('connecting');
+          ).toBe('failed');
         });
       });
     });
