@@ -128,6 +128,16 @@ describe('BlueveryState', () => {
           dummyPeripheralInfo,
         );
       });
+      test('should be overwrite existed PeripheralInfo', () => {
+        const newPeripheralInfo: PeripheralInfo = {
+          ...dummyPeripheralInfo,
+          name: 'newTestPeripheral1',
+        };
+        blueveryState.setPeripheralToManagingPeripherals(newPeripheralInfo);
+        expect(blueveryState.getState().managingPeripherals['1'].name).toBe(
+          'newTestPeripheral1',
+        );
+      });
     });
     describe('deletePeripheralFromManagingPeripherals', () => {
       test('should delete peripheral from conectedPeripherals', () => {
@@ -143,6 +153,12 @@ describe('BlueveryState', () => {
       });
     });
     describe('managingPeripheral:connect', () => {
+      test('should be throw when target peripheral property does not exist', () => {
+        expect(() =>
+          blueveryState.setManagingPeripheralConnecting('2'),
+        ).toThrowError('2 is not found in managingPeripherals');
+      });
+
       describe('setManagingPeripheralConnecting', () => {
         test('should change to on connecting of the State', () => {
           expect(
