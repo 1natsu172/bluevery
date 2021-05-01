@@ -51,6 +51,7 @@ export class Bluevery {
 
   /**;
    * Force stop Bluevery's operation completely.
+   * TODO: more implements
    */
   stopBluevery() {
     this.core.listeners.removeAllSubscriptions();

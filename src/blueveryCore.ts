@@ -79,7 +79,6 @@ export class BlueveryCore {
       optionalOnDisconnectPeripheral:
         blueveryOptions?.onDisconnectPeripheralHandler,
     });
-    // TODO: removeの処理実装する
     this.listeners.setAnyInternalSubscription(
       'disconnectPeripheralListener',
       registerDisconnectPeripheralListener(
