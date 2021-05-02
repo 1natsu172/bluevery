@@ -54,7 +54,7 @@ export class Bluevery {
    * TODO: more implements
    */
   stopBluevery() {
-    this.core.listeners.removeAllSubscriptions();
+    this.core.stop();
   }
 
   /**

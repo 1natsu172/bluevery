@@ -23,7 +23,7 @@ export function createInitialState(overrideState?: Partial<State>): State {
 export class BlueveryState {
   private _savedInitialState: State;
   mutationState: State;
-  private unsubscribeTheState: () => void;
+  unsubscribeTheState: () => void;
 
   constructor({
     initialState,

@@ -84,6 +84,8 @@ describe('bluevery: primitive APIs', () => {
       mockInternalSubscriptions.forEach((subscription) =>
         expect(subscription).toBeCalled(),
       );
+
+      // TODO: stateのunsubscribeのテストを書く必要がある
     });
   });
 });

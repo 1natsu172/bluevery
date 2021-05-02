@@ -106,6 +106,11 @@ export class BlueveryCore {
     }
   }
 
+  stop() {
+    this.listeners.removeAllSubscriptions();
+    this.state.unsubscribeTheState();
+  }
+
   setUserDefinedOptions(options: BlueveryOptions) {
     this.userDefinedOptions = options;
   }
