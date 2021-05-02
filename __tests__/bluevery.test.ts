@@ -5,7 +5,12 @@ import {BlueveryState} from '../src/blueveryState';
 import {BlueveryListeners} from '../src/blueveryListeners';
 import * as omoiyarify from '../src/utils/omoiyarify';
 import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
-import {EmitterSubscription} from 'react-native';
+import {dummyPeripheralInfo} from './__utils__/dummyPeripheralInfo';
+import {mockPlatform} from './__utils__/mockPlatform';
+import {EmitterSubscription, NativeEventEmitter} from 'react-native';
+import {DisconnectedPeripheralInfo} from '../src/libs';
+
+const nativeEventEmitter = new NativeEventEmitter();
 
 let bluevery: Bluevery;
 let spiedApplyOmoiyari: jest.SpyInstance;
@@ -39,34 +44,38 @@ describe('bluevery: primitive APIs', () => {
       await bluevery.init();
       const actualThenInitialized = bluevery.checkIsInitialized();
       expect(actualThenInitialized).toBe(true);
+      bluevery.stopBluevery();
     });
   });
 
   describe('stopBluevery', () => {
-    test('should rebluevery completely', () => {
-      const blueveryListeners = new BlueveryListeners();
-      const mockPublicSubscriptions = [jest.fn(), jest.fn(), jest.fn()];
-      const mockInternalSubscriptions = [jest.fn(), jest.fn(), jest.fn()];
-      mockPublicSubscriptions.forEach((subscription, index) => {
-        blueveryListeners.setAnyPublicSubscription(
-          index.toString(),
-          // @ts-expect-error
-          `test${index}`,
-          ({remove: subscription} as unknown) as EmitterSubscription,
-        );
-      });
-      mockInternalSubscriptions.forEach((subscription, index) => {
+    const blueveryListeners = new BlueveryListeners();
+    const mockPublicSubscriptions = [jest.fn(), jest.fn(), jest.fn()];
+    const mockInternalSubscriptions = [jest.fn(), jest.fn(), jest.fn()];
+    mockPublicSubscriptions.forEach((subscription, index) => {
+      blueveryListeners.setAnyPublicSubscription(
+        index.toString(),
         // @ts-expect-error
-        blueveryListeners.setAnyInternalSubscription(`test${index}`, ({
-          remove: subscription,
-        } as unknown) as EmitterSubscription);
-      });
+        `test${index}`,
+        ({remove: subscription} as unknown) as EmitterSubscription,
+      );
+    });
+    mockInternalSubscriptions.forEach((subscription, index) => {
+      // @ts-expect-error
+      blueveryListeners.setAnyInternalSubscription(`test${index}`, ({
+        remove: subscription,
+      } as unknown) as EmitterSubscription);
+    });
 
+    beforeEach(() => {
       bluevery = new Bluevery({
         BlueveryCore,
         BlueveryState,
         blueveryListeners,
       });
+    });
+
+    test('should stop bluevery completely', () => {
       bluevery.stopBluevery();
 
       mockPublicSubscriptions.forEach((subscription) =>
@@ -81,28 +90,74 @@ describe('bluevery: primitive APIs', () => {
 
 describe('bluevery: commands APIs', () => {
   describe('init', () => {
-    const initFn = jest.fn();
-    const core = (jest.fn().mockImplementation(() => ({
-      listeners: {publicListeners: {}},
-      init: initFn,
-    })) as unknown) as typeof BlueveryCore;
+    test('can only init once', async () => {
+      const initFn = jest.fn();
+      const core = (jest.fn().mockImplementation(() => ({
+        listeners: {publicListeners: {}},
+        state: new BlueveryState({}),
+        init: initFn,
+      })) as unknown) as typeof BlueveryCore;
 
-    beforeEach(() => {
-      jest.clearAllMocks();
       bluevery = new Bluevery({
         BlueveryCore: core,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
       });
-    });
-    test('can only init once', async () => {
       await bluevery.init();
       const secondTryInit = await bluevery.init();
       expect(secondTryInit).toBe(undefined);
       expect(initFn).toHaveBeenCalledTimes(1);
     });
 
-    test.todo('setting userDefinedOptions');
+    test('user should be able to know that disconnected', async () => {
+      const optionalDisconnectHandler = jest.fn();
+      const testerPeripheral = dummyPeripheralInfo('tester1');
+      await bluevery.init({
+        onDisconnectPeripheralHandler: optionalDisconnectHandler,
+      });
+      // @ts-expect-error
+      bluevery.core.state.setPeripheralToManagingPeripherals(testerPeripheral);
+      const disconnectInfo: DisconnectedPeripheralInfo = {
+        peripheral: testerPeripheral.id,
+        status: 1,
+      };
+      nativeEventEmitter.emit('BleManagerDisconnectPeripheral', disconnectInfo);
+      // @ts-expect-error
+      const state = bluevery.core.getState();
+      expect(state.managingPeripherals.tester1.connect).toBe('disconnected');
+      expect(optionalDisconnectHandler).toBeCalled();
+      expect(bluevery.publicListeners[testerPeripheral.id]).toBe(undefined);
+    });
+
+    describe('save the already connected & bonded peripherals at init', () => {
+      test('iOS: should save the already connected', async () => {
+        await bluevery.init();
+        // @ts-expect-error
+        const managingPeripherals = bluevery.core.getState()
+          .managingPeripherals;
+        expect(managingPeripherals).toHaveProperty('connected1');
+        expect(managingPeripherals).toHaveProperty('connected2');
+        expect(managingPeripherals).toHaveProperty('connected3');
+        expect(managingPeripherals).not.toHaveProperty('connected4');
+        expect(managingPeripherals).not.toHaveProperty('bonded1');
+      });
+
+      test('Android: should save the already connected & bonded', async () => {
+        mockPlatform('android', 10);
+        await bluevery.init();
+        // @ts-expect-error
+        const managingPeripherals = bluevery.core.getState()
+          .managingPeripherals;
+        expect(managingPeripherals).toHaveProperty('connected1');
+        expect(managingPeripherals).toHaveProperty('connected2');
+        expect(managingPeripherals).toHaveProperty('connected3');
+        expect(managingPeripherals).not.toHaveProperty('connected4');
+        expect(managingPeripherals).toHaveProperty('bonded1');
+        expect(managingPeripherals).toHaveProperty('bonded2');
+        expect(managingPeripherals).toHaveProperty('bonded3');
+        expect(managingPeripherals).not.toHaveProperty('bonded4');
+      });
+    });
   });
 
   describe('startScan', () => {

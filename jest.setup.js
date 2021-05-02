@@ -11,8 +11,46 @@ jest.mock('react-native-ble-manager', () => {
     start: jest.fn(async () => {}),
     scan: jest.fn(async () => {}),
     stopScan: jest.fn(async () => {}),
-    getConnectedPeripherals: jest.fn(async () => []),
-    getBondedPeripherals: jest.fn(async () => []),
+    getConnectedPeripherals: jest.fn(async () => [
+      {
+        id: 'connected1',
+        rssi: 1,
+        name: 'connectedTester1',
+        advertising: {},
+      },
+      {
+        id: 'connected2',
+        rssi: 2,
+        name: 'connectedTester2',
+        advertising: {},
+      },
+      {
+        id: 'connected3',
+        rssi: 3,
+        name: 'connectedTester3',
+        advertising: {},
+      },
+    ]),
+    getBondedPeripherals: jest.fn(async () => [
+      {
+        id: 'bonded1',
+        rssi: 1,
+        name: 'bondedTester1',
+        advertising: {},
+      },
+      {
+        id: 'bonded2',
+        rssi: 2,
+        name: 'bondedTester2',
+        advertising: {},
+      },
+      {
+        id: 'bonded3',
+        rssi: 3,
+        name: 'bondedTester3',
+        advertising: {},
+      },
+    ]),
     read: jest.fn(async () => [[1], [2], [3]]),
     write: jest.fn(async () => [[1], [2], [3]]),
     checkState: jest.fn(() => {

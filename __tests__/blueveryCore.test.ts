@@ -7,6 +7,7 @@ import {
   requestPermission,
 } from '../src/libs';
 import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
+import {dummyPeripheralInfo} from './__utils__/dummyPeripheralInfo';
 import BleManager from 'react-native-ble-manager';
 import {EmitterSubscription} from 'react-native';
 
@@ -18,13 +19,6 @@ jest.mock('../src/libs', () => ({
   checkPermission: jest.fn(),
   requestPermission: jest.fn(),
 }));
-
-const dummyPeripheralInfo = (id: string) => ({
-  id: id,
-  rssi: Number(id),
-  advertising: {},
-  name: `testPeripheral${id}`,
-});
 
 /**
  * prepare instances & spiedMethods
@@ -80,6 +74,15 @@ beforeEach(() => {
 });
 
 describe('BlueveryCore', () => {
+  describe('init', () => {
+    test('should set userDefinedOptions', () => {
+      const opts = {onDisconnectPeripheralHandler: jest.fn()};
+      blueveryCore.init(opts);
+      // @ts-expect-error
+      expect(blueveryCore.userDefinedOptions).toEqual(opts);
+    });
+  });
+
   describe('checkAndRequestPermission', () => {
     const mockedCheckPermission = checkPermission as jest.MockedFunction<
       typeof checkPermission

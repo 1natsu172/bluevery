@@ -27,6 +27,22 @@ export class BlueveryListeners {
     _set(this.internalListeners, `${key}`, value);
   }
 
+  removeAnyPublicSubscription<Key extends keyof PublicSubscriptions>(
+    peripheralId: PeripheralId,
+    key: Key,
+  ) {
+    this.publicListeners[peripheralId]?.[key]?.remove();
+  }
+
+  removePeripheralPublicSubscription(peripheralId: PeripheralId) {
+    const subscription = this.publicListeners[peripheralId];
+    if (subscription) {
+      Object.values(subscription).forEach((listener) => {
+        listener?.remove();
+      });
+    }
+  }
+
   removeAllSubscriptions() {
     Object.values(this.internalListeners).forEach((listener) => {
       listener?.remove();

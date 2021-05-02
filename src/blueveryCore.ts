@@ -72,9 +72,9 @@ export class BlueveryCore {
      */
     const handleDisconnectPeripheral = createHandleDisconnectPeripheral({
       onDisconnectPeripheral: (disconnectInfo) => {
-        this.state.deletePeripheralFromManagingPeripherals(
-          disconnectInfo.peripheral,
-        );
+        const peripheralId = disconnectInfo.peripheral;
+        this.state.setManagingPeripheralDisconnected(peripheralId);
+        this.listeners.removePeripheralPublicSubscription(peripheralId);
       },
       optionalOnDisconnectPeripheral:
         blueveryOptions?.onDisconnectPeripheralHandler,
