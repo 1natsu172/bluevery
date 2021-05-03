@@ -81,16 +81,22 @@ describe('bluevery: primitive APIs', () => {
       } as unknown) as EmitterSubscription);
     });
 
+    const onChangeStateHandler = jest.fn();
+
     beforeEach(async () => {
       bluevery = new Bluevery({
         BlueveryCore,
         BlueveryState,
         blueveryListeners,
       });
-      await bluevery.init();
+      await bluevery.init({onChangeStateHandler});
     });
 
     test('should stop bluevery completely', () => {
+      // @ts-expect-error テストのためにprivateプロパティアクセスしている
+      bluevery.core.state.onScanning();
+      expect(onChangeStateHandler).toBeCalledTimes(1);
+
       bluevery.stopBluevery();
 
       mockPublicSubscriptions.forEach((subscription) =>
@@ -100,7 +106,9 @@ describe('bluevery: primitive APIs', () => {
         expect(subscription).toBeCalled(),
       );
 
-      // TODO: stateのunsubscribeのテストを書く必要がある
+      // @ts-expect-error テストのためにprivateプロパティアクセスしている
+      bluevery.core.state.offScanning();
+      expect(onChangeStateHandler).toBeCalledTimes(1);
     });
   });
 });
