@@ -9,6 +9,8 @@ import {MethodParamsRecord} from './utils/typeUtils/MethodParamsRecord';
 
 export type BlueveryOptions = {
   onDisconnectPeripheralHandler?: DisconnectedPeripheralHandler;
+  onChangeStateHandler?: (state: State) => unknown;
+  initialState?: State;
 };
 
 export type PeripheralId = string;

@@ -16,26 +16,30 @@ import {
 import {applyOmoiyari, ToBetterOptions} from './utils';
 import {DEFAULT_OMOIYARI_TIME} from './constants';
 
-type ConstructorArgs = {
+type __ConstructorsAndInstances__ = {
   BlueveryCore: typeof _BlueveryCore;
   BlueveryState: typeof _BlueveryState;
   blueveryListeners: InstanceType<typeof _BlueveryListeners>;
 };
+type ConstructorArgs = __ConstructorsAndInstances__;
 
 export class Bluevery {
-  private core: _BlueveryCore;
-  private __DO_NOT_DIRECT_USE_STATE__: State;
-  publicListeners: PublicListeners;
+  private __constructorsAndInstances__: __ConstructorsAndInstances__;
+  private __DO_NOT_DIRECT_USE_STATE__: State | undefined;
+  private core: _BlueveryCore | undefined;
+  publicListeners: PublicListeners | undefined;
 
   constructor({
     BlueveryCore,
     BlueveryState,
     blueveryListeners,
   }: ConstructorArgs) {
-    this.core = new BlueveryCore({BlueveryState, blueveryListeners});
-    this.publicListeners = this.core.listeners.publicListeners;
-    // @ts-expect-error
-    this.__DO_NOT_DIRECT_USE_STATE__ = this.core.__DO_NOT_DIRECT_USE_STATE__;
+    this.__constructorsAndInstances__ = {
+      BlueveryCore,
+      BlueveryState,
+      blueveryListeners,
+    };
+
     autoBind(this);
   }
 
@@ -54,7 +58,7 @@ export class Bluevery {
    * TODO: more implements
    */
   stopBluevery() {
-    this.core.stop();
+    this.core?.stop?.();
   }
 
   /**
@@ -65,6 +69,21 @@ export class Bluevery {
     if (this.checkIsInitialized()) {
       return;
     }
+    const {
+      BlueveryCore,
+      BlueveryState,
+      blueveryListeners,
+    } = this.__constructorsAndInstances__;
+    this.core = new BlueveryCore({
+      BlueveryState,
+      blueveryListeners,
+      initialState: blueveryOptions?.initialState,
+      onChangeStateHandler: blueveryOptions?.onChangeStateHandler,
+    });
+    this.publicListeners = this.core.listeners.publicListeners;
+    // @ts-expect-error
+    this.__DO_NOT_DIRECT_USE_STATE__ = this.core.__DO_NOT_DIRECT_USE_STATE__;
+
     await this.core.init(blueveryOptions);
     this.initialized = true;
   }
@@ -97,7 +116,7 @@ export class Bluevery {
     const intervalScan = () =>
       promiseInterval(
         async () => {
-          await this.core.scan({
+          await this.core?.scan({
             scanningSettings,
             discoverHandler,
             matchFn,
@@ -111,7 +130,7 @@ export class Bluevery {
     });
 
     // Initialize the list before scan
-    this.core.clearScannedPeripherals();
+    this.core?.clearScannedPeripherals();
     await omoiyariIntervalScan();
   }
 
@@ -170,7 +189,7 @@ export class Bluevery {
       bondingOptions || {},
     );
 
-    await this.core.connect({
+    await this.core?.connect({
       connectParams,
       connectOptions: _connectOptions,
       bondingParams,
@@ -210,7 +229,7 @@ export class Bluevery {
       await this.startScan(scanParams);
     } while (
       // receive対象のperipheralが見つからなければdoし続ける(見つかるまでscanを繰り返す)
-      this.core.getState().scannedPeripherals[targetPeripheralId] === undefined
+      this.core?.getState().scannedPeripherals[targetPeripheralId] === undefined
     );
 
     await this.connect({
@@ -222,7 +241,7 @@ export class Bluevery {
       retrieveServicesOptions,
     });
 
-    await this.core.startNotification({
+    await this.core?.startNotification({
       startNotificationParams,
       receiveCharacteristicHandler,
     });
@@ -233,7 +252,7 @@ export class Bluevery {
   }: {
     stopNotificationParams: BleManagerParams['stopNotification'];
   }) {
-    return await this.core.stopNotification({stopNotificationParams});
+    return await this.core?.stopNotification({stopNotificationParams});
   }
 
   // TODO: read前にretrieveServicesのコールが必要だが実装で吸収するか考える
@@ -247,7 +266,7 @@ export class Bluevery {
       },
       options || {},
     );
-    return await this.core.readValue(readValueParams, _options);
+    return await this.core?.readValue(readValueParams, _options);
   }
 
   // TODO: write前にretrieveServicesのコールが必要だが実装で吸収するか考える
@@ -261,6 +280,6 @@ export class Bluevery {
       },
       options || {},
     );
-    return await this.core.writeValue(writeValueParams, _options);
+    return await this.core?.writeValue(writeValueParams, _options);
   }
 }

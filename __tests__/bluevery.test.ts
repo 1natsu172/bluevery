@@ -14,16 +14,25 @@ const nativeEventEmitter = new NativeEventEmitter();
 
 let bluevery: Bluevery;
 let spiedApplyOmoiyari: jest.SpyInstance;
-beforeEach(() => {
+let spiedCoreInit: jest.SpyInstance;
+beforeEach(async () => {
   // cleanup spies
   jest.restoreAllMocks();
   spiedApplyOmoiyari = jest.spyOn(omoiyarify, 'applyOmoiyari');
+  // NOTE: core#initでdisconnectのリスナーが張られるが、removeされないまま残ってしまうと他のテストがコケるのでメソッド自体モックしておく。実体実行したいテストでのみrestoreするようにする。
+  spiedCoreInit = jest
+    .spyOn(BlueveryCore.prototype, 'init')
+    .mockImplementation(async () => {});
 
   bluevery = new Bluevery({
     BlueveryCore,
     BlueveryState,
     blueveryListeners: new BlueveryListeners(),
   });
+  await bluevery.init();
+});
+afterEach(async () => {
+  bluevery.stopBluevery();
 });
 
 describe('truthExportedBluevery', () => {
@@ -39,12 +48,17 @@ describe('truthExportedBluevery', () => {
 describe('bluevery: primitive APIs', () => {
   describe('checkIsInitialized', () => {
     test('should return isInitialized', async () => {
+      bluevery = new Bluevery({
+        BlueveryCore,
+        BlueveryState,
+        blueveryListeners: new BlueveryListeners(),
+      });
       const actual = bluevery.checkIsInitialized();
       expect(actual).toBe(false);
       await bluevery.init();
       const actualThenInitialized = bluevery.checkIsInitialized();
       expect(actualThenInitialized).toBe(true);
-      bluevery.stopBluevery();
+      // bluevery.stopBluevery();
     });
   });
 
@@ -67,12 +81,13 @@ describe('bluevery: primitive APIs', () => {
       } as unknown) as EmitterSubscription);
     });
 
-    beforeEach(() => {
+    beforeEach(async () => {
       bluevery = new Bluevery({
         BlueveryCore,
         BlueveryState,
         blueveryListeners,
       });
+      await bluevery.init();
     });
 
     test('should stop bluevery completely', () => {
@@ -92,6 +107,15 @@ describe('bluevery: primitive APIs', () => {
 
 describe('bluevery: commands APIs', () => {
   describe('init', () => {
+    beforeEach(async () => {
+      spiedCoreInit.mockRestore();
+      bluevery = new Bluevery({
+        BlueveryCore,
+        BlueveryState,
+        blueveryListeners: new BlueveryListeners(),
+      });
+    });
+
     test('can only init once', async () => {
       const initFn = jest.fn();
       const core = (jest.fn().mockImplementation(() => ({
@@ -114,6 +138,13 @@ describe('bluevery: commands APIs', () => {
     test('user should be able to know that disconnected', async () => {
       const optionalDisconnectHandler = jest.fn();
       const testerPeripheral = dummyPeripheralInfo('tester1');
+      // MEMO: トップレベルbeforeEachで1度initしてるのでリスナーが残ってしまう。なのでinitのテストの前に1回stopしておく
+      // bluevery.stopBluevery();
+      bluevery = new Bluevery({
+        BlueveryCore,
+        BlueveryState,
+        blueveryListeners: new BlueveryListeners(),
+      });
       await bluevery.init({
         onDisconnectPeripheralHandler: optionalDisconnectHandler,
       });
@@ -165,21 +196,25 @@ describe('bluevery: commands APIs', () => {
   describe('startScan', () => {
     jest.useFakeTimers();
     const scanFn = jest.fn();
+    const initFn = jest.fn();
     const clearScannedPeripheralsFn = jest.fn();
     const core = (jest.fn().mockImplementation(() => ({
       listeners: {publicListeners: {}},
+      init: initFn,
       scan: scanFn,
       clearScannedPeripherals: clearScannedPeripheralsFn,
     })) as unknown) as typeof BlueveryCore;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       jest.clearAllMocks();
       bluevery = new Bluevery({
         BlueveryCore: core,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
       });
+      await bluevery.init();
     });
+
     describe('interval', () => {
       test('should correct intervalLength', async () => {
         bluevery.startScan({
@@ -309,16 +344,18 @@ describe('bluevery: commands APIs', () => {
     const writeValueFn = jest.fn(() => 'wrote to peripheral');
     const core = (jest.fn().mockImplementation(() => ({
       listeners: {publicListeners: {}},
+      init: jest.fn(),
       writeValue: writeValueFn,
     })) as unknown) as typeof BlueveryCore;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       jest.clearAllMocks();
       bluevery = new Bluevery({
         BlueveryCore: core,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
       });
+      await bluevery.init();
     });
 
     describe('writeValue: positive pattern', () => {
@@ -350,16 +387,18 @@ describe('bluevery: commands APIs', () => {
     const readValueFn = jest.fn(() => 'read to peripheral');
     const core = (jest.fn().mockImplementation(() => ({
       listeners: {publicListeners: {}},
+      init: jest.fn(),
       readValue: readValueFn,
     })) as unknown) as typeof BlueveryCore;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       jest.clearAllMocks();
       bluevery = new Bluevery({
         BlueveryCore: core,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
       });
+      await bluevery.init();
     });
 
     describe('readValue: positive pattern', () => {
@@ -385,16 +424,18 @@ describe('bluevery: commands APIs', () => {
     const connectFn = jest.fn();
     const core = (jest.fn().mockImplementation(() => ({
       listeners: {publicListeners: {}},
+      init: jest.fn(),
       connect: connectFn,
     })) as unknown) as typeof BlueveryCore;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       jest.clearAllMocks();
       bluevery = new Bluevery({
         BlueveryCore: core,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
       });
+      await bluevery.init();
     });
 
     describe('connect: check calls', () => {
@@ -417,7 +458,7 @@ describe('bluevery: commands APIs', () => {
     let startScanFn = jest.fn();
     let spiedStartNotification: jest.SpyInstance;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       jest.clearAllMocks();
       //cleanup spys
       jest.restoreAllMocks();
@@ -431,6 +472,7 @@ describe('bluevery: commands APIs', () => {
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
       });
+      await bluevery.init();
       bluevery.connect = connectFn;
       bluevery.startScan = startScanFn;
     });
@@ -491,16 +533,18 @@ describe('bluevery: commands APIs', () => {
     const stopNotificationFn = jest.fn();
     const core = (jest.fn().mockImplementation(() => ({
       listeners: {publicListeners: {}},
+      init: jest.fn(),
       stopNotification: stopNotificationFn,
     })) as unknown) as typeof BlueveryCore;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       jest.clearAllMocks();
       bluevery = new Bluevery({
         BlueveryCore: core,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
       });
+      await bluevery.init();
     });
 
     describe('stopNotification: check calls', () => {
