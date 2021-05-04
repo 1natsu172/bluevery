@@ -26,6 +26,8 @@ import {
   ToBetterOptions,
   toBetterPromise,
   toThrowErrorIfRejected,
+  toInspectPromiseReturnValue,
+  InspectorFn,
 } from './utils';
 import {BlueveryState as _BlueveryState} from './blueveryState';
 import {BlueveryListeners as _BlueveryListeners} from './blueveryListeners';
@@ -401,7 +403,9 @@ export class BlueveryCore {
     retrieveServicesOptions,
   }: {
     readValueParams: BleManagerParams['read'];
-    readValueOptions: ToBetterOptions;
+    readValueOptions: ToBetterOptions & {
+      advanceRetryCondition?: InspectorFn<typeof BleManager.read>;
+    };
     retrieveServicesParams: BleManagerParams['retrieveServices'];
     // TODO: change to `must timeout option` type
     retrieveServicesOptions: ToBetterOptions;
@@ -430,9 +434,13 @@ export class BlueveryCore {
       );
     }
 
-    // FIXME: readの関数をDIできるようにしてほしい。read自体は成功しているが空配列で返ってくるケースがあり、そういうときにretryできる実装に今はなっていない。
     const _readValue = toBetterPromise(
-      toThrowErrorIfRejected(BleManager.read),
+      toThrowErrorIfRejected(
+        toInspectPromiseReturnValue(
+          BleManager.read,
+          readValueOptions.advanceRetryCondition,
+        ),
+      ),
       readValueOptions,
     );
 

@@ -2,7 +2,7 @@ import {Peripheral} from 'react-native-ble-manager';
 import promiseInterval from 'interval-promise';
 import autoBind from 'auto-bind';
 import deepmerge from 'deepmerge';
-import {BlueveryCore as _BlueveryCore} from './blueveryCore';
+import {BlueveryCore, BlueveryCore as _BlueveryCore} from './blueveryCore';
 import {BlueveryState as _BlueveryState} from './blueveryState';
 import {BlueveryListeners as _BlueveryListeners} from './blueveryListeners';
 import {
@@ -277,7 +277,9 @@ export class Bluevery {
     retrieveServicesOptions,
   }: {
     readValueParams: BleManagerParams['read'];
-    readValueOptions?: ToBetterOptions;
+    readValueOptions?: Parameters<
+      InstanceType<typeof BlueveryCore>['readValue']
+    >[0]['readValueOptions'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
     /**
      * @description retrieveServices must have timeout
@@ -285,7 +287,11 @@ export class Bluevery {
      */
     retrieveServicesOptions?: ToBetterOptions;
   }) {
-    const _readValueOptions = deepmerge<ToBetterOptions>(
+    const _readValueOptions = deepmerge<
+      Parameters<
+        InstanceType<typeof BlueveryCore>['readValue']
+      >[0]['readValueOptions']
+    >(
       {
         retryOptions: {factor: 1, retries: 4},
       },
