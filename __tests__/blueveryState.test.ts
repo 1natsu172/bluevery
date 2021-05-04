@@ -239,6 +239,44 @@ describe('BlueveryState', () => {
         });
       });
     });
+    describe('managingPeripheral:retrieveServices', () => {
+      describe('setManagingPeripheralRetrieving', () => {
+        test('should change to connecting of the State', () => {
+          expect(
+            blueveryState.getState().managingPeripherals['1'].retrieveServices,
+          ).toBeUndefined();
+          blueveryState.setManagingPeripheralRetrieving(dummyPeripheralInfo.id);
+          expect(
+            blueveryState.getState().managingPeripherals['1'].retrieveServices,
+          ).toBe('retrieving');
+        });
+      });
+      describe('setManagingPeripheralRetrieved', () => {
+        test('should change to connecting of the State', () => {
+          expect(
+            blueveryState.getState().managingPeripherals['1'].retrieveServices,
+          ).toBeUndefined();
+          blueveryState.setManagingPeripheralRetrieved(dummyPeripheralInfo.id);
+          expect(
+            blueveryState.getState().managingPeripherals['1'].retrieveServices,
+          ).toBe('retrieved');
+        });
+      });
+      describe('setManagingPeripheralRetrieveFailed', () => {
+        test('should change to connecting of the State', () => {
+          expect(
+            blueveryState.getState().managingPeripherals['1'].retrieveServices,
+          ).toBeUndefined();
+          blueveryState.setManagingPeripheralRetrieveFailed(
+            dummyPeripheralInfo.id,
+          );
+          expect(
+            blueveryState.getState().managingPeripherals['1'].retrieveServices,
+          ).toBe('failed');
+        });
+      });
+    });
+
     describe('managingPeripheral:receivingForCharacteristicValue', () => {
       describe('onReceivingForCharacteristicValue', () => {
         test('should change to on receivingForCharacteristicValue of the State', () => {

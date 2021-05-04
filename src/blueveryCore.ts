@@ -270,8 +270,17 @@ export class BlueveryCore {
     bondingOptions: ToBetterOptions;
   }) {
     const [targetPeripheralId] = connectParams;
+    const [, serviceUUIDs] = retrieveServicesParams;
     const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
     if (isPassedRequireCheck === false) {
+      return false;
+    }
+
+    const isAlreadyConnected = await BleManager.isPeripheralConnected(
+      targetPeripheralId,
+      serviceUUIDs || [],
+    );
+    if (isAlreadyConnected) {
       return false;
     }
 
@@ -308,10 +317,44 @@ export class BlueveryCore {
     this.state.setManagingPeripheralConnected(targetPeripheralId);
   }
 
-  async writeValue(
-    writeValueParams: BleManagerParams['write'],
-    options: ToBetterOptions,
+  /**
+   * @description retrieveServices must have timeout
+   */
+  async retrieveServices(
+    retrieveServicesParams: BleManagerParams['retrieveServices'],
+    // TODO: change to `must timeout option` type
+    retrieveServicesOptions: ToBetterOptions,
   ) {
+    const [peripheralId] = retrieveServicesParams;
+
+    const _retrieveServices = toBetterPromise(
+      toThrowErrorIfRejected(BleManager.retrieveServices),
+      retrieveServicesOptions,
+    );
+
+    this.state.setManagingPeripheralRetrieving(peripheralId);
+    await _retrieveServices(...retrieveServicesParams)
+      .then((_peripheralInfo) => {
+        this.state.setManagingPeripheralRetrieved(peripheralId);
+      })
+      .catch((error) => {
+        this.state.setManagingPeripheralRetrieveFailed(peripheralId);
+        throw error;
+      });
+  }
+
+  async writeValue({
+    writeValueParams,
+    writeValueOptions,
+    retrieveServicesParams,
+    retrieveServicesOptions,
+  }: {
+    writeValueParams: BleManagerParams['write'];
+    writeValueOptions: ToBetterOptions;
+    retrieveServicesParams: BleManagerParams['retrieveServices'];
+    // TODO: change to `must timeout option` type
+    retrieveServicesOptions: ToBetterOptions;
+  }) {
     const [peripheralId] = writeValueParams;
 
     const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
@@ -319,11 +362,26 @@ export class BlueveryCore {
       return false;
     }
 
+    // FIXME: selector化
     this.checkThePeripheralIsManaging(peripheralId);
+    const targetPeripheralId = this.getState().managingPeripherals[
+      peripheralId
+    ];
+
+    /**
+     * @description must call `this#retrieveServices` method before write calling
+     */
+    // FIXME: selector化で吸収したら型もundefinedになりようがないので ! 消せる
+    if (targetPeripheralId!.retrieveServices !== 'retrieved') {
+      await this.retrieveServices(
+        retrieveServicesParams,
+        retrieveServicesOptions,
+      );
+    }
 
     const _writeValue = toBetterPromise(
       toThrowErrorIfRejected(BleManager.write),
-      options,
+      writeValueOptions,
     );
 
     try {
@@ -336,10 +394,18 @@ export class BlueveryCore {
     }
   }
 
-  async readValue(
-    readValueParams: BleManagerParams['read'],
-    options: ToBetterOptions,
-  ) {
+  async readValue({
+    readValueParams,
+    readValueOptions,
+    retrieveServicesParams,
+    retrieveServicesOptions,
+  }: {
+    readValueParams: BleManagerParams['read'];
+    readValueOptions: ToBetterOptions;
+    retrieveServicesParams: BleManagerParams['retrieveServices'];
+    // TODO: change to `must timeout option` type
+    retrieveServicesOptions: ToBetterOptions;
+  }) {
     const [peripheralId] = readValueParams;
 
     const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
@@ -347,12 +413,27 @@ export class BlueveryCore {
       return false;
     }
 
+    // FIXME: selector化
     this.checkThePeripheralIsManaging(peripheralId);
+    const targetPeripheralId = this.getState().managingPeripherals[
+      peripheralId
+    ];
+
+    /**
+     * @description must call `this#retrieveServices` method before read calling
+     */
+    // FIXME: selector化で吸収したら型もundefinedになりようがないので ! 消せる
+    if (targetPeripheralId!.retrieveServices !== 'retrieved') {
+      await this.retrieveServices(
+        retrieveServicesParams,
+        retrieveServicesOptions,
+      );
+    }
 
     // FIXME: readの関数をDIできるようにしてほしい。read自体は成功しているが空配列で返ってくるケースがあり、そういうときにretryできる実装に今はなっていない。
     const _readValue = toBetterPromise(
       toThrowErrorIfRejected(BleManager.read),
-      options,
+      readValueOptions,
     );
 
     try {
@@ -365,17 +446,37 @@ export class BlueveryCore {
     }
   }
 
-  /**
-   * @description must call `this#connect` method before this method calling
-   */
   async startNotification({
     startNotificationParams,
     receiveCharacteristicHandler,
+    retrieveServicesParams,
+    retrieveServicesOptions,
   }: {
     startNotificationParams: BleManagerParams['startNotification'];
     receiveCharacteristicHandler: PublicHandlers['HandleDidUpdateValueForCharacteristic'];
+    retrieveServicesParams: BleManagerParams['retrieveServices'];
+    // TODO: change to `must timeout option` type
+    retrieveServicesOptions: ToBetterOptions;
   }) {
     const [peripheralId] = startNotificationParams;
+
+    // FIXME: selector化
+    this.checkThePeripheralIsManaging(peripheralId);
+    const targetPeripheralId = this.getState().managingPeripherals[
+      peripheralId
+    ];
+
+    /**
+     * @description must call `this#retrieveServices` method before startNotification calling
+     */
+    // FIXME: selector化で吸収したら型もundefinedになりようがないので ! 消せる
+    if (targetPeripheralId!.retrieveServices !== 'retrieved') {
+      await this.retrieveServices(
+        retrieveServicesParams,
+        retrieveServicesOptions,
+      );
+    }
+
     /**
      * startNotificationが複数回呼ばれた場合listenerを一度破棄しておく
      */

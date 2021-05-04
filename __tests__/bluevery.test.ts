@@ -368,26 +368,35 @@ describe('bluevery: commands APIs', () => {
 
     describe('writeValue: positive pattern', () => {
       test('should return value if exist', async () => {
-        const wrote = await bluevery.writeValue([
-          'dummyPid',
-          'dummySUuid',
-          'dummyCharaValue',
-          'this is data',
-        ]);
+        const wrote = await bluevery.writeValue({
+          writeValueParams: [
+            'dummyPid',
+            'dummySUuid',
+            'dummyCharaValue',
+            'this is data',
+          ],
+          retrieveServicesParams: ['dummyPid'],
+        });
         expect(wrote).toBe('wrote to peripheral');
       });
     });
 
     describe('writeValue: check calls', () => {
       test('should call core#writeValue', async () => {
-        await bluevery.writeValue([
-          'dummyPid',
-          'dummySUuid',
-          'dummyCharaValue',
-          'this is data',
-        ]);
+        await bluevery.writeValue({
+          writeValueParams: [
+            'dummyPid',
+            'dummySUuid',
+            'dummyCharaValue',
+            'this is data',
+          ],
+          retrieveServicesParams: ['dummyPid'],
+        });
         expect(writeValueFn).toBeCalled();
       });
+      test.todo(
+        'should call retrieveServices if retrieve has not yet been called',
+      );
     });
   });
 
@@ -411,20 +420,25 @@ describe('bluevery: commands APIs', () => {
 
     describe('readValue: positive pattern', () => {
       test('should return value if exist', async () => {
-        const read = await bluevery.readValue([
-          'dummyPid',
-          'dummySUuid',
-          'dummyCharaValue',
-        ]);
+        const read = await bluevery.readValue({
+          readValueParams: ['dummyPid', 'dummySUuid', 'dummyCharaValue'],
+          retrieveServicesParams: ['dummyPid'],
+        });
         expect(read).toBe('read to peripheral');
       });
     });
 
     describe('readValue: check calls', () => {
       test('should call core#readValue', async () => {
-        await bluevery.readValue(['dummyPid', 'dummySUuid', 'dummyCharaValue']);
+        await bluevery.readValue({
+          readValueParams: ['dummyPid', 'dummySUuid', 'dummyCharaValue'],
+          retrieveServicesParams: ['dummyPid'],
+        });
         expect(readValueFn).toBeCalled();
       });
+      test.todo(
+        'should call retrieveServices if retrieve has not yet been called',
+      );
     });
   });
 

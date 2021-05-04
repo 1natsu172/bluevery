@@ -153,6 +153,28 @@ export class BlueveryState {
     this.setManagingPeripheralInfoProperty(peripheralId, 'connect', 'failed');
   }
 
+  setManagingPeripheralRetrieving(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(
+      peripheralId,
+      'retrieveServices',
+      'retrieving',
+    );
+  }
+  setManagingPeripheralRetrieved(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(
+      peripheralId,
+      'retrieveServices',
+      'retrieved',
+    );
+  }
+  setManagingPeripheralRetrieveFailed(peripheralId: PeripheralId) {
+    this.setManagingPeripheralInfoProperty(
+      peripheralId,
+      'retrieveServices',
+      'failed',
+    );
+  }
+
   onReceivingForCharacteristicValue(peripheralId: PeripheralId) {
     this.setManagingPeripheralInfoProperty(
       peripheralId,

@@ -19,6 +19,7 @@ export type PeripheralInfo = Peripheral & {
   bonded?: 'unknown' | boolean;
   communicate?: 'nonCommunicate' | 'reading' | 'writing';
   receivingForCharacteristicValue?: boolean;
+  retrieveServices?: 'retrieving' | 'retrieved' | 'failed';
 };
 
 export type State = {

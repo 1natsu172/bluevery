@@ -200,7 +200,7 @@ export class Bluevery {
   }
 
   /**
-   * NOTE: connect, retrieveServices, bondingはconnectメソッドで必要なのでオプションのデフォルト指定がないので意図的
+   * NOTE: connect, bondingはconnectメソッドで必要で、connectメソッド側でオプションのデフォルト値は吸収しているのでこのメソッドで設定しないのは意図的。
    */
   async receiveCharacteristicValue({
     scanParams,
@@ -217,6 +217,10 @@ export class Bluevery {
     connectParams: BleManagerParams['connect'];
     connectOptions?: ToBetterOptions;
     retrieveServicesParams: BleManagerParams['retrieveServices'];
+    /**
+     * @description retrieveServices must have timeout
+     * @default timeoutMilliseconds = 5000ms
+     */
     retrieveServicesOptions?: ToBetterOptions;
     bondingParams: BleManagerParams['createBond'];
     bondingOptions?: ToBetterOptions;
@@ -224,6 +228,15 @@ export class Bluevery {
     receiveCharacteristicHandler: PublicHandlers['HandleDidUpdateValueForCharacteristic'];
   }) {
     const [targetPeripheralId] = connectParams;
+
+    // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
+    const _retrieveServicesOptions = deepmerge<ToBetterOptions>(
+      {
+        retryOptions: {factor: 1, retries: 4},
+        timeoutOptions: {timeoutMilliseconds: 5000},
+      },
+      retrieveServicesOptions || {},
+    );
 
     do {
       await this.startScan(scanParams);
@@ -244,6 +257,8 @@ export class Bluevery {
     await this.core?.startNotification({
       startNotificationParams,
       receiveCharacteristicHandler,
+      retrieveServicesParams,
+      retrieveServicesOptions: _retrieveServicesOptions,
     });
   }
 
@@ -255,31 +270,80 @@ export class Bluevery {
     return await this.core?.stopNotification({stopNotificationParams});
   }
 
-  // TODO: read前にretrieveServicesのコールが必要だが実装で吸収するか考える
-  async readValue(
-    readValueParams: BleManagerParams['read'],
-    options?: ToBetterOptions,
-  ) {
-    const _options = deepmerge<ToBetterOptions>(
+  async readValue({
+    readValueParams,
+    readValueOptions,
+    retrieveServicesParams,
+    retrieveServicesOptions,
+  }: {
+    readValueParams: BleManagerParams['read'];
+    readValueOptions?: ToBetterOptions;
+    retrieveServicesParams: BleManagerParams['retrieveServices'];
+    /**
+     * @description retrieveServices must have timeout
+     * @default timeoutMilliseconds = 5000ms
+     */
+    retrieveServicesOptions?: ToBetterOptions;
+  }) {
+    const _readValueOptions = deepmerge<ToBetterOptions>(
       {
         retryOptions: {factor: 1, retries: 4},
       },
-      options || {},
+      readValueOptions || {},
     );
-    return await this.core?.readValue(readValueParams, _options);
+
+    // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
+    const _retrieveServicesOptions = deepmerge<ToBetterOptions>(
+      {
+        retryOptions: {factor: 1, retries: 4},
+        timeoutOptions: {timeoutMilliseconds: 5000},
+      },
+      retrieveServicesOptions || {},
+    );
+
+    return await this.core?.readValue({
+      readValueParams,
+      readValueOptions: _readValueOptions,
+      retrieveServicesParams,
+      retrieveServicesOptions: _retrieveServicesOptions,
+    });
   }
 
-  // TODO: write前にretrieveServicesのコールが必要だが実装で吸収するか考える
-  async writeValue(
-    writeValueParams: BleManagerParams['write'],
-    options?: ToBetterOptions,
-  ) {
-    const _options = deepmerge<ToBetterOptions>(
+  async writeValue({
+    writeValueParams,
+    writeValueOptions,
+    retrieveServicesParams,
+    retrieveServicesOptions,
+  }: {
+    writeValueParams: BleManagerParams['write'];
+    writeValueOptions?: ToBetterOptions;
+    retrieveServicesParams: BleManagerParams['retrieveServices'];
+    /**
+     * @description retrieveServices must have timeout
+     * @default timeoutMilliseconds = 5000ms
+     */
+    retrieveServicesOptions?: ToBetterOptions;
+  }) {
+    const _writeValueoptions = deepmerge<ToBetterOptions>(
       {
         retryOptions: {factor: 1, retries: 4},
       },
-      options || {},
+      writeValueOptions || {},
     );
-    return await this.core?.writeValue(writeValueParams, _options);
+    // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
+    const _retrieveServicesOptions = deepmerge<ToBetterOptions>(
+      {
+        retryOptions: {factor: 1, retries: 4},
+        timeoutOptions: {timeoutMilliseconds: 5000},
+      },
+      retrieveServicesOptions || {},
+    );
+
+    return await this.core?.writeValue({
+      writeValueParams,
+      writeValueOptions: _writeValueoptions,
+      retrieveServicesParams,
+      retrieveServicesOptions: _retrieveServicesOptions,
+    });
   }
 }

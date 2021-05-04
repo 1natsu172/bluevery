@@ -31,6 +31,7 @@ let spiedRequireCheckBeforeBleProcess: jest.SpyInstance;
 let spiedCheckThePeripheralIsManaging: jest.SpyInstance;
 let spiedCleanupScan: jest.SpyInstance;
 let spiedClearScannedPeripherals: jest.SpyInstance;
+let spiedRetrieveServices: jest.SpyInstance;
 beforeEach(() => {
   // cleanup mocks
   jest.clearAllMocks();
@@ -64,6 +65,10 @@ beforeEach(() => {
     BlueveryCore.prototype,
     // @ts-expect-error
     'checkThePeripheralIsManaging',
+  );
+  spiedRetrieveServices = jest.spyOn(
+    BlueveryCore.prototype,
+    'retrieveServices',
   );
 
   // note: need create instance after spyOn
@@ -355,16 +360,61 @@ describe('BlueveryCore', () => {
         blueveryListeners: new BlueveryListeners(),
         BlueveryState,
         initialState: createInitialState({
-          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
+          managingPeripherals: {
+            ['1']: dummyPeripheralInfo('1'),
+            ['2']: {
+              ...dummyPeripheralInfo('2'),
+              retrieveServices: 'retrieved',
+            },
+          },
         }),
       });
     });
     test('should return if value exists', async () => {
-      const ret = await blueveryCore.writeValue(
-        ['1', 'dummySUUID', 'dummyCharaUUID', 'this is dummy data'],
-        {},
-      );
+      const ret = await blueveryCore.writeValue({
+        writeValueParams: [
+          '1',
+          'dummySUUID',
+          'dummyCharaUUID',
+          'this is dummy data',
+        ],
+        writeValueOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
       expect(ret).toStrictEqual([[1], [2], [3]]);
+    });
+
+    test('should call retrieveServices, if not retrieved', async () => {
+      await blueveryCore.writeValue({
+        writeValueParams: [
+          '1',
+          'dummySUUID',
+          'dummyCharaUUID',
+          'this is dummy data',
+        ],
+        writeValueOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
+
+      expect(spiedRetrieveServices).toBeCalled();
+    });
+
+    test('should not call retrieveServices, if already retrieved', async () => {
+      await blueveryCore.writeValue({
+        writeValueParams: [
+          '2',
+          'dummySUUID',
+          'dummyCharaUUID',
+          'this is dummy data',
+        ],
+        writeValueOptions: {},
+        retrieveServicesParams: ['2'],
+        retrieveServicesOptions: {},
+      });
+
+      expect(spiedRetrieveServices).not.toBeCalled();
     });
 
     test('should change communicate status', async () => {
@@ -377,29 +427,43 @@ describe('BlueveryCore', () => {
         }),
         onChangeStateHandler: (state) => {
           spyCommunicateStatus(state.managingPeripherals['1'].communicate);
-          // first called
-          expect(spyCommunicateStatus.mock.calls[0][0]).toBe('writing');
         },
       });
       // check initial status
       expect(blueveryCore.getState().managingPeripherals['1'].communicate).toBe(
         undefined,
       );
-      await blueveryCore.writeValue(
-        ['1', 'dummySUUID', 'dummyCharaUUID', 'this is dummy data'],
-        {},
-      );
-      // finally status
+      await blueveryCore.writeValue({
+        writeValueParams: [
+          '1',
+          'dummySUUID',
+          'dummyCharaUUID',
+          'this is dummy data',
+        ],
+        writeValueOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
+      // first communicate status (retrieveのコールがあるのでcommunicateの呼ばれるタイミングは実装によって左右される)
+      expect(spyCommunicateStatus.mock.calls[2][0]).toBe('writing');
+      // finally communicate status
       expect(blueveryCore.getState().managingPeripherals['1'].communicate).toBe(
         'nonCommunicate',
       );
     });
 
     test('writeValue: check calls', async () => {
-      await blueveryCore.writeValue(
-        ['1', 'dummySUUID', 'dummyCharaUUID', 'this is dummy data'],
-        {},
-      );
+      await blueveryCore.writeValue({
+        writeValueParams: [
+          '1',
+          'dummySUUID',
+          'dummyCharaUUID',
+          'this is dummy data',
+        ],
+        writeValueOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
       expect(BleManager.write).toBeCalled();
       expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
       expect(spiedCheckThePeripheralIsManaging).toBeCalled();
@@ -411,10 +475,17 @@ describe('BlueveryCore', () => {
         throw new Error('fixture error');
       });
 
-      const _write = blueveryCore.writeValue(
-        ['1', 'dummySUUID', 'dummyCharaUUID', 'this is dummy data'],
-        {},
-      );
+      const _write = blueveryCore.writeValue({
+        writeValueParams: [
+          '1',
+          'dummySUUID',
+          'dummyCharaUUID',
+          'this is dummy data',
+        ],
+        writeValueOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
       await expect(_write).rejects.toThrow('fixture error');
     });
   });
@@ -425,16 +496,43 @@ describe('BlueveryCore', () => {
         blueveryListeners: new BlueveryListeners(),
         BlueveryState,
         initialState: createInitialState({
-          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
+          managingPeripherals: {
+            ['1']: dummyPeripheralInfo('1'),
+            ['2']: {...dummyPeripheralInfo('2'), retrieveServices: 'retrieved'},
+          },
         }),
       });
     });
     test('should return if value exists', async () => {
-      const ret = await blueveryCore.readValue(
-        ['1', 'dummySUUID', 'dummyCharaUUID'],
-        {},
-      );
+      const ret = await blueveryCore.readValue({
+        readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
+        readValueOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
       expect(ret).toStrictEqual([[1], [2], [3]]);
+    });
+
+    test('should call retrieveServices, if not retrieved', async () => {
+      await blueveryCore.readValue({
+        readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
+        readValueOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
+
+      expect(spiedRetrieveServices).toBeCalled();
+    });
+
+    test('should not call retrieveServices, if already retrieved', async () => {
+      await blueveryCore.readValue({
+        readValueParams: ['2', 'dummySUUID', 'dummyCharaUUID'],
+        readValueOptions: {},
+        retrieveServicesParams: ['2'],
+        retrieveServicesOptions: {},
+      });
+
+      expect(spiedRetrieveServices).not.toBeCalled();
     });
 
     test('should change communicate status', async () => {
@@ -447,23 +545,33 @@ describe('BlueveryCore', () => {
         }),
         onChangeStateHandler: (state) => {
           spyCommunicateStatus(state.managingPeripherals['1'].communicate);
-          // first called
-          expect(spyCommunicateStatus.mock.calls[0][0]).toBe('reading');
         },
       });
       // check initial status
       expect(blueveryCore.getState().managingPeripherals['1'].communicate).toBe(
         undefined,
       );
-      await blueveryCore.readValue(['1', 'dummySUUID', 'dummyCharaUUID'], {});
-      // finally status
+      await blueveryCore.readValue({
+        readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
+        readValueOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
+      // first communicate status (retrieveのコールがあるのでcommunicateの呼ばれるタイミングは実装によって左右される)
+      expect(spyCommunicateStatus.mock.calls[2][0]).toBe('reading');
+      // finally communicate status
       expect(blueveryCore.getState().managingPeripherals['1'].communicate).toBe(
         'nonCommunicate',
       );
     });
 
     test('readValue: check calls', async () => {
-      await blueveryCore.readValue(['1', 'dummySUUID', 'dummyCharaUUID'], {});
+      await blueveryCore.readValue({
+        readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
+        readValueOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
       expect(BleManager.read).toBeCalled();
       expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
       expect(spiedCheckThePeripheralIsManaging).toBeCalled();
@@ -475,10 +583,12 @@ describe('BlueveryCore', () => {
         throw new Error('fixture error');
       });
 
-      const _read = blueveryCore.readValue(
-        ['1', 'dummySUUID', 'dummyCharaUUID'],
-        {},
-      );
+      const _read = blueveryCore.readValue({
+        readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
+        readValueOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
       await expect(_read).rejects.toThrow('fixture error');
     });
   });
@@ -489,9 +599,27 @@ describe('BlueveryCore', () => {
         blueveryListeners: new BlueveryListeners(),
         BlueveryState,
         initialState: createInitialState({
-          scannedPeripherals: {['1']: dummyPeripheralInfo('1')},
+          scannedPeripherals: {
+            ['1']: dummyPeripheralInfo('1'),
+          },
         }),
       });
+    });
+
+    test('connect: shoube be early return if already connected the peripheral', async () => {
+      // @ts-expect-error mocked at jest.setup.js
+      BleManager.isPeripheralConnected.mockImplementationOnce(() => true);
+
+      const ret = await blueveryCore.connect({
+        bondingParams: ['1', ''],
+        bondingOptions: {},
+        connectParams: ['1'],
+        connectOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
+
+      expect(ret).toBe(false);
     });
 
     test('connect: should be change connect of state the managing peripheral', async () => {
@@ -553,7 +681,68 @@ describe('BlueveryCore', () => {
     });
   });
 
+  describe('retrieveServices', () => {
+    const spyRetrieveServicesState = jest.fn();
+    beforeEach(() => {
+      jest.clearAllMocks();
+      blueveryCore = new BlueveryCore({
+        blueveryListeners: new BlueveryListeners(),
+        BlueveryState,
+        initialState: createInitialState({
+          managingPeripherals: {
+            ['1']: dummyPeripheralInfo('1'),
+          },
+        }),
+        onChangeStateHandler: (state) => {
+          spyRetrieveServicesState(
+            state.managingPeripherals['1'].retrieveServices,
+          );
+        },
+      });
+    });
+
+    test('check calls', async () => {
+      await blueveryCore.retrieveServices(['1'], {});
+      expect(BleManager.retrieveServices).toBeCalled();
+    });
+
+    test('should change state of peripheral retrieveServices', async () => {
+      await blueveryCore.retrieveServices(['1'], {});
+      expect(spyRetrieveServicesState.mock.calls[0][0]).toBe('retrieving');
+      expect(spyRetrieveServicesState.mock.calls[1][0]).toBe('retrieved');
+    });
+
+    test('should throw if error occured', async () => {
+      // @ts-expect-error
+      BleManager.retrieveServices.mockImplementationOnce(async () => {
+        throw new Error('fixture error');
+      });
+
+      const _retrieve = blueveryCore.retrieveServices(['1'], {});
+      await expect(_retrieve).rejects.toThrow('fixture error');
+      expect(
+        blueveryCore.getState().managingPeripherals['1'].retrieveServices,
+      ).toBe('failed');
+    });
+  });
+
   describe('startNotification', () => {
+    let blueveryListeners;
+
+    beforeEach(() => {
+      blueveryListeners = new BlueveryListeners();
+      blueveryCore = new BlueveryCore({
+        BlueveryState,
+        blueveryListeners,
+        initialState: createInitialState({
+          managingPeripherals: {
+            ['1']: dummyPeripheralInfo('1'),
+            ['2']: {...dummyPeripheralInfo('2'), retrieveServices: 'retrieved'},
+          },
+        }),
+      });
+    });
+
     test('startNotification: should be reset the previous listener, if there is one', async () => {
       const mockRemoveFn = jest.fn();
       const spyReceivingCharaValueState = jest.fn();
@@ -579,49 +768,59 @@ describe('BlueveryCore', () => {
       await blueveryCore.startNotification({
         startNotificationParams: ['1', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
       });
       expect(mockRemoveFn).toBeCalled();
-      expect(spyReceivingCharaValueState.mock.calls[0][0]).toBe(false);
+      // listenerがremoveされたタイミングのstateの変化をassertしている。実装の順番に左右されるテストにならざるを得ない。
+      expect(spyReceivingCharaValueState.mock.calls[2][0]).toBe(false);
     });
 
-    test('startNotification: should be receiving characteristic value', async () => {
-      const spyReceivingCharaValueState = jest.fn();
-
-      const blueveryListeners = new BlueveryListeners();
-      blueveryCore = new BlueveryCore({
-        BlueveryState,
-        blueveryListeners,
-        initialState: createInitialState({
-          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
-        }),
-        onChangeStateHandler: (state) => {
-          spyReceivingCharaValueState(
-            state.managingPeripherals['1'].receivingForCharacteristicValue,
-          );
-        },
-      });
+    test('should call retrieveServices, if not retrieved', async () => {
       await blueveryCore.startNotification({
         startNotificationParams: ['1', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
+      });
+
+      expect(spiedRetrieveServices).toBeCalled();
+    });
+
+    test('should not call retrieveServices, if already retrieved', async () => {
+      await blueveryCore.startNotification({
+        startNotificationParams: ['2', 'test', 'test'],
+        receiveCharacteristicHandler: () => {},
+        retrieveServicesParams: ['2'],
+        retrieveServicesOptions: {},
+      });
+
+      expect(spiedRetrieveServices).not.toBeCalled();
+    });
+
+    test('startNotification: should be receiving characteristic value', async () => {
+      await blueveryCore.startNotification({
+        startNotificationParams: ['1', 'test', 'test'],
+        receiveCharacteristicHandler: () => {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
       });
       expect(
         blueveryListeners.publicListeners['1']
           .receivingForCharacteristicValueListener,
       ).not.toBeUndefined();
-      expect(spyReceivingCharaValueState.mock.calls[0][0]).toBe(true);
+      expect(
+        blueveryCore.getState().managingPeripherals['1']
+          .receivingForCharacteristicValue,
+      ).toBe(true);
     });
+
     test('startNotification: connect: check calls', async () => {
-      const blueveryListeners = new BlueveryListeners();
-      blueveryCore = new BlueveryCore({
-        BlueveryState,
-        blueveryListeners,
-        initialState: createInitialState({
-          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
-        }),
-      });
       await blueveryCore.startNotification({
         startNotificationParams: ['1', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {},
       });
 
       expect(BleManager.startNotification).toBeCalled();

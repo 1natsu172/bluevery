@@ -65,5 +65,6 @@ jest.mock('react-native-ble-manager', () => {
     createBond: jest.fn(),
     startNotification: jest.fn(),
     stopNotification: jest.fn(),
+    isPeripheralConnected: jest.fn(() => false),
   };
 });
