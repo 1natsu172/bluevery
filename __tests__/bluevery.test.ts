@@ -394,9 +394,6 @@ describe('bluevery: commands APIs', () => {
         });
         expect(writeValueFn).toBeCalled();
       });
-      test.todo(
-        'should call retrieveServices if retrieve has not yet been called',
-      );
     });
   });
 
@@ -436,9 +433,6 @@ describe('bluevery: commands APIs', () => {
         });
         expect(readValueFn).toBeCalled();
       });
-      test.todo(
-        'should call retrieveServices if retrieve has not yet been called',
-      );
     });
   });
 
