@@ -1,6 +1,7 @@
 import pRetry, {Options as RetryOptions} from 'p-retry';
 import pTimeout from 'p-timeout';
 import pCancelable, {OnCancelFunction} from 'p-cancelable';
+import {SetRequired} from 'type-fest';
 
 type TimeoutOptions = {
   timeoutMilliseconds: number;
@@ -24,6 +25,11 @@ type BetterOptionsWithCancelable = {
 };
 
 export type ToBetterOptions = BetterOptions | BetterOptionsWithCancelable;
+
+export type ToBetterOptionsWithMustTimeout = SetRequired<
+  ToBetterOptions,
+  'timeoutOptions'
+>;
 
 export const toCancelablePromise = <ArgsType extends unknown[], ReturnValue>(
   fn: (...args: ArgsType) => PromiseLike<ReturnValue>,

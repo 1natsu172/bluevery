@@ -3,11 +3,14 @@
   "version": "0.0.1",
   "private": true,
   "main": "dist",
-  "types": "dist",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "postinstall": "npx patch-package",
     "dev": "tsc --watch --incremental",
     "test": "jest",
     "test:coverage": "jest --coverage",
+    "test:type": "tsd",
+    "test:all": "jest && tsd",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "typecheck": "tsc --noEmit",
     "build": "yarn build:clean && tsc --build",
@@ -54,6 +57,7 @@
     "react-native": "0.63.2",
     "react-test-renderer": "16.13.1",
     "time-span": "^4.0.0",
+    "tsd": "^0.14.0",
     "type-fest": "^1.0.2",
     "typescript": "^4.0.3"
   }
