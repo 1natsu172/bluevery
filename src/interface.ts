@@ -5,6 +5,11 @@ import {
   DisconnectedPeripheralHandler,
   HandleDidUpdateValueForCharacteristic,
 } from './libs';
+import {
+  InspectorFn,
+  ToBetterOptions,
+  ToBetterOptionsWithMustTimeout,
+} from './utils';
 import {MethodParamsRecord} from './utils/typeUtils/MethodParamsRecord';
 
 export type BlueveryOptions = {
@@ -57,3 +62,19 @@ export type BlueveryEvents = 'didChangeBlueveryState';
  */
 export type TBleManager = typeof BleManager;
 export type BleManagerParams = MethodParamsRecord<TBleManager>;
+
+/**
+ * Bluevery each method options map
+ */
+export interface BlueveryMethodOptions {
+  scan: ToBetterOptions;
+  connect: ToBetterOptionsWithMustTimeout;
+  retrieveServices: ToBetterOptionsWithMustTimeout;
+  read: ToBetterOptions & {
+    advanceRetryCondition?: InspectorFn<typeof BleManager.read>;
+  };
+  write: ToBetterOptions;
+  createBond: ToBetterOptionsWithMustTimeout;
+  startNotification: ToBetterOptions;
+  stopNotification: ToBetterOptions;
+}

@@ -380,7 +380,7 @@ describe('BlueveryCore', () => {
         ],
         writeValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
       expect(ret).toStrictEqual([[1], [2], [3]]);
     });
@@ -395,7 +395,7 @@ describe('BlueveryCore', () => {
         ],
         writeValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
 
       expect(spiedRetrieveServices).toBeCalled();
@@ -411,7 +411,7 @@ describe('BlueveryCore', () => {
         ],
         writeValueOptions: {},
         retrieveServicesParams: ['2'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
 
       expect(spiedRetrieveServices).not.toBeCalled();
@@ -442,7 +442,7 @@ describe('BlueveryCore', () => {
         ],
         writeValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
       // first communicate status (retrieveのコールがあるのでcommunicateの呼ばれるタイミングは実装によって左右される)
       expect(spyCommunicateStatus.mock.calls[2][0]).toBe('writing');
@@ -462,7 +462,7 @@ describe('BlueveryCore', () => {
         ],
         writeValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
       expect(BleManager.write).toBeCalled();
       expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
@@ -484,7 +484,7 @@ describe('BlueveryCore', () => {
         ],
         writeValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
       await expect(_write).rejects.toThrow('fixture error');
     });
@@ -508,7 +508,7 @@ describe('BlueveryCore', () => {
         readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
         readValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
       expect(ret).toStrictEqual([[1], [2], [3]]);
     });
@@ -518,7 +518,7 @@ describe('BlueveryCore', () => {
         readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
         readValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
 
       expect(spiedRetrieveServices).toBeCalled();
@@ -529,7 +529,7 @@ describe('BlueveryCore', () => {
         readValueParams: ['2', 'dummySUUID', 'dummyCharaUUID'],
         readValueOptions: {},
         retrieveServicesParams: ['2'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
 
       expect(spiedRetrieveServices).not.toBeCalled();
@@ -555,7 +555,7 @@ describe('BlueveryCore', () => {
         readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
         readValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
       // first communicate status (retrieveのコールがあるのでcommunicateの呼ばれるタイミングは実装によって左右される)
       expect(spyCommunicateStatus.mock.calls[2][0]).toBe('reading');
@@ -570,7 +570,7 @@ describe('BlueveryCore', () => {
         readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
         readValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
       expect(BleManager.read).toBeCalled();
       expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
@@ -587,7 +587,7 @@ describe('BlueveryCore', () => {
         readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
         readValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
       await expect(_read).rejects.toThrow('fixture error');
     });
@@ -612,11 +612,11 @@ describe('BlueveryCore', () => {
 
       const ret = await blueveryCore.connect({
         bondingParams: ['1', ''],
-        bondingOptions: {},
+        bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
         connectParams: ['1'],
-        connectOptions: {},
+        connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
 
       expect(ret).toBe(false);
@@ -641,11 +641,11 @@ describe('BlueveryCore', () => {
       );
       await blueveryCore.connect({
         bondingParams: ['1', ''],
-        bondingOptions: {},
+        bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
         connectParams: ['1'],
-        connectOptions: {},
+        connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
 
       expect(spyConnectState.mock.calls[0][0]).toBe(undefined);
@@ -656,11 +656,11 @@ describe('BlueveryCore', () => {
     test('connect: should be throw if not found peripheral in scannedPeripherals', async () => {
       const connecting = blueveryCore.connect({
         bondingParams: ['1', ''],
-        bondingOptions: {},
+        bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
         connectParams: ['2'],
-        connectOptions: {},
+        connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
       await expect(connecting).rejects.toThrow();
     });
@@ -668,11 +668,11 @@ describe('BlueveryCore', () => {
     test('connect: check calls', async () => {
       await blueveryCore.connect({
         bondingParams: ['1', ''],
-        bondingOptions: {},
+        bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
         connectParams: ['1'],
-        connectOptions: {},
+        connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
       expect(BleManager.connect).toBeCalled();
       expect(BleManager.retrieveServices).toBeCalled();
@@ -702,12 +702,16 @@ describe('BlueveryCore', () => {
     });
 
     test('check calls', async () => {
-      await blueveryCore.retrieveServices(['1'], {});
+      await blueveryCore.retrieveServices(['1'], {
+        timeoutOptions: {timeoutMilliseconds: 1000},
+      });
       expect(BleManager.retrieveServices).toBeCalled();
     });
 
     test('should change state of peripheral retrieveServices', async () => {
-      await blueveryCore.retrieveServices(['1'], {});
+      await blueveryCore.retrieveServices(['1'], {
+        timeoutOptions: {timeoutMilliseconds: 1000},
+      });
       expect(spyRetrieveServicesState.mock.calls[0][0]).toBe('retrieving');
       expect(spyRetrieveServicesState.mock.calls[1][0]).toBe('retrieved');
     });
@@ -718,7 +722,9 @@ describe('BlueveryCore', () => {
         throw new Error('fixture error');
       });
 
-      const _retrieve = blueveryCore.retrieveServices(['1'], {});
+      const _retrieve = blueveryCore.retrieveServices(['1'], {
+        timeoutOptions: {timeoutMilliseconds: 1000},
+      });
       await expect(_retrieve).rejects.toThrow('fixture error');
       expect(
         blueveryCore.getState().managingPeripherals['1'].retrieveServices,
@@ -769,7 +775,7 @@ describe('BlueveryCore', () => {
         startNotificationParams: ['1', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
       expect(mockRemoveFn).toBeCalled();
       // listenerがremoveされたタイミングのstateの変化をassertしている。実装の順番に左右されるテストにならざるを得ない。
@@ -781,7 +787,7 @@ describe('BlueveryCore', () => {
         startNotificationParams: ['1', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
 
       expect(spiedRetrieveServices).toBeCalled();
@@ -792,7 +798,7 @@ describe('BlueveryCore', () => {
         startNotificationParams: ['2', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
         retrieveServicesParams: ['2'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
 
       expect(spiedRetrieveServices).not.toBeCalled();
@@ -803,7 +809,7 @@ describe('BlueveryCore', () => {
         startNotificationParams: ['1', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
       expect(
         blueveryListeners.publicListeners['1']
@@ -820,7 +826,7 @@ describe('BlueveryCore', () => {
         startNotificationParams: ['1', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {},
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
 
       expect(BleManager.startNotification).toBeCalled();

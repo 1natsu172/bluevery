@@ -4,6 +4,7 @@ import {Permission} from 'react-native-permissions';
 import delay from 'delay';
 import {
   BlueveryOptions,
+  BlueveryMethodOptions,
   PeripheralInfo,
   State,
   BleManagerParams,
@@ -23,11 +24,9 @@ import {
   createHandleDisconnectPeripheral,
 } from './libs';
 import {
-  ToBetterOptions,
   toBetterPromise,
   toThrowErrorIfRejected,
   toInspectPromiseReturnValue,
-  InspectorFn,
 } from './utils';
 import {BlueveryState as _BlueveryState} from './blueveryState';
 import {BlueveryListeners as _BlueveryListeners} from './blueveryListeners';
@@ -265,11 +264,11 @@ export class BlueveryCore {
     bondingOptions,
   }: {
     connectParams: BleManagerParams['connect'];
-    connectOptions: ToBetterOptions;
+    connectOptions: BlueveryMethodOptions['connect'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
-    retrieveServicesOptions: ToBetterOptions;
+    retrieveServicesOptions: BlueveryMethodOptions['retrieveServices'];
     bondingParams: BleManagerParams['createBond'];
-    bondingOptions: ToBetterOptions;
+    bondingOptions: BlueveryMethodOptions['createBond'];
   }) {
     const [targetPeripheralId] = connectParams;
     const [, serviceUUIDs] = retrieveServicesParams;
@@ -324,8 +323,7 @@ export class BlueveryCore {
    */
   async retrieveServices(
     retrieveServicesParams: BleManagerParams['retrieveServices'],
-    // TODO: change to `must timeout option` type
-    retrieveServicesOptions: ToBetterOptions,
+    retrieveServicesOptions: BlueveryMethodOptions['retrieveServices'],
   ) {
     const [peripheralId] = retrieveServicesParams;
 
@@ -352,10 +350,9 @@ export class BlueveryCore {
     retrieveServicesOptions,
   }: {
     writeValueParams: BleManagerParams['write'];
-    writeValueOptions: ToBetterOptions;
+    writeValueOptions: BlueveryMethodOptions['write'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
-    // TODO: change to `must timeout option` type
-    retrieveServicesOptions: ToBetterOptions;
+    retrieveServicesOptions: BlueveryMethodOptions['retrieveServices'];
   }) {
     const [peripheralId] = writeValueParams;
 
@@ -403,12 +400,9 @@ export class BlueveryCore {
     retrieveServicesOptions,
   }: {
     readValueParams: BleManagerParams['read'];
-    readValueOptions: ToBetterOptions & {
-      advanceRetryCondition?: InspectorFn<typeof BleManager.read>;
-    };
+    readValueOptions: BlueveryMethodOptions['read'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
-    // TODO: change to `must timeout option` type
-    retrieveServicesOptions: ToBetterOptions;
+    retrieveServicesOptions: BlueveryMethodOptions['retrieveServices'];
   }) {
     const [peripheralId] = readValueParams;
 
@@ -463,8 +457,7 @@ export class BlueveryCore {
     startNotificationParams: BleManagerParams['startNotification'];
     receiveCharacteristicHandler: PublicHandlers['HandleDidUpdateValueForCharacteristic'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
-    // TODO: change to `must timeout option` type
-    retrieveServicesOptions: ToBetterOptions;
+    retrieveServicesOptions: BlueveryMethodOptions['retrieveServices'];
   }) {
     const [peripheralId] = startNotificationParams;
 

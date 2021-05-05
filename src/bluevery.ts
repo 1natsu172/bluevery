@@ -12,8 +12,9 @@ import {
   State,
   PublicHandlers,
   PublicListeners,
+  BlueveryMethodOptions,
 } from './interface';
-import {applyOmoiyari, ToBetterOptions} from './utils';
+import {applyOmoiyari} from './utils';
 import {DEFAULT_OMOIYARI_TIME} from './constants';
 
 type __ConstructorsAndInstances__ = {
@@ -147,13 +148,13 @@ export class Bluevery {
      * @description connect must have timeout
      * @default timeoutMilliseconds = 8000ms
      */
-    connectOptions?: ToBetterOptions;
+    connectOptions?: BlueveryMethodOptions['connect'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
     /**
      * @description retrieveServices must have timeout
      * @default timeoutMilliseconds = 5000ms
      */
-    retrieveServicesOptions?: ToBetterOptions;
+    retrieveServicesOptions?: BlueveryMethodOptions['retrieveServices'];
     /**
      * @description [Android only]
      */
@@ -162,10 +163,10 @@ export class Bluevery {
      * @description bonding must have timeout
      * @default timeoutMilliseconds = 10000ms
      */
-    bondingOptions?: ToBetterOptions;
+    bondingOptions?: BlueveryMethodOptions['createBond'];
   }) {
     // Note: connectはiOSで失敗してもタイムアウトしないので、タイムアウトするようにする
-    const _connectOptions = deepmerge<ToBetterOptions>(
+    const _connectOptions = deepmerge<BlueveryMethodOptions['connect']>(
       {
         retryOptions: {factor: 1, retries: 4},
         timeoutOptions: {timeoutMilliseconds: 8000},
@@ -173,7 +174,9 @@ export class Bluevery {
       connectOptions || {},
     );
     // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
-    const _retrieveServicesOptions = deepmerge<ToBetterOptions>(
+    const _retrieveServicesOptions = deepmerge<
+      BlueveryMethodOptions['retrieveServices']
+    >(
       {
         retryOptions: {factor: 1, retries: 4},
         timeoutOptions: {timeoutMilliseconds: 5000},
@@ -181,7 +184,7 @@ export class Bluevery {
       retrieveServicesOptions || {},
     );
     // Note: 無限にbondingして返ってこないケースがあるので、タイムアウトするようにする
-    const _bondingOptions = deepmerge<ToBetterOptions>(
+    const _bondingOptions = deepmerge<BlueveryMethodOptions['createBond']>(
       {
         retryOptions: {factor: 1, retries: 4},
         timeoutOptions: {timeoutMilliseconds: 10000},
@@ -215,22 +218,24 @@ export class Bluevery {
   }: {
     scanParams: Parameters<InstanceType<typeof Bluevery>['startScan']>[0];
     connectParams: BleManagerParams['connect'];
-    connectOptions?: ToBetterOptions;
+    connectOptions?: BlueveryMethodOptions['connect'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
     /**
      * @description retrieveServices must have timeout
      * @default timeoutMilliseconds = 5000ms
      */
-    retrieveServicesOptions?: ToBetterOptions;
+    retrieveServicesOptions?: BlueveryMethodOptions['retrieveServices'];
     bondingParams: BleManagerParams['createBond'];
-    bondingOptions?: ToBetterOptions;
+    bondingOptions?: BlueveryMethodOptions['createBond'];
     startNotificationParams: BleManagerParams['startNotification'];
     receiveCharacteristicHandler: PublicHandlers['HandleDidUpdateValueForCharacteristic'];
   }) {
     const [targetPeripheralId] = connectParams;
 
     // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
-    const _retrieveServicesOptions = deepmerge<ToBetterOptions>(
+    const _retrieveServicesOptions = deepmerge<
+      BlueveryMethodOptions['retrieveServices']
+    >(
       {
         retryOptions: {factor: 1, retries: 4},
         timeoutOptions: {timeoutMilliseconds: 5000},
@@ -285,7 +290,7 @@ export class Bluevery {
      * @description retrieveServices must have timeout
      * @default timeoutMilliseconds = 5000ms
      */
-    retrieveServicesOptions?: ToBetterOptions;
+    retrieveServicesOptions?: BlueveryMethodOptions['retrieveServices'];
   }) {
     const _readValueOptions = deepmerge<
       Parameters<
@@ -299,7 +304,9 @@ export class Bluevery {
     );
 
     // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
-    const _retrieveServicesOptions = deepmerge<ToBetterOptions>(
+    const _retrieveServicesOptions = deepmerge<
+      BlueveryMethodOptions['retrieveServices']
+    >(
       {
         retryOptions: {factor: 1, retries: 4},
         timeoutOptions: {timeoutMilliseconds: 5000},
@@ -322,22 +329,24 @@ export class Bluevery {
     retrieveServicesOptions,
   }: {
     writeValueParams: BleManagerParams['write'];
-    writeValueOptions?: ToBetterOptions;
+    writeValueOptions?: BlueveryMethodOptions['write'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
     /**
      * @description retrieveServices must have timeout
      * @default timeoutMilliseconds = 5000ms
      */
-    retrieveServicesOptions?: ToBetterOptions;
+    retrieveServicesOptions?: BlueveryMethodOptions['retrieveServices'];
   }) {
-    const _writeValueoptions = deepmerge<ToBetterOptions>(
+    const _writeValueoptions = deepmerge<BlueveryMethodOptions['write']>(
       {
         retryOptions: {factor: 1, retries: 4},
       },
       writeValueOptions || {},
     );
     // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
-    const _retrieveServicesOptions = deepmerge<ToBetterOptions>(
+    const _retrieveServicesOptions = deepmerge<
+      BlueveryMethodOptions['retrieveServices']
+    >(
       {
         retryOptions: {factor: 1, retries: 4},
         timeoutOptions: {timeoutMilliseconds: 5000},
