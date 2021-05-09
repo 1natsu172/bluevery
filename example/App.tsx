@@ -60,13 +60,12 @@ export const timeToByteArray = (d: Date) => {
 };
 
 const App = () => {
-  // const [bleState, setBleState] = useState<BlueveryState>();
   const bleState = useBlueveryState();
 
   useEffect(() => {
-    const blue = async () => {
+    const initAndScan = async () => {
       if (!bluevery.checkIsInitialized()) {
-        bluevery.init({
+        await bluevery.init({
           onDisconnectPeripheralHandler: (p) => {
             console.log(`${p.peripheral} is dosconnected`);
           },
@@ -85,60 +84,60 @@ const App = () => {
         // matchFn: (p) => !!p.id.match(new RegExp(/^BP_SERVICE_UUID/)),
       });
       // return () => {
-      //   cleanup
+      //   TODO: implements cleanup scan methos
       // }
     };
-    blue();
+    initAndScan();
   }, []);
-  const receiveCharacteristicValue = useCallback(
+  const onReceiveCharacteristicValue = useCallback(
     async (peripheralInfo: PeripheralInfo) => {
+      await bluevery.writeValue({
+        writeValueParams: [
+          peripheralInfo.id,
+          BP_SERVICE_UUID,
+          BP_DATETIME_CHARECTERISTIC_UUID,
+          timeToByteArray(new Date()),
+        ],
+        retrieveServicesParams: [peripheralInfo.id],
+      });
+      await bluevery.readValue({
+        readValueParams: [
+          peripheralInfo.id,
+          BP_SERVICE_UUID,
+          BP_DATETIME_CHARECTERISTIC_UUID,
+        ],
+        retrieveServicesParams: [peripheralInfo.id],
+      });
       await bluevery.receiveCharacteristicValue({
         scanParams: {
           scanOptions: {
             scanningSettings: [[], 1, true],
           },
         },
-        connectParams: {connectParams: [peripheralInfo.id]},
-        retrieveServicesParams: {retrieveServicesParams: [peripheralInfo.id]},
-        bondingParams: {
-          createBondParams: [peripheralInfo.id, peripheralInfo.id],
-        },
-        readValueParams: {
-          readValueParams: [
-            peripheralInfo.id,
-            BP_SERVICE_UUID,
-            BP_DATETIME_CHARECTERISTIC_UUID,
-          ],
-        },
-        writeValueParams: {
-          writeValueParams: [
-            peripheralInfo.id,
-            BP_SERVICE_UUID,
-            BP_DATETIME_CHARECTERISTIC_UUID,
-            timeToByteArray(new Date()),
-          ],
-        },
+        connectParams: [peripheralInfo.id],
+        retrieveServicesParams: [peripheralInfo.id],
+        bondingParams: [peripheralInfo.id, peripheralInfo.id],
         startNotificationParams: [
           peripheralInfo.id,
           BP_SERVICE_UUID,
           BP_MEASUREMENT_CHARECTERISTIC_UUID,
         ],
+        receiveCharacteristicHandler: (res) => {
+          console.log({...res});
+        },
       });
     },
     [],
   );
-  const onSelectPeripheral = useCallback(
+  const onConnectPeripheral = useCallback(
     async (peripheralInfo: PeripheralInfo) => {
       await bluevery.connect({
-        connectParams: {connectParams: [peripheralInfo.id]},
-        retrieveServicesParams: {retrieveServicesParams: [peripheralInfo.id]},
-        bondingParams: {
-          createBondParams: [peripheralInfo.id, peripheralInfo.id],
-        },
+        connectParams: [peripheralInfo.id],
+        retrieveServicesParams: [peripheralInfo.id],
+        bondingParams: [peripheralInfo.id, peripheralInfo.id],
       });
-      await receiveCharacteristicValue(peripheralInfo);
     },
-    [receiveCharacteristicValue],
+    [],
   );
 
   return (
@@ -156,16 +155,25 @@ const App = () => {
           )}
           <FlatList
             ListEmptyComponent={() => <Text>no list</Text>}
-            data={bleState ? Object.values(bleState?.scannedPeripherals) : null}
-            renderItem={({item}) => (
-              <TouchableOpacity
-                style={{marginBottom: 10}}
-                key={item.id}
-                onPress={() => onSelectPeripheral(item)}>
-                <Text>{`${item.name}`}</Text>
-                <Text>{`${item.id}`}</Text>
-              </TouchableOpacity>
-            )}
+            data={bleState ? Object.values(bleState.scannedPeripherals) : null}
+            renderItem={({item}) =>
+              item ? (
+                <ScrollView>
+                  <TouchableOpacity
+                    style={{marginBottom: 10}}
+                    key={item.id}
+                    onPress={() => onConnectPeripheral(item)}>
+                    <Text>{`${item.name}`}</Text>
+                    <Text>{`${item.id}`}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    key={item.id}
+                    onPress={() => onReceiveCharacteristicValue(item)}>
+                    <Text>onReceive</Text>
+                  </TouchableOpacity>
+                </ScrollView>
+              ) : null
+            }
           />
           <View style={styles.body}>
             <View style={styles.sectionContainer}>
