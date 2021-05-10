@@ -22,16 +22,16 @@ import {
 import {useKeepAwake} from 'expo-keep-awake';
 import {useErrorHandler} from 'react-error-boundary';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {bluevery, PeripheralInfo, useBlueveryState} from 'bluevery';
+import {
+  HermesAnnounce,
+  Header,
+  ScannedPeripheralList,
+  TabViews,
+} from './components';
+import {SceneMap, TabView} from 'react-native-tab-view';
 
-declare const global: {HermesInternal: null | {}};
 export const BP_MONITOR_NAME_AND = 'A&D_UA-651BLE';
 export const BP_SERVICE_UUID = '1810';
 /**
@@ -59,12 +59,43 @@ export const timeToByteArray = (d: Date) => {
   const otherData = new Uint8Array([month, day, hours, minutes, seconds]);
   return [...Array.from(yearData), ...Array.from(otherData)];
 };
+const A = () => <View style={{flex: 1, backgroundColor: '#ff4081'}} />;
 
 const App = () => {
   useKeepAwake();
   const handleError = useErrorHandler();
 
   const bleState = useBlueveryState();
+
+  const routes = React.useMemo(
+    () => [
+      {key: 'first', title: 'Scanned'},
+      {key: 'second', title: 'Managed'},
+    ],
+    [],
+  );
+  const renderScene: Parameters<typeof TabView>['0']['renderScene'] = ({
+    route,
+  }) => {
+    switch (route.key) {
+      case 'first':
+        return (
+          <ScannedPeripheralList
+            peripheralsMap={bleState.scannedPeripherals}
+            onPress={onConnectPeripheral}
+          />
+        );
+      case 'second':
+        return (
+          <ScannedPeripheralList
+            peripheralsMap={bleState.scannedPeripherals}
+            onPress={onConnectPeripheral}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   useEffect(() => {
     const initAndScan = async () => {
@@ -187,71 +218,19 @@ const App = () => {
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <FlatList
-            ListEmptyComponent={() => <Text>no list</Text>}
-            data={Object.values(bleState.scannedPeripherals)}
-            renderItem={({item}) =>
-              item ? (
-                <ScrollView key={item.id}>
-                  <TouchableOpacity
-                    style={{marginBottom: 10}}
-                    onPress={() => onConnectPeripheral(item)}>
-                    <Text>{`${item.name}`}</Text>
-                    <Text>{`${item.id}`}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => onReceiveCharacteristicValue(item)}>
-                    <Text>onReceive</Text>
-                  </TouchableOpacity>
-                </ScrollView>
-              ) : null
-            }
-          />
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.tsx</Text> to change
-                this screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
+      <Header />
+
+      <SafeAreaView style={styles.mainContentContainer}>
+        {/* @ts-expect-error */}
+        <TabViews routes={routes} scenes={renderScene} />
       </SafeAreaView>
+      <HermesAnnounce />
     </>
   );
 };
 
 const styles = StyleSheet.create({
+  mainContentContainer: {flex: 1},
   scrollView: {
     backgroundColor: Colors.lighter,
   },

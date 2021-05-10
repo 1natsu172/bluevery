@@ -1,9 +1,19 @@
 import React from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 import {ErrorBoundary, FallbackProps} from 'react-error-boundary';
+import {Provider as RNPaperProvider, DefaultTheme} from 'react-native-paper';
 import App from './App';
 
 type Props = {};
+
+const theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: 'tomato',
+    accent: 'yellow',
+  },
+};
 
 const ErrorFallback: React.VFC<FallbackProps> = ({
   error,
@@ -22,8 +32,10 @@ const ErrorFallback: React.VFC<FallbackProps> = ({
 
 export function AppContainer(_props: Props) {
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <App />
-    </ErrorBoundary>
+    <RNPaperProvider theme={theme}>
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <App />
+      </ErrorBoundary>
+    </RNPaperProvider>
   );
 }
