@@ -35,6 +35,7 @@ beforeEach(async () => {
   await bluevery.init();
 });
 afterEach(async () => {
+  // NOTE: トップレベルbeforeEachで1度initしてるのでtestするたびに以前のリスナーがどんどん残ってしまう。なので各test後に毎回stopしておく
   bluevery.stopBluevery();
 });
 
@@ -62,7 +63,6 @@ describe('bluevery: primitive APIs', () => {
       await bluevery.init();
       const actualThenInitialized = bluevery.checkIsInitialized();
       expect(actualThenInitialized).toBe(true);
-      // bluevery.stopBluevery();
     });
   });
 
@@ -155,8 +155,6 @@ describe('bluevery: commands APIs', () => {
     test('user should be able to know that disconnected', async () => {
       const optionalDisconnectHandler = jest.fn();
       const testerPeripheral = dummyPeripheralInfo('tester1');
-      // MEMO: トップレベルbeforeEachで1度initしてるのでリスナーが残ってしまう。なのでinitのテストの前に1回stopしておく
-      // bluevery.stopBluevery();
       bluevery = new Bluevery({
         BlueveryCore,
         BlueveryState,
