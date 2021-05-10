@@ -1,4 +1,5 @@
 module.exports = {
+  setupFilesAfterEnv: ['jest-extended'],
   preset: 'react-native',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   setupFiles: ['<rootDir>/jest.setup.js'],

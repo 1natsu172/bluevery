@@ -94,32 +94,45 @@ const App = () => {
   }, []);
   const onReceiveCharacteristicValue = useCallback(
     async (peripheralInfo: PeripheralInfo) => {
-      await bluevery.writeValue({
-        writeValueParams: [
-          peripheralInfo.id,
-          BP_SERVICE_UUID,
-          BP_DATETIME_CHARECTERISTIC_UUID,
-          timeToByteArray(new Date()),
-        ],
-        retrieveServicesParams: [peripheralInfo.id],
-      });
-      await bluevery.readValue({
-        readValueParams: [
-          peripheralInfo.id,
-          BP_SERVICE_UUID,
-          BP_DATETIME_CHARECTERISTIC_UUID,
-        ],
-        retrieveServicesParams: [peripheralInfo.id],
-      });
       await bluevery.receiveCharacteristicValue({
+        onCallBeforeStartNotification: async () => {
+          await bluevery.connect({
+            connectParams: [peripheralInfo.id],
+            retrieveServicesParams: [peripheralInfo.id],
+            retrieveServicesOptions: {
+              retryOptions: {retries: 15},
+              timeoutOptions: {timeoutMilliseconds: 10000},
+            },
+            bondingParams: [peripheralInfo.id, peripheralInfo.id],
+          });
+          await bluevery.writeValue({
+            writeValueParams: [
+              peripheralInfo.id,
+              BP_SERVICE_UUID,
+              BP_DATETIME_CHARECTERISTIC_UUID,
+              timeToByteArray(new Date()),
+            ],
+            retrieveServicesParams: [peripheralInfo.id],
+          });
+          await bluevery.readValue({
+            readValueParams: [
+              peripheralInfo.id,
+              BP_SERVICE_UUID,
+              BP_DATETIME_CHARECTERISTIC_UUID,
+            ],
+            retrieveServicesParams: [peripheralInfo.id],
+          });
+        },
         scanParams: {
           scanOptions: {
             scanningSettings: [[], 1, true],
           },
         },
-        connectParams: [peripheralInfo.id],
         retrieveServicesParams: [peripheralInfo.id],
-        bondingParams: [peripheralInfo.id, peripheralInfo.id],
+        retrieveServicesOptions: {
+          retryOptions: {retries: 15},
+          timeoutOptions: {timeoutMilliseconds: 10000},
+        },
         startNotificationParams: [
           peripheralInfo.id,
           BP_SERVICE_UUID,
@@ -138,6 +151,23 @@ const App = () => {
         connectParams: [peripheralInfo.id],
         retrieveServicesParams: [peripheralInfo.id],
         bondingParams: [peripheralInfo.id, peripheralInfo.id],
+      });
+      await bluevery.writeValue({
+        writeValueParams: [
+          peripheralInfo.id,
+          BP_SERVICE_UUID,
+          BP_DATETIME_CHARECTERISTIC_UUID,
+          timeToByteArray(new Date()),
+        ],
+        retrieveServicesParams: [peripheralInfo.id],
+      });
+      await bluevery.readValue({
+        readValueParams: [
+          peripheralInfo.id,
+          BP_SERVICE_UUID,
+          BP_DATETIME_CHARECTERISTIC_UUID,
+        ],
+        retrieveServicesParams: [peripheralInfo.id],
       });
     },
     [],

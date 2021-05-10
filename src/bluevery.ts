@@ -210,30 +210,27 @@ export class Bluevery {
    */
   async receiveCharacteristicValue({
     scanParams,
-    connectParams,
-    connectOptions,
     retrieveServicesParams,
     retrieveServicesOptions,
-    bondingParams,
-    bondingOptions,
+    onCallBeforeStartNotification,
     startNotificationParams,
     receiveCharacteristicHandler,
   }: {
     scanParams: Parameters<InstanceType<typeof Bluevery>['startScan']>[0];
-    connectParams: BleManagerParams['connect'];
-    connectOptions?: BlueveryMethodOptions['connect'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
     /**
      * @description retrieveServices must have timeout
      * @default timeoutMilliseconds = 5000ms
      */
     retrieveServicesOptions?: BlueveryMethodOptions['retrieveServices'];
-    bondingParams: BleManagerParams['createBond'];
-    bondingOptions?: BlueveryMethodOptions['createBond'];
+    /**
+     * @description Some peripherals may require preprocessing with startNotifiocaion. This is useful in such cases. Please refer to the "example app".
+     */
+    onCallBeforeStartNotification?: () => unknown | Promise<unknown>;
     startNotificationParams: BleManagerParams['startNotification'];
     receiveCharacteristicHandler: PublicHandlers['HandleDidUpdateValueForCharacteristic'];
   }) {
-    const [targetPeripheralId] = connectParams;
+    const [targetPeripheralId] = startNotificationParams;
 
     // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
     const _retrieveServicesOptions = deepmerge<
@@ -253,14 +250,9 @@ export class Bluevery {
       this.core?.getState().scannedPeripherals[targetPeripheralId] === undefined
     );
 
-    await this.connect({
-      connectParams,
-      connectOptions,
-      bondingParams,
-      bondingOptions,
-      retrieveServicesParams,
-      retrieveServicesOptions,
-    });
+    if (onCallBeforeStartNotification) {
+      await onCallBeforeStartNotification();
+    }
 
     await this.core?.startNotification({
       startNotificationParams,

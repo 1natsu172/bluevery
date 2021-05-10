@@ -1,3 +1,4 @@
+import 'jest-extended';
 import {proxy} from 'valtio';
 import {bluevery as truthExportedBluevery} from '../src';
 import {Bluevery} from '../src/bluevery';
@@ -484,6 +485,7 @@ describe('bluevery: commands APIs', () => {
 
   describe('receiveCharacteristicValue', () => {
     const connectFn = jest.fn();
+    const mockedOnCallBeforeStartNotification = jest.fn(async () => {});
     let startScanFn = jest.fn();
     let spiedStartNotification: jest.SpyInstance;
 
@@ -527,8 +529,6 @@ describe('bluevery: commands APIs', () => {
       await bluevery.receiveCharacteristicValue({
         scanParams: {scanOptions: {scanningSettings: [['1'], 1]}},
         retrieveServicesParams: ['1'],
-        connectParams: ['1'],
-        bondingParams: ['1', 'test'],
         startNotificationParams: ['1', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
       });
@@ -541,20 +541,22 @@ describe('bluevery: commands APIs', () => {
         await bluevery.receiveCharacteristicValue({
           scanParams: {scanOptions: {scanningSettings: [['1'], 1]}},
           retrieveServicesParams: ['1'],
-          connectParams: ['1'],
-          bondingParams: ['1', 'test'],
           startNotificationParams: ['1', 'test', 'test'],
           receiveCharacteristicHandler: () => {},
+          onCallBeforeStartNotification: mockedOnCallBeforeStartNotification,
         });
       });
       test('should call startScan', async () => {
         expect(startScanFn).toBeCalled();
       });
-      test('should call connect', async () => {
-        expect(connectFn).toBeCalled();
-      });
       test('should call startNotification', async () => {
         expect(spiedStartNotification).toBeCalled();
+      });
+      test('should call onCallBeforeStartNotification before startNotifiocation', () => {
+        expect(mockedOnCallBeforeStartNotification).toHaveBeenCalledBefore(
+          // @ts-expect-error spyOnとMockの型違いを言われるがランタイムで動くのでignore
+          spiedStartNotification,
+        );
       });
     });
   });
