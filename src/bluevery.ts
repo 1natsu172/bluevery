@@ -9,7 +9,7 @@ import {
   BleManagerParams,
   BlueveryOptions,
   PeripheralInfo,
-  State,
+  Store,
   PublicHandlers,
   PublicListeners,
   BlueveryMethodOptions,
@@ -21,12 +21,13 @@ type __ConstructorsAndInstances__ = {
   BlueveryCore: typeof _BlueveryCore;
   BlueveryState: typeof _BlueveryState;
   blueveryListeners: InstanceType<typeof _BlueveryListeners>;
+  store: Store;
 };
 type ConstructorArgs = __ConstructorsAndInstances__;
 
 export class Bluevery {
   private __constructorsAndInstances__: __ConstructorsAndInstances__;
-  private __DO_NOT_DIRECT_USE_STATE__: State | undefined;
+  private __DO_NOT_DIRECT_USE_STORE__: Store;
   private core: _BlueveryCore | undefined;
   publicListeners: PublicListeners | undefined;
 
@@ -34,12 +35,15 @@ export class Bluevery {
     BlueveryCore,
     BlueveryState,
     blueveryListeners,
+    store,
   }: ConstructorArgs) {
     this.__constructorsAndInstances__ = {
       BlueveryCore,
       BlueveryState,
       blueveryListeners,
+      store,
     };
+    this.__DO_NOT_DIRECT_USE_STORE__ = store;
 
     autoBind(this);
   }
@@ -78,12 +82,11 @@ export class Bluevery {
     this.core = new BlueveryCore({
       BlueveryState,
       blueveryListeners,
+      store: this.__DO_NOT_DIRECT_USE_STORE__,
       initialState: blueveryOptions?.initialState,
       onChangeStateHandler: blueveryOptions?.onChangeStateHandler,
     });
     this.publicListeners = this.core.listeners.publicListeners;
-    // @ts-expect-error
-    this.__DO_NOT_DIRECT_USE_STATE__ = this.core.__DO_NOT_DIRECT_USE_STATE__;
 
     await this.core.init(blueveryOptions);
     this.initialized = true;

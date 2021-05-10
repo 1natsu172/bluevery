@@ -1,7 +1,8 @@
+import {proxy} from 'valtio';
 import {bluevery as truthExportedBluevery} from '../src';
 import {Bluevery} from '../src/bluevery';
 import {BlueveryCore} from '../src/blueveryCore';
-import {BlueveryState} from '../src/blueveryState';
+import {BlueveryState, createInitialState} from '../src/blueveryState';
 import {BlueveryListeners} from '../src/blueveryListeners';
 import * as omoiyarify from '../src/utils/omoiyarify';
 import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
@@ -28,6 +29,7 @@ beforeEach(async () => {
     BlueveryCore,
     BlueveryState,
     blueveryListeners: new BlueveryListeners(),
+    store: proxy({bluevery: createInitialState()}),
   });
   await bluevery.init();
 });
@@ -52,6 +54,7 @@ describe('bluevery: primitive APIs', () => {
         BlueveryCore,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
+        store: proxy({bluevery: createInitialState()}),
       });
       const actual = bluevery.checkIsInitialized();
       expect(actual).toBe(false);
@@ -88,6 +91,7 @@ describe('bluevery: primitive APIs', () => {
         BlueveryCore,
         BlueveryState,
         blueveryListeners,
+        store: proxy({bluevery: createInitialState()}),
       });
       await bluevery.init({onChangeStateHandler});
     });
@@ -121,6 +125,7 @@ describe('bluevery: commands APIs', () => {
         BlueveryCore,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
+        store: proxy({bluevery: createInitialState()}),
       });
     });
 
@@ -128,7 +133,9 @@ describe('bluevery: commands APIs', () => {
       const initFn = jest.fn();
       const core = (jest.fn().mockImplementation(() => ({
         listeners: {publicListeners: {}},
-        state: new BlueveryState({}),
+        state: new BlueveryState({
+          store: proxy({bluevery: createInitialState()}),
+        }),
         init: initFn,
       })) as unknown) as typeof BlueveryCore;
 
@@ -136,6 +143,7 @@ describe('bluevery: commands APIs', () => {
         BlueveryCore: core,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
+        store: proxy({bluevery: createInitialState()}),
       });
       await bluevery.init();
       const secondTryInit = await bluevery.init();
@@ -152,6 +160,7 @@ describe('bluevery: commands APIs', () => {
         BlueveryCore,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
+        store: proxy({bluevery: createInitialState()}),
       });
       await bluevery.init({
         onDisconnectPeripheralHandler: optionalDisconnectHandler,
@@ -219,6 +228,7 @@ describe('bluevery: commands APIs', () => {
         BlueveryCore: core,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
+        store: proxy({bluevery: createInitialState()}),
       });
       await bluevery.init();
     });
@@ -362,6 +372,7 @@ describe('bluevery: commands APIs', () => {
         BlueveryCore: core,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
+        store: proxy({bluevery: createInitialState()}),
       });
       await bluevery.init();
     });
@@ -411,6 +422,7 @@ describe('bluevery: commands APIs', () => {
         BlueveryCore: core,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
+        store: proxy({bluevery: createInitialState()}),
       });
       await bluevery.init();
     });
@@ -450,6 +462,7 @@ describe('bluevery: commands APIs', () => {
         BlueveryCore: core,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
+        store: proxy({bluevery: createInitialState()}),
       });
       await bluevery.init();
     });
@@ -487,6 +500,7 @@ describe('bluevery: commands APIs', () => {
         BlueveryCore,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
+        store: proxy({bluevery: createInitialState()}),
       });
       await bluevery.init();
       bluevery.connect = connectFn;
@@ -559,6 +573,7 @@ describe('bluevery: commands APIs', () => {
         BlueveryCore: core,
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
+        store: proxy({bluevery: createInitialState()}),
       });
       await bluevery.init();
     });

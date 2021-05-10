@@ -27,7 +27,12 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-import {bluevery, PeripheralInfo, useBlueveryState} from 'bluevery';
+import {
+  bluevery,
+  PeripheralInfo,
+  useBlueveryState,
+  useDevBlueveryState,
+} from 'bluevery';
 import {useCallback} from 'react';
 
 declare const global: {HermesInternal: null | {}};
@@ -155,19 +160,17 @@ const App = () => {
           )}
           <FlatList
             ListEmptyComponent={() => <Text>no list</Text>}
-            data={bleState ? Object.values(bleState.scannedPeripherals) : null}
+            data={Object.values(bleState.scannedPeripherals)}
             renderItem={({item}) =>
               item ? (
-                <ScrollView>
+                <ScrollView key={item.id}>
                   <TouchableOpacity
                     style={{marginBottom: 10}}
-                    key={item.id}
                     onPress={() => onConnectPeripheral(item)}>
                     <Text>{`${item.name}`}</Text>
                     <Text>{`${item.id}`}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    key={item.id}
                     onPress={() => onReceiveCharacteristicValue(item)}>
                     <Text>onReceive</Text>
                   </TouchableOpacity>

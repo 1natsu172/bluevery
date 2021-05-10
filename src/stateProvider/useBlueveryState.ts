@@ -1,5 +1,8 @@
 import {useSnapshot} from 'valtio';
-import {State} from '../interface';
+import {Store} from '../interface';
 
-export const createUseBlueveryState = (state: State) => () =>
-  useSnapshot(state);
+/**
+ * @description store must be a reference to a single proxy object
+ */
+export const createUseBlueveryState = (store: Store) => () =>
+  useSnapshot(store.bluevery);

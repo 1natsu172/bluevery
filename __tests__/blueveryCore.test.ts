@@ -1,3 +1,4 @@
+import {proxy} from 'valtio';
 import {BlueveryCore} from '../src/blueveryCore';
 import {BlueveryState, createInitialState} from '../src/blueveryState';
 import {BlueveryListeners} from '../src/blueveryListeners';
@@ -75,6 +76,7 @@ beforeEach(() => {
   blueveryCore = new BlueveryCore({
     BlueveryState,
     blueveryListeners: new BlueveryListeners(),
+    store: proxy({bluevery: createInitialState()}),
   });
 });
 
@@ -111,6 +113,7 @@ describe('BlueveryCore', () => {
         blueveryCore = new BlueveryCore({
           BlueveryState,
           blueveryListeners: new BlueveryListeners(),
+          store: proxy({bluevery: createInitialState()}),
         });
 
         // @ts-ignore ts(2341) access to private
@@ -138,6 +141,7 @@ describe('BlueveryCore', () => {
           blueveryCore = new BlueveryCore({
             BlueveryState,
             blueveryListeners: new BlueveryListeners(),
+            store: proxy({bluevery: createInitialState()}),
           });
 
           // @ts-ignore ts(2341) access to private
@@ -165,6 +169,7 @@ describe('BlueveryCore', () => {
           blueveryCore = new BlueveryCore({
             BlueveryState,
             blueveryListeners: new BlueveryListeners(),
+            store: proxy({bluevery: createInitialState()}),
           });
 
           // @ts-ignore ts(2341) access to private
@@ -190,6 +195,7 @@ describe('BlueveryCore', () => {
       blueveryCore = new BlueveryCore({
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
+        store: proxy({bluevery: createInitialState()}),
       });
 
       // @ts-ignore ts(2341) access to private
@@ -211,6 +217,7 @@ describe('BlueveryCore', () => {
         blueveryCore = new BlueveryCore({
           BlueveryState,
           blueveryListeners: new BlueveryListeners(),
+          store: proxy({bluevery: createInitialState()}),
         });
 
         // @ts-ignore ts(2341) access to private
@@ -224,6 +231,7 @@ describe('BlueveryCore', () => {
         blueveryCore = new BlueveryCore({
           BlueveryState,
           blueveryListeners: new BlueveryListeners(),
+          store: proxy({bluevery: createInitialState()}),
         });
 
         // @ts-ignore ts(2341) access to private
@@ -236,6 +244,8 @@ describe('BlueveryCore', () => {
   describe('checkThePeripheralIsManaging', () => {
     beforeEach(() => {
       blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
         blueveryListeners: new BlueveryListeners(),
         BlueveryState,
         initialState: createInitialState({
@@ -268,6 +278,8 @@ describe('BlueveryCore', () => {
         // unSpy
         spiedCheckBluetoothEnabled.mockRestore();
         blueveryCore = new BlueveryCore({
+          store: proxy({bluevery: createInitialState()}),
+
           BlueveryState,
           blueveryListeners: new BlueveryListeners(),
         });
@@ -283,6 +295,8 @@ describe('BlueveryCore', () => {
         // unSpy
         spiedCheckBluetoothEnabled.mockRestore();
         blueveryCore = new BlueveryCore({
+          store: proxy({bluevery: createInitialState()}),
+
           BlueveryState,
           blueveryListeners: new BlueveryListeners(),
         });
@@ -334,6 +348,8 @@ describe('BlueveryCore', () => {
         test('should guard if return false', async () => {
           spiedRequireCheckBeforeBleProcess.mockResolvedValueOnce(false);
           blueveryCore = new BlueveryCore({
+            store: proxy({bluevery: createInitialState()}),
+
             BlueveryState,
             blueveryListeners: new BlueveryListeners(),
           });
@@ -343,6 +359,8 @@ describe('BlueveryCore', () => {
         test('should not guard return true', async () => {
           spiedRequireCheckBeforeBleProcess.mockResolvedValueOnce(true);
           blueveryCore = new BlueveryCore({
+            store: proxy({bluevery: createInitialState()}),
+
             BlueveryState,
             blueveryListeners: new BlueveryListeners(),
           });
@@ -357,6 +375,8 @@ describe('BlueveryCore', () => {
   describe('writeValue', () => {
     beforeEach(() => {
       blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
         blueveryListeners: new BlueveryListeners(),
         BlueveryState,
         initialState: createInitialState({
@@ -420,6 +440,8 @@ describe('BlueveryCore', () => {
     test('should change communicate status', async () => {
       const spyCommunicateStatus = jest.fn();
       blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
         blueveryListeners: new BlueveryListeners(),
         BlueveryState,
         initialState: createInitialState({
@@ -493,6 +515,8 @@ describe('BlueveryCore', () => {
   describe('readValue', () => {
     beforeEach(() => {
       blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
         blueveryListeners: new BlueveryListeners(),
         BlueveryState,
         initialState: createInitialState({
@@ -538,6 +562,8 @@ describe('BlueveryCore', () => {
     test('should change communicate status', async () => {
       const spyCommunicateStatus = jest.fn();
       blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
         blueveryListeners: new BlueveryListeners(),
         BlueveryState,
         initialState: createInitialState({
@@ -596,6 +622,8 @@ describe('BlueveryCore', () => {
   describe('conect', () => {
     beforeEach(() => {
       blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
         blueveryListeners: new BlueveryListeners(),
         BlueveryState,
         initialState: createInitialState({
@@ -625,6 +653,8 @@ describe('BlueveryCore', () => {
     test('connect: should be change connect of state the managing peripheral', async () => {
       const spyConnectState = jest.fn();
       blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
         blueveryListeners: new BlueveryListeners(),
         BlueveryState,
         initialState: createInitialState({
@@ -686,6 +716,8 @@ describe('BlueveryCore', () => {
     beforeEach(() => {
       jest.clearAllMocks();
       blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
         blueveryListeners: new BlueveryListeners(),
         BlueveryState,
         initialState: createInitialState({
@@ -738,6 +770,8 @@ describe('BlueveryCore', () => {
     beforeEach(() => {
       blueveryListeners = new BlueveryListeners();
       blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
         BlueveryState,
         blueveryListeners,
         initialState: createInitialState({
@@ -760,6 +794,8 @@ describe('BlueveryCore', () => {
         ({remove: mockRemoveFn} as unknown) as EmitterSubscription,
       );
       blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
         BlueveryState,
         blueveryListeners,
         initialState: createInitialState({
@@ -845,6 +881,8 @@ describe('BlueveryCore', () => {
         ({remove: mockRemoveFn} as unknown) as EmitterSubscription,
       );
       blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
         BlueveryState,
         blueveryListeners,
         initialState: createInitialState({

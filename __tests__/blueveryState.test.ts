@@ -1,4 +1,5 @@
-import {BlueveryState} from '../src/blueveryState';
+import {proxy} from 'valtio';
+import {BlueveryState, createInitialState} from '../src/blueveryState';
 import {PeripheralInfo, State} from '../src/interface';
 
 /**
@@ -17,7 +18,9 @@ beforeEach(() => {
   // cleanup spys
   jest.restoreAllMocks();
 
-  blueveryState = new BlueveryState({});
+  blueveryState = new BlueveryState({
+    store: proxy({bluevery: createInitialState()}),
+  });
 });
 
 describe('BlueveryState', () => {
@@ -26,6 +29,8 @@ describe('BlueveryState', () => {
       describe('initialState', () => {
         test('should inject initialState', () => {
           blueveryState = new BlueveryState({
+            store: proxy({bluevery: createInitialState()}),
+
             initialState: {
               bluetoothEnabled: false,
               error: undefined,
@@ -48,7 +53,10 @@ describe('BlueveryState', () => {
       describe('onChangeStateHandler', () => {
         test('should call onChangeHandler when onChangeState', () => {
           const onChangeStateHandler = jest.fn();
-          blueveryState = new BlueveryState({onChangeStateHandler});
+          blueveryState = new BlueveryState({
+            store: proxy({bluevery: createInitialState()}),
+            onChangeStateHandler,
+          });
           expect(onChangeStateHandler).not.toBeCalled();
           blueveryState.onScanning();
           expect(onChangeStateHandler).toBeCalled();

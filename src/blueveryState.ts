@@ -1,4 +1,4 @@
-import {State, PeripheralInfo, PeripheralId} from './interface';
+import {State, PeripheralInfo, PeripheralId, Store} from './interface';
 import {proxy, snapshot, subscribe} from 'valtio';
 import autoBind from 'auto-bind';
 import {Permission} from 'react-native-permissions';
@@ -21,18 +21,27 @@ export function createInitialState(overrideState?: Partial<State>): State {
 }
 
 export class BlueveryState {
+  private _storeRef: Store;
   private _savedInitialState: State;
   mutationState: State;
   unsubscribeTheState: () => void;
 
   constructor({
+    store,
     initialState,
     onChangeStateHandler,
   }: {
+    store: Store;
     initialState?: State;
     onChangeStateHandler?: (state: State) => unknown;
   }) {
-    this.mutationState = proxy(createInitialState(initialState));
+    this._storeRef = store;
+
+    if (initialState) {
+      this._storeRef.bluevery = initialState;
+    }
+
+    this.mutationState = this._storeRef.bluevery;
     this.unsubscribeTheState = subscribe(
       this.mutationState,
       () => {
@@ -93,7 +102,7 @@ export class BlueveryState {
    * reset to initial state
    */
   resetState() {
-    this.mutationState = proxy(this._savedInitialState);
+    this.reInitState(this._savedInitialState);
   }
 
   /**
@@ -101,7 +110,8 @@ export class BlueveryState {
    */
   reInitState(newInitialState: State) {
     this._savedInitialState = newInitialState;
-    this.mutationState = proxy(newInitialState);
+    this._storeRef.bluevery = newInitialState;
+    this.mutationState = this._storeRef.bluevery;
   }
 
   /**

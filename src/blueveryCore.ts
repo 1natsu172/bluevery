@@ -6,6 +6,7 @@ import {
   BlueveryOptions,
   BlueveryMethodOptions,
   PeripheralInfo,
+  Store,
   State,
   BleManagerParams,
   PeripheralId,
@@ -38,6 +39,7 @@ type ConstructorArgs = {
   blueveryListeners: InstanceType<typeof _BlueveryListeners>;
   initialState?: State;
   onChangeStateHandler?: (state: State) => unknown;
+  store: Store;
 };
 
 const BleManagerModule = NativeModules.BleManager;
@@ -48,7 +50,6 @@ export class BlueveryCore {
 
   private userDefinedOptions: BlueveryOptions = {};
   private state: _BlueveryState;
-  private __DO_NOT_DIRECT_USE_STATE__: State;
   listeners: _BlueveryListeners;
 
   constructor({
@@ -56,9 +57,13 @@ export class BlueveryCore {
     blueveryListeners,
     initialState,
     onChangeStateHandler,
+    store,
   }: ConstructorArgs) {
-    this.state = new BlueveryState({initialState, onChangeStateHandler});
-    this.__DO_NOT_DIRECT_USE_STATE__ = this.state.mutationState;
+    this.state = new BlueveryState({
+      store,
+      initialState,
+      onChangeStateHandler,
+    });
     this.listeners = blueveryListeners;
     autoBind(this);
   }

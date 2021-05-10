@@ -27,6 +27,10 @@ export type PeripheralInfo = Peripheral & {
   retrieveServices?: 'retrieving' | 'retrieved' | 'failed';
 };
 
+export type Store = {
+  bluevery: State;
+};
+
 export type State = {
   bluetoothEnabled: boolean;
   permissionGranted: {
