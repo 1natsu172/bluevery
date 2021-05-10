@@ -318,8 +318,9 @@ export class BlueveryCore {
 
     await _connect(...connectParams);
     await _retrieveServices(...retrieveServicesParams);
-    await _bonding(...bondingParams);
-
+    if (Platform.OS === 'android') {
+      await _bonding(...bondingParams);
+    }
     this.state.setManagingPeripheralConnected(targetPeripheralId);
   }
 

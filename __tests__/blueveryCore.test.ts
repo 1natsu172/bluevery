@@ -11,6 +11,7 @@ import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
 import {dummyPeripheralInfo} from './__utils__/dummyPeripheralInfo';
 import BleManager from 'react-native-ble-manager';
 import {EmitterSubscription} from 'react-native';
+import {mockPlatform} from './__utils__/mockPlatform';
 
 jest.mock('../src/libs', () => ({
   __esModule: true,
@@ -695,19 +696,41 @@ describe('BlueveryCore', () => {
       await expect(connecting).rejects.toThrow();
     });
 
-    test('connect: check calls', async () => {
-      await blueveryCore.connect({
-        bondingParams: ['1', ''],
-        bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
-        connectParams: ['1'],
-        connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
-        retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+    describe('connect: check calls', () => {
+      test('iOS', async () => {
+        mockPlatform('ios', 10);
+        await blueveryCore.connect({
+          bondingParams: ['1', ''],
+          bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+          connectParams: ['1'],
+          connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+          retrieveServicesParams: ['1'],
+          retrieveServicesOptions: {
+            timeoutOptions: {timeoutMilliseconds: 1000},
+          },
+        });
+        expect(BleManager.connect).toBeCalled();
+        expect(BleManager.retrieveServices).toBeCalled();
+        expect(BleManager.createBond).not.toBeCalled();
+        expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
       });
-      expect(BleManager.connect).toBeCalled();
-      expect(BleManager.retrieveServices).toBeCalled();
-      expect(BleManager.createBond).toBeCalled();
-      expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
+      test('Android', async () => {
+        mockPlatform('android', 10);
+        await blueveryCore.connect({
+          bondingParams: ['1', ''],
+          bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+          connectParams: ['1'],
+          connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+          retrieveServicesParams: ['1'],
+          retrieveServicesOptions: {
+            timeoutOptions: {timeoutMilliseconds: 1000},
+          },
+        });
+        expect(BleManager.connect).toBeCalled();
+        expect(BleManager.retrieveServices).toBeCalled();
+        expect(BleManager.createBond).toBeCalled();
+        expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
+      });
     });
   });
 
@@ -857,7 +880,7 @@ describe('BlueveryCore', () => {
       ).toBe(true);
     });
 
-    test('startNotification: connect: check calls', async () => {
+    test('startNotification: check calls', async () => {
       await blueveryCore.startNotification({
         startNotificationParams: ['1', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
