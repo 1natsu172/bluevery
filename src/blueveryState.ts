@@ -1,5 +1,5 @@
 import {State, PeripheralInfo, PeripheralId, Store} from './interface';
-import {proxy, snapshot, subscribe} from 'valtio';
+import {snapshot, subscribe} from 'valtio';
 import autoBind from 'auto-bind';
 import {Permission} from 'react-native-permissions';
 import {Peripheral} from 'react-native-ble-manager';
