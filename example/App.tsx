@@ -8,7 +8,7 @@
  * @format
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useCallback} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -19,8 +19,8 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
-
 import {useKeepAwake} from 'expo-keep-awake';
+import {useErrorHandler} from 'react-error-boundary';
 
 import {
   Header,
@@ -30,7 +30,6 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import {bluevery, PeripheralInfo, useBlueveryState} from 'bluevery';
-import {useCallback} from 'react';
 
 declare const global: {HermesInternal: null | {}};
 export const BP_MONITOR_NAME_AND = 'A&D_UA-651BLE';
@@ -63,112 +62,124 @@ export const timeToByteArray = (d: Date) => {
 
 const App = () => {
   useKeepAwake();
+  const handleError = useErrorHandler();
+
   const bleState = useBlueveryState();
 
   useEffect(() => {
     const initAndScan = async () => {
-      if (!bluevery.checkIsInitialized()) {
+      try {
         await bluevery.init({
           onDisconnectPeripheralHandler: (p) => {
             console.log(`${p.peripheral} is dosconnected`);
           },
         });
+        await bluevery.startScan({
+          scanOptions: {
+            // scanningSettings: [[BP_SERVICE_UUID], 1, true],
+            scanningSettings: [[], 1, true],
+            intervalLength: 1000,
+            iterations: 5,
+          },
+          // discoverHandler: (peripheral) => {
+          //   console.log('discovered peripheral', peripheral);
+          // },
+          // matchFn: (p) => !!p.id.match(new RegExp(/^BP_SERVICE_UUID/)),
+        });
+        // return () => {
+        //   TODO: implements cleanup scan methos
+        // }
+      } catch (error) {
+        handleError(error);
       }
-      await bluevery.startScan({
-        scanOptions: {
-          // scanningSettings: [[BP_SERVICE_UUID], 1, true],
-          scanningSettings: [[], 1, true],
-          intervalLength: 1000,
-          iterations: 5,
-        },
-        // discoverHandler: (peripheral) => {
-        //   console.log('discovered peripheral', peripheral);
-        // },
-        // matchFn: (p) => !!p.id.match(new RegExp(/^BP_SERVICE_UUID/)),
-      });
-      // return () => {
-      //   TODO: implements cleanup scan methos
-      // }
     };
     initAndScan();
   }, []);
   const onReceiveCharacteristicValue = useCallback(
     async (peripheralInfo: PeripheralInfo) => {
-      await bluevery.receiveCharacteristicValue({
-        onCallBeforeStartNotification: async () => {
-          await bluevery.connect({
-            connectParams: [peripheralInfo.id],
-            retrieveServicesParams: [peripheralInfo.id],
-            retrieveServicesOptions: {
-              retryOptions: {retries: 15},
-              timeoutOptions: {timeoutMilliseconds: 10000},
-            },
-            bondingParams: [peripheralInfo.id, peripheralInfo.id],
-          });
-          await bluevery.writeValue({
-            writeValueParams: [
-              peripheralInfo.id,
-              BP_SERVICE_UUID,
-              BP_DATETIME_CHARECTERISTIC_UUID,
-              timeToByteArray(new Date()),
-            ],
-            retrieveServicesParams: [peripheralInfo.id],
-          });
-          await bluevery.readValue({
-            readValueParams: [
-              peripheralInfo.id,
-              BP_SERVICE_UUID,
-              BP_DATETIME_CHARECTERISTIC_UUID,
-            ],
-            retrieveServicesParams: [peripheralInfo.id],
-          });
-        },
-        scanParams: {
-          scanOptions: {
-            scanningSettings: [[], 1, true],
+      try {
+        await bluevery.receiveCharacteristicValue({
+          onCallBeforeStartNotification: async () => {
+            await bluevery.connect({
+              connectParams: [peripheralInfo.id],
+              retrieveServicesParams: [peripheralInfo.id],
+              retrieveServicesOptions: {
+                retryOptions: {retries: 15},
+                timeoutOptions: {timeoutMilliseconds: 10000},
+              },
+              bondingParams: [peripheralInfo.id, peripheralInfo.id],
+            });
+            await bluevery.writeValue({
+              writeValueParams: [
+                peripheralInfo.id,
+                BP_SERVICE_UUID,
+                BP_DATETIME_CHARECTERISTIC_UUID,
+                timeToByteArray(new Date()),
+              ],
+              retrieveServicesParams: [peripheralInfo.id],
+            });
+            await bluevery.readValue({
+              readValueParams: [
+                peripheralInfo.id,
+                BP_SERVICE_UUID,
+                BP_DATETIME_CHARECTERISTIC_UUID,
+              ],
+              retrieveServicesParams: [peripheralInfo.id],
+            });
           },
-        },
-        retrieveServicesParams: [peripheralInfo.id],
-        retrieveServicesOptions: {
-          retryOptions: {retries: 15},
-          timeoutOptions: {timeoutMilliseconds: 10000},
-        },
-        startNotificationParams: [
-          peripheralInfo.id,
-          BP_SERVICE_UUID,
-          BP_MEASUREMENT_CHARECTERISTIC_UUID,
-        ],
-        receiveCharacteristicHandler: (res) => {
-          console.log({...res});
-        },
-      });
+          scanParams: {
+            scanOptions: {
+              scanningSettings: [[], 1, true],
+            },
+          },
+          retrieveServicesParams: [peripheralInfo.id],
+          retrieveServicesOptions: {
+            retryOptions: {retries: 15},
+            timeoutOptions: {timeoutMilliseconds: 10000},
+          },
+          startNotificationParams: [
+            peripheralInfo.id,
+            BP_SERVICE_UUID,
+            BP_MEASUREMENT_CHARECTERISTIC_UUID,
+          ],
+          receiveCharacteristicHandler: (res) => {
+            console.log({...res});
+          },
+        });
+      } catch (error) {
+        handleError(error);
+      }
     },
     [],
   );
   const onConnectPeripheral = useCallback(
     async (peripheralInfo: PeripheralInfo) => {
-      await bluevery.connect({
-        connectParams: [peripheralInfo.id],
-        retrieveServicesParams: [peripheralInfo.id],
-        bondingParams: [peripheralInfo.id, peripheralInfo.id],
-      });
-      await bluevery.writeValue({
-        writeValueParams: [
-          peripheralInfo.id,
-          BP_SERVICE_UUID,
-          BP_DATETIME_CHARECTERISTIC_UUID,
-          timeToByteArray(new Date()),
-        ],
-        retrieveServicesParams: [peripheralInfo.id],
-      });
-      await bluevery.readValue({
-        readValueParams: [
-          peripheralInfo.id,
-          BP_SERVICE_UUID,
-          BP_DATETIME_CHARECTERISTIC_UUID,
-        ],
-        retrieveServicesParams: [peripheralInfo.id],
-      });
+      try {
+        await bluevery.connect({
+          connectParams: [peripheralInfo.id],
+          retrieveServicesParams: [peripheralInfo.id],
+          bondingParams: [peripheralInfo.id, peripheralInfo.id],
+        });
+        await bluevery.writeValue({
+          writeValueParams: [
+            peripheralInfo.id,
+            BP_SERVICE_UUID,
+            BP_DATETIME_CHARECTERISTIC_UUID,
+            timeToByteArray(new Date()),
+          ],
+          retrieveServicesParams: [peripheralInfo.id],
+        });
+        await bluevery.readValue({
+          readValueParams: [
+            peripheralInfo.id,
+            BP_SERVICE_UUID,
+            BP_DATETIME_CHARECTERISTIC_UUID,
+          ],
+          retrieveServicesParams: [peripheralInfo.id],
+        });
+      } catch (error) {
+        handleError(error);
+      }
     },
     [],
   );
