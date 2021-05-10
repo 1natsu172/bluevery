@@ -10,11 +10,13 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "bluevery": "link:../",
+    "expo-keep-awake": "^9.1.2",
     "react": "16.13.1",
     "react-native": "0.63.2",
     "react-native-ble-manager": "^7.3.1",
     "react-native-permissions": "^2.2.0",
-    "bluevery": "link:../"
+    "react-native-unimodules": "^0.13.3"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",

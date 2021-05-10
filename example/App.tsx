@@ -20,6 +20,8 @@ import {
   FlatList,
 } from 'react-native';
 
+import {useKeepAwake} from 'expo-keep-awake';
+
 import {
   Header,
   LearnMoreLinks,
@@ -27,12 +29,7 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-import {
-  bluevery,
-  PeripheralInfo,
-  useBlueveryState,
-  useDevBlueveryState,
-} from 'bluevery';
+import {bluevery, PeripheralInfo, useBlueveryState} from 'bluevery';
 import {useCallback} from 'react';
 
 declare const global: {HermesInternal: null | {}};
@@ -65,6 +62,7 @@ export const timeToByteArray = (d: Date) => {
 };
 
 const App = () => {
+  useKeepAwake();
   const bleState = useBlueveryState();
 
   useEffect(() => {
