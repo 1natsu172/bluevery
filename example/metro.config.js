@@ -10,7 +10,12 @@ const escape = require('escape-string-regexp');
 const parentPak = require('../package.json');
 
 const rootPath = path.resolve(__dirname, '..');
-const modules = ['@babel/runtime', ...Object.keys(parentPak.peerDependencies)];
+const modules = [
+  '@babel/runtime',
+  ...Object.keys({
+    ...parentPak.peerDependencies,
+  }),
+];
 
 module.exports = {
   projectRoot: __dirname,
@@ -19,7 +24,7 @@ module.exports = {
     getTransformOptions: async () => ({
       transform: {
         experimentalImportSupport: false,
-        inlineRequires: false,
+        inlineRequires: true,
       },
     }),
   },

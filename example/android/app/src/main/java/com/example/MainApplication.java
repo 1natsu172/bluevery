@@ -1,7 +1,7 @@
 package com.example;
 
 // com.myapp should be your package name
-import com.myapp.generated.BasePackageList;
+import com.example.generated.BasePackageList;
 
 import android.app.Application;
 import android.content.Context;
