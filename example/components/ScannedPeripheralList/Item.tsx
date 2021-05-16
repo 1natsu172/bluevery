@@ -1,20 +1,12 @@
 import React, {useCallback} from 'react';
 import {Card, Button} from 'react-native-paper';
 import {PeripheralInfo} from 'bluevery';
-import {View, Text, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 
 type Props = {
   peripheralInfo: PeripheralInfo;
   onPress: (peripheralInfo: PeripheralInfo) => Promise<void>;
 };
-
-// const Connect = () => {
-//   return (
-//     <View>
-//       <Text>Connect</Text>
-//     </View>
-//   );
-// };
 
 export const Item: React.VFC<Props> = ({peripheralInfo, onPress}) => {
   const {id, name} = peripheralInfo;
@@ -25,26 +17,23 @@ export const Item: React.VFC<Props> = ({peripheralInfo, onPress}) => {
   }, []);
 
   return (
-    // <List.Item
-    //   title={name}
-    //   description={id}
-    //   onPress={_onPress}
-    //   titleEllipsizeMode={'middle'}
-    //   titleNumberOfLines={2}
-    //   right={() => <Connect />}
-    // />
-    <Card>
+    <Card style={styles.cardWrapper}>
       <Card.Content>
-        <Card.Title title={name} subtitle={id} />
-        <Card.Actions style={styles.actions}>
-          <Button onPress={_onPress}>Connect</Button>
-        </Card.Actions>
+        <Card.Title
+          title={name}
+          subtitle={id}
+          right={() => <Button onPress={_onPress}>Connect</Button>}
+        />
       </Card.Content>
     </Card>
   );
 };
 
 const styles = StyleSheet.create({
+  cardWrapper: {
+    marginHorizontal: 10,
+    marginBottom: 10,
+  },
   actions: {
     justifyContent: 'flex-end',
   },
