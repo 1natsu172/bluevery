@@ -2,6 +2,7 @@ import {Bluevery} from './bluevery';
 import {BlueveryCore} from './blueveryCore';
 import {BlueveryState, createInitialState} from './blueveryState';
 import {BlueveryListeners} from './blueveryListeners';
+import * as _reExportBlueveryUtils from './blueveryUtils';
 import {createUseBlueveryState} from './stateProvider';
 import {proxy} from 'valtio';
 
@@ -18,3 +19,5 @@ export const useBlueveryState = createUseBlueveryState(
 );
 
 export * from './interface';
+
+export const blueveryUtils = _reExportBlueveryUtils;
