@@ -56,7 +56,12 @@ const App = () => {
               await bluevery.startScan({
                 scanOptions: {
                   // scanningSettings: [[BP_SERVICE_UUID], 1, true],
-                  scanningSettings: [[], 1, true],
+                  scanningSettings: [
+                    [],
+                    3,
+                    true,
+                    // {reportDelay: 0, scanMode: 2},
+                  ],
                   intervalLength: 1000,
                   iterations: 5,
                 },
@@ -94,7 +99,7 @@ const App = () => {
         await bluevery.startScan({
           scanOptions: {
             // scanningSettings: [[BP_SERVICE_UUID], 1, true],
-            scanningSettings: [[], 1, true],
+            scanningSettings: [[], 3, true],
             intervalLength: 1000,
             iterations: 5,
           },
@@ -115,16 +120,14 @@ const App = () => {
   }, []);
 
   return (
-    <>
+    <SafeAreaView style={styles.mainContentContainer}>
       <StatusBar barStyle="dark-content" />
       <Header />
 
-      <SafeAreaView style={styles.mainContentContainer}>
-        {/* @ts-expect-error */}
-        <TabViews routes={routes} scenes={renderScene} />
-      </SafeAreaView>
+      {/* @ts-expect-error */}
+      <TabViews routes={routes} scenes={renderScene} />
       <HermesAnnounce />
-    </>
+    </SafeAreaView>
   );
 };
 

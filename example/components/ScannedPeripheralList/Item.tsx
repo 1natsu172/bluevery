@@ -1,5 +1,5 @@
 import React, {useCallback} from 'react';
-import {Card, Button} from 'react-native-paper';
+import {Card, Button, Caption} from 'react-native-paper';
 import {PeripheralInfo} from 'bluevery';
 import {StyleSheet} from 'react-native';
 
@@ -9,7 +9,7 @@ type Props = {
 };
 
 export const Item: React.VFC<Props> = ({peripheralInfo, onConnect}) => {
-  const {id, name} = peripheralInfo;
+  const {id, name, advertising, rssi} = peripheralInfo;
 
   const _onConnect = useCallback(async () => {
     await onConnect(peripheralInfo);
@@ -18,12 +18,18 @@ export const Item: React.VFC<Props> = ({peripheralInfo, onConnect}) => {
 
   return (
     <Card style={styles.cardWrapper}>
+      <Card.Title
+        title={name}
+        subtitle={id}
+        right={() => <Button onPress={_onConnect}>Connect</Button>}
+      />
       <Card.Content>
-        <Card.Title
-          title={name}
-          subtitle={id}
-          right={() => <Button onPress={_onConnect}>Connect</Button>}
-        />
+        <Caption>RSSI: {rssi}</Caption>
+        {Object.entries(advertising).map(([key, value]) => (
+          <Caption>
+            {key}: {JSON.stringify(value)}
+          </Caption>
+        ))}
       </Card.Content>
     </Card>
   );

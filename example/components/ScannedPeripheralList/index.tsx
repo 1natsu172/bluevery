@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  FlatList,
-  ScrollView,
-  RefreshControl,
-  View,
-  StyleSheet,
-} from 'react-native';
+import {FlatList, RefreshControl, View, StyleSheet} from 'react-native';
 import {ActivityIndicator, List, Text} from 'react-native-paper';
 import {PeripheralInfo, State} from 'bluevery';
 import {Item} from './Item';
@@ -41,29 +35,27 @@ export const ScannedPeripheralList: React.VFC<Props> = ({
     } catch (error) {
       handleError(error);
     }
-  }, [onRefresh]);
+  }, [handleError, onRefresh]);
 
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={_onRefresh} />
-      }>
-      <List.Section>
-        <View style={styles.listSubHeader}>
-          <List.Subheader>Scanned Peripherals</List.Subheader>
-          <ActivityIndicator animating={isScanning} size={16} />
-        </View>
-        <FlatList
-          ListEmptyComponent={() => <Text>no list</Text>}
-          data={peripherals}
-          renderItem={({item}) =>
-            item ? (
-              <Item key={item.id} peripheralInfo={item} onConnect={onConnect} />
-            ) : null
-          }
-        />
-      </List.Section>
-    </ScrollView>
+    <>
+      <View style={styles.listSubHeader}>
+        <List.Subheader>Scanned Peripherals</List.Subheader>
+        <ActivityIndicator animating={isScanning} size={16} />
+      </View>
+      <FlatList
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={_onRefresh} />
+        }
+        ListEmptyComponent={() => <Text>no list</Text>}
+        data={peripherals}
+        renderItem={({item}) =>
+          item ? (
+            <Item key={item.id} peripheralInfo={item} onConnect={onConnect} />
+          ) : null
+        }
+      />
+    </>
   );
 };
 

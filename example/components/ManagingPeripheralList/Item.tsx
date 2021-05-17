@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Card, Text} from 'react-native-paper';
+import {Button, Card, Caption} from 'react-native-paper';
 import {PeripheralInfo} from 'bluevery';
 import {StyleSheet} from 'react-native';
 
@@ -27,18 +27,26 @@ export const Item: React.VFC<Props> = ({
     communicate,
     retrieveServices,
     receivingForCharacteristicValue,
+    advertising,
+    rssi,
   } = peripheralInfo;
 
   return (
     <Card style={styles.cardWrapper}>
       <Card.Title title={name} subtitle={id} />
       <Card.Content>
-        <Text>connect: {connect}</Text>
-        <Text>bonded:{bonded}</Text>
-        <Text>communicate: {communicate}</Text>
-        <Text>retreieve:{retrieveServices}</Text>
-        <Text>receiving:{receivingForCharacteristicValue}</Text>
-        <Text>characteristicValues:{JSON.stringify(characteristicValues)}</Text>
+        <Caption>
+          serviceUUID: {JSON.stringify(advertising.serviceUUIDs)}
+        </Caption>
+        <Caption>RSSI: {rssi}</Caption>
+        <Caption>connect: {connect}</Caption>
+        <Caption>bonded:{bonded}</Caption>
+        <Caption>communicate: {communicate}</Caption>
+        <Caption>retreieve:{retrieveServices}</Caption>
+        <Caption>receiving:{receivingForCharacteristicValue}</Caption>
+        <Caption>
+          characteristicValues:{JSON.stringify(characteristicValues)}
+        </Caption>
       </Card.Content>
       {receiveCharateristicValue ? (
         <Card.Actions>
@@ -51,7 +59,9 @@ export const Item: React.VFC<Props> = ({
             Receive from {receiveCharateristicValue.name}
           </Button>
         </Card.Actions>
-      ) : null}
+      ) : (
+        <Card.Content children={null} />
+      )}
     </Card>
   );
 };
