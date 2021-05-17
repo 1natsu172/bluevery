@@ -1,10 +1,8 @@
 import React, {useCallback, useMemo} from 'react';
-import {Text, FlatList} from 'react-native';
+import {Text, FlatList, ScrollView} from 'react-native';
 import {List} from 'react-native-paper';
-import {PeripheralId, PeripheralInfo, State, blueveryUtils} from 'bluevery';
+import {PeripheralId, PeripheralInfo, State} from 'bluevery';
 import {Item} from './Item';
-
-const {plainState} = blueveryUtils;
 
 type Props = {
   peripheralsMap: State['managingPeripherals'];
@@ -41,24 +39,26 @@ export const ManagingPeripheralList: React.VFC<Props> = ({
   );
 
   return (
-    <List.Section>
-      <List.Subheader>Managing Peripherals</List.Subheader>
-      <FlatList
-        ListEmptyComponent={() => <Text>no list</Text>}
-        data={peripherals}
-        renderItem={({item}) =>
-          item ? (
-            <Item
-              key={item.id}
-              peripheralInfo={item}
-              characteristicValues={characteristicValuesMap[item.id]}
-              receiveCharateristicValue={getReceiveCharacteristicHandler(
-                item.name,
-              )}
-            />
-          ) : null
-        }
-      />
-    </List.Section>
+    <ScrollView>
+      <List.Section>
+        <List.Subheader>Managing Peripherals</List.Subheader>
+        <FlatList
+          ListEmptyComponent={() => <Text>no list</Text>}
+          data={peripherals}
+          renderItem={({item}) =>
+            item ? (
+              <Item
+                key={item.id}
+                peripheralInfo={item}
+                characteristicValues={characteristicValuesMap[item.id]}
+                receiveCharateristicValue={getReceiveCharacteristicHandler(
+                  item.name,
+                )}
+              />
+            ) : null
+          }
+        />
+      </List.Section>
+    </ScrollView>
   );
 };

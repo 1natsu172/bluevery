@@ -49,6 +49,7 @@ const App = () => {
       case 'first':
         return (
           <ScannedPeripheralList
+            isScanning={bleState.scanning}
             peripheralsMap={bleState.scannedPeripherals}
             onConnect={onConnectPeripheral}
             onRefresh={async () =>

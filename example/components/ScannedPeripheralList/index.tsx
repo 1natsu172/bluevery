@@ -1,29 +1,46 @@
 import React from 'react';
-import {Text, FlatList, ScrollView, RefreshControl} from 'react-native';
-import {List} from 'react-native-paper';
+import {
+  FlatList,
+  ScrollView,
+  RefreshControl,
+  View,
+  StyleSheet,
+} from 'react-native';
+import {ActivityIndicator, List, Text} from 'react-native-paper';
 import {PeripheralInfo, State} from 'bluevery';
 import {Item} from './Item';
+import {useErrorHandler} from 'react-error-boundary';
 
 type Props = {
   peripheralsMap: State['scannedPeripherals'];
   onConnect: (peripheralInfo: PeripheralInfo) => Promise<void>;
   onRefresh: () => Promise<void>;
+  isScanning: boolean;
 };
 
 export const ScannedPeripheralList: React.VFC<Props> = ({
   peripheralsMap,
   onConnect,
   onRefresh,
+  isScanning,
 }) => {
+  const handleError = useErrorHandler();
   const peripherals = React.useMemo(() => Object.values(peripheralsMap), [
     peripheralsMap,
   ]);
 
   const [refreshing, setRefreshing] = React.useState(false);
 
-  const _onRefresh = React.useCallback(() => {
+  const _onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-    onRefresh().then(() => setRefreshing(false));
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+    try {
+      await onRefresh();
+    } catch (error) {
+      handleError(error);
+    }
   }, [onRefresh]);
 
   return (
@@ -32,7 +49,10 @@ export const ScannedPeripheralList: React.VFC<Props> = ({
         <RefreshControl refreshing={refreshing} onRefresh={_onRefresh} />
       }>
       <List.Section>
-        <List.Subheader>Scanned Peripherals</List.Subheader>
+        <View style={styles.listSubHeader}>
+          <List.Subheader>Scanned Peripherals</List.Subheader>
+          <ActivityIndicator animating={isScanning} size={16} />
+        </View>
         <FlatList
           ListEmptyComponent={() => <Text>no list</Text>}
           data={peripherals}
@@ -46,3 +66,9 @@ export const ScannedPeripheralList: React.VFC<Props> = ({
     </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  listSubHeader: {
+    flexDirection: 'row',
+  },
+});

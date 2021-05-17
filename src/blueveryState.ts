@@ -217,7 +217,12 @@ export class BlueveryState {
     this.mutationState.scannedPeripherals[peripheral.id] = peripheral;
   }
   clearScannedPeripherals() {
-    this.mutationState.scannedPeripherals = this._savedInitialState.scannedPeripherals;
+    /**
+     * NOTE:FIXME: テストでは問題ないが実際にexampleで動かすとスプレッド展開にして新しいオブジェクト生成をしないとクリアされないという謎現象がある。再スキャンしたときになぜかクリアされないバグっぽい現象なので直されたい。
+     */
+    this.mutationState.scannedPeripherals = {
+      ...this._savedInitialState.scannedPeripherals,
+    };
   }
 
   setPeripheralToManagingPeripherals(peripheralInfo: PeripheralInfo) {
