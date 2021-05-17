@@ -8,64 +8,32 @@
  * @format
  */
 
-import React, {useEffect, useCallback} from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-  TouchableOpacity,
-  FlatList,
-} from 'react-native';
+import React, {useEffect} from 'react';
+import {SafeAreaView, StyleSheet, StatusBar} from 'react-native';
 import {useKeepAwake} from 'expo-keep-awake';
 import {useErrorHandler} from 'react-error-boundary';
-
+import {TabView} from 'react-native-tab-view';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {bluevery, PeripheralInfo, useBlueveryState} from 'bluevery';
+
+import {bluevery, useBlueveryState} from 'bluevery';
+import {useAND_UA_651BLE} from './hooks';
 import {
   HermesAnnounce,
   Header,
   ScannedPeripheralList,
+  ManagingPeripheralList,
   TabViews,
 } from './components';
-import {SceneMap, TabView} from 'react-native-tab-view';
-
-export const BP_MONITOR_NAME_AND = 'A&D_UA-651BLE';
-export const BP_SERVICE_UUID = '1810';
-/**
- * BLE(GATT)のキャラクタリスティックUUID: タイムスタンプ
- */
-export const BP_DATETIME_CHARECTERISTIC_UUID = '2a08';
-/**
- * BLE(GATT)のキャラクタリスティックUUID: 血圧測定データ
- */
-export const BP_MEASUREMENT_CHARECTERISTIC_UUID = '2a35';
-
-/**
- * Dateを以下の形式のbyte arrayに変換する
- * |year (16bit)|month(8bit)|day(8bit)|hours(8bit)|minutes(8bit)|seconds(8bit)|
- */
-export const timeToByteArray = (d: Date) => {
-  const year = d.getFullYear();
-  const month = d.getMonth() + 1;
-  const day = d.getDate();
-  const hours = d.getHours();
-  const minutes = d.getMinutes();
-  const seconds = d.getSeconds();
-  const yearData = new Uint8Array(new Uint16Array([year]).buffer); // 16bit -> 8bit array
-
-  const otherData = new Uint8Array([month, day, hours, minutes, seconds]);
-  return [...Array.from(yearData), ...Array.from(otherData)];
-};
-const A = () => <View style={{flex: 1, backgroundColor: '#ff4081'}} />;
 
 const App = () => {
   useKeepAwake();
   const handleError = useErrorHandler();
-
   const bleState = useBlueveryState();
+  const {
+    characteristicValues,
+    onConnectPeripheral,
+    receiveCharacteristicValueHandlers,
+  } = useAND_UA_651BLE({onError: handleError});
 
   const routes = React.useMemo(
     () => [
@@ -82,14 +50,31 @@ const App = () => {
         return (
           <ScannedPeripheralList
             peripheralsMap={bleState.scannedPeripherals}
-            onPress={onConnectPeripheral}
+            onConnect={onConnectPeripheral}
+            onRefresh={async () =>
+              await bluevery.startScan({
+                scanOptions: {
+                  // scanningSettings: [[BP_SERVICE_UUID], 1, true],
+                  scanningSettings: [[], 1, true],
+                  intervalLength: 1000,
+                  iterations: 5,
+                },
+                // discoverHandler: (peripheral) => {
+                //   console.log('discovered peripheral', peripheral);
+                // },
+                // matchFn: (p) => !!p.id.match(new RegExp(/^BP_SERVICE_UUID/)),
+              })
+            }
           />
         );
       case 'second':
         return (
-          <ScannedPeripheralList
-            peripheralsMap={bleState.scannedPeripherals}
-            onPress={onConnectPeripheral}
+          <ManagingPeripheralList
+            peripheralsMap={bleState.managingPeripherals}
+            characteristicValuesMap={characteristicValues}
+            receiveCharacteristicHandlersMap={
+              receiveCharacteristicValueHandlers
+            }
           />
         );
       default:
@@ -117,103 +102,16 @@ const App = () => {
           // },
           // matchFn: (p) => !!p.id.match(new RegExp(/^BP_SERVICE_UUID/)),
         });
-        // return () => {
-        //   TODO: implements cleanup scan methos
-        // }
       } catch (error) {
         handleError(error);
       }
     };
     initAndScan();
+    return () => {
+      console.log('cleanup: initAndScan');
+      bluevery.stopBluevery();
+    };
   }, []);
-  const onReceiveCharacteristicValue = useCallback(
-    async (peripheralInfo: PeripheralInfo) => {
-      try {
-        await bluevery.receiveCharacteristicValue({
-          onCallBeforeStartNotification: async () => {
-            await bluevery.connect({
-              connectParams: [peripheralInfo.id],
-              retrieveServicesParams: [peripheralInfo.id],
-              retrieveServicesOptions: {
-                retryOptions: {retries: 15},
-                timeoutOptions: {timeoutMilliseconds: 10000},
-              },
-              bondingParams: [peripheralInfo.id, peripheralInfo.id],
-            });
-            await bluevery.writeValue({
-              writeValueParams: [
-                peripheralInfo.id,
-                BP_SERVICE_UUID,
-                BP_DATETIME_CHARECTERISTIC_UUID,
-                timeToByteArray(new Date()),
-              ],
-              retrieveServicesParams: [peripheralInfo.id],
-            });
-            await bluevery.readValue({
-              readValueParams: [
-                peripheralInfo.id,
-                BP_SERVICE_UUID,
-                BP_DATETIME_CHARECTERISTIC_UUID,
-              ],
-              retrieveServicesParams: [peripheralInfo.id],
-            });
-          },
-          scanParams: {
-            scanOptions: {
-              scanningSettings: [[], 1, true],
-            },
-          },
-          retrieveServicesParams: [peripheralInfo.id],
-          retrieveServicesOptions: {
-            retryOptions: {retries: 15},
-            timeoutOptions: {timeoutMilliseconds: 10000},
-          },
-          startNotificationParams: [
-            peripheralInfo.id,
-            BP_SERVICE_UUID,
-            BP_MEASUREMENT_CHARECTERISTIC_UUID,
-          ],
-          receiveCharacteristicHandler: (res) => {
-            console.log({...res});
-          },
-        });
-      } catch (error) {
-        handleError(error);
-      }
-    },
-    [],
-  );
-  const onConnectPeripheral = useCallback(
-    async (peripheralInfo: PeripheralInfo) => {
-      try {
-        await bluevery.connect({
-          connectParams: [peripheralInfo.id],
-          retrieveServicesParams: [peripheralInfo.id],
-          bondingParams: [peripheralInfo.id, peripheralInfo.id],
-        });
-        await bluevery.writeValue({
-          writeValueParams: [
-            peripheralInfo.id,
-            BP_SERVICE_UUID,
-            BP_DATETIME_CHARECTERISTIC_UUID,
-            timeToByteArray(new Date()),
-          ],
-          retrieveServicesParams: [peripheralInfo.id],
-        });
-        await bluevery.readValue({
-          readValueParams: [
-            peripheralInfo.id,
-            BP_SERVICE_UUID,
-            BP_DATETIME_CHARECTERISTIC_UUID,
-          ],
-          retrieveServicesParams: [peripheralInfo.id],
-        });
-      } catch (error) {
-        handleError(error);
-      }
-    },
-    [],
-  );
 
   return (
     <>

@@ -5,14 +5,14 @@ import {StyleSheet} from 'react-native';
 
 type Props = {
   peripheralInfo: PeripheralInfo;
-  onPress: (peripheralInfo: PeripheralInfo) => Promise<void>;
+  onConnect: (peripheralInfo: PeripheralInfo) => Promise<void>;
 };
 
-export const Item: React.VFC<Props> = ({peripheralInfo, onPress}) => {
+export const Item: React.VFC<Props> = ({peripheralInfo, onConnect}) => {
   const {id, name} = peripheralInfo;
 
-  const _onPress = useCallback(async () => {
-    await onPress(peripheralInfo);
+  const _onConnect = useCallback(async () => {
+    await onConnect(peripheralInfo);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -22,7 +22,7 @@ export const Item: React.VFC<Props> = ({peripheralInfo, onPress}) => {
         <Card.Title
           title={name}
           subtitle={id}
-          right={() => <Button onPress={_onPress}>Connect</Button>}
+          right={() => <Button onPress={_onConnect}>Connect</Button>}
         />
       </Card.Content>
     </Card>

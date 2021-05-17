@@ -24,7 +24,7 @@ const ErrorFallback: React.VFC<FallbackProps> = ({
       <Text>Something went wrong:</Text>
       <Text>{error.message}</Text>
       <TouchableOpacity onPress={resetErrorBoundary}>
-        Try again
+        <Text>Try again</Text>
       </TouchableOpacity>
     </View>
   );

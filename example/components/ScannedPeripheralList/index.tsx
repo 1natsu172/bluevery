@@ -1,34 +1,48 @@
-import React, {useMemo} from 'react';
-import {Text, FlatList} from 'react-native';
+import React from 'react';
+import {Text, FlatList, ScrollView, RefreshControl} from 'react-native';
 import {List} from 'react-native-paper';
 import {PeripheralInfo, State} from 'bluevery';
 import {Item} from './Item';
 
 type Props = {
   peripheralsMap: State['scannedPeripherals'];
-  onPress: (peripheralInfo: PeripheralInfo) => Promise<void>;
+  onConnect: (peripheralInfo: PeripheralInfo) => Promise<void>;
+  onRefresh: () => Promise<void>;
 };
 
 export const ScannedPeripheralList: React.VFC<Props> = ({
   peripheralsMap,
-  onPress,
+  onConnect,
+  onRefresh,
 }) => {
-  const peripherals = useMemo(() => Object.values(peripheralsMap), [
+  const peripherals = React.useMemo(() => Object.values(peripheralsMap), [
     peripheralsMap,
   ]);
 
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const _onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    onRefresh().then(() => setRefreshing(false));
+  }, [onRefresh]);
+
   return (
-    <List.Section>
-      <List.Subheader>Scanned Peripherals</List.Subheader>
-      <FlatList
-        ListEmptyComponent={() => <Text>no list</Text>}
-        data={peripherals}
-        renderItem={({item}) =>
-          item ? (
-            <Item key={item.id} peripheralInfo={item} onPress={onPress} />
-          ) : null
-        }
-      />
-    </List.Section>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={_onRefresh} />
+      }>
+      <List.Section>
+        <List.Subheader>Scanned Peripherals</List.Subheader>
+        <FlatList
+          ListEmptyComponent={() => <Text>no list</Text>}
+          data={peripherals}
+          renderItem={({item}) =>
+            item ? (
+              <Item key={item.id} peripheralInfo={item} onConnect={onConnect} />
+            ) : null
+          }
+        />
+      </List.Section>
+    </ScrollView>
   );
 };
