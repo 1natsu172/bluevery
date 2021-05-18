@@ -333,7 +333,7 @@ describe('BlueveryCore', () => {
       });
 
       test('should return false if requireCheckBeforeBleProcess failed', async () => {
-        spiedRequireCheckBeforeBleProcess.mockImplementation(() => false);
+        spiedRequireCheckBeforeBleProcess.mockImplementationOnce(() => false);
         blueveryCore.scan({scanningSettings: [[], 1]});
         await flushPromisesAdvanceTimer(1000);
         expect(spiedRequireCheckBeforeBleProcess).toBeCalledTimes(1);
@@ -417,7 +417,7 @@ describe('BlueveryCore', () => {
       });
     });
     test('should return false if requireCheckBeforeBleProcess failed', async () => {
-      spiedRequireCheckBeforeBleProcess.mockImplementation(() => false);
+      spiedRequireCheckBeforeBleProcess.mockImplementationOnce(() => false);
       const ret = await blueveryCore.writeValue({
         writeValueParams: [
           '1',
@@ -571,7 +571,7 @@ describe('BlueveryCore', () => {
     });
 
     test('should return false if requireCheckBeforeBleProcess failed', async () => {
-      spiedRequireCheckBeforeBleProcess.mockImplementation(() => false);
+      spiedRequireCheckBeforeBleProcess.mockImplementationOnce(() => false);
       const ret = await blueveryCore.readValue({
         readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
         readValueOptions: {},
@@ -689,7 +689,7 @@ describe('BlueveryCore', () => {
     });
 
     test('should return false if requireCheckBeforeBleProcess failed', async () => {
-      spiedRequireCheckBeforeBleProcess.mockImplementation(() => false);
+      spiedRequireCheckBeforeBleProcess.mockImplementationOnce(() => false);
       const ret = await blueveryCore.connect({
         bondingParams: ['1', ''],
         bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
