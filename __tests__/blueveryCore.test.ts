@@ -996,18 +996,18 @@ describe('BlueveryCore', () => {
 
   describe('clearScannedPeripherals', () => {
     test('should clear scanned peripherals', () => {
-      const dummySate = createInitialState();
-      dummySate.scannedPeripherals.dummy = {
+      const dummyState = createInitialState({ scannedPeripherals: {['1']:{
         id: '1',
         rssi: 1,
         advertising: {},
         name: 'testPeripheral1',
-      };
+      }}});
       blueveryCore = new BlueveryCore({
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),
-        store: proxy({bluevery: dummySate}),
+        store: proxy({bluevery: dummyState}),
       });
+
       expect(
         Object.values(blueveryCore.getState().scannedPeripherals),
       ).toHaveLength(1);
