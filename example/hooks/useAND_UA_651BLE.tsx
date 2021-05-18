@@ -1,5 +1,6 @@
 import {useCallback, useState} from 'react';
 import {bluevery, PeripheralId, PeripheralInfo} from 'bluevery';
+import {BleController} from './type';
 
 export const BP_MONITOR_NAME_AND = 'A&D_UA-651BLE';
 export const BP_SERVICE_UUID = '1810';
@@ -35,7 +36,9 @@ export const timeToByteArray = (d: Date) => {
 type Props = {
   onError: (error: Error) => unknown;
 };
-export const useAND_UA_651BLE = ({onError}: Props) => {
+export const useAND_UA_651BLE: (props: Props) => BleController = ({
+  onError,
+}: Props) => {
   const [characteristicValues, setCharacteristicValues] = useState<
     {
       [K in PeripheralId]: unknown[];
