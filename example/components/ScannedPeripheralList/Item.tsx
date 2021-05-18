@@ -26,7 +26,7 @@ export const Item: React.VFC<Props> = ({peripheralInfo, onConnect}) => {
       <Card.Content>
         <Caption>RSSI: {rssi}</Caption>
         {Object.entries(advertising).map(([key, value]) => (
-          <Caption>
+          <Caption key={key}>
             {key}: {JSON.stringify(value)}
           </Caption>
         ))}
