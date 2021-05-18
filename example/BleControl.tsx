@@ -10,10 +10,10 @@ import {
 
 type Props = {
   onConnectPeripheral: (peripheralInfo: PeripheralInfo) => Promise<void>;
-  characteristicValuesMap: {
+  characteristicValues: {
     [x: string]: unknown[] | undefined;
   };
-  receiveCharacteristicHandlersMap:
+  receiveCharacteristicValueHandlers:
     | undefined
     | {
         [x: string]:
@@ -73,9 +73,9 @@ export const BleControl: React.VFC<Props> = (props) => {
         return (
           <ManagingPeripheralList
             peripheralsMap={bleState.managingPeripherals}
-            characteristicValuesMap={props.characteristicValuesMap}
+            characteristicValuesMap={props.characteristicValues}
             receiveCharacteristicHandlersMap={
-              props.receiveCharacteristicHandlersMap
+              props.receiveCharacteristicValueHandlers
             }
           />
         );
