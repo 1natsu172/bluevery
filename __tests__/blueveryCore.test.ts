@@ -332,6 +332,31 @@ describe('BlueveryCore', () => {
         expect(spiedRequireCheckBeforeBleProcess).toBeCalledTimes(1);
       });
 
+      test('should return false if requireCheckBeforeBleProcess failed', async () => {
+        spiedRequireCheckBeforeBleProcess.mockImplementation(() => false);
+        blueveryCore.scan({scanningSettings: [[], 1]});
+        await flushPromisesAdvanceTimer(1000);
+        expect(spiedRequireCheckBeforeBleProcess).toBeCalledTimes(1);
+      });
+
+      test('should call console.warn if BleManager.scan throw exception', async () => {
+        const orgScan = BleManager.scan;
+        BleManager.scan = async () => {
+          throw new Error();
+        };
+        const orgWarn = console.warn;
+        const mockWarn = jest.fn();
+        console.warn = mockWarn;
+        try {
+          blueveryCore.scan({scanningSettings: [[], 1]});
+          await flushPromisesAdvanceTimer(1000);
+        } finally {
+          BleManager.scan = orgScan;
+          console.warn = orgWarn;
+        }
+        expect(mockWarn).toBeCalledTimes(1);
+      });
+
       test('should call cleanupScan at the end of process', async () => {
         blueveryCore.scan({scanningSettings: [[], 1]});
         await flushPromisesAdvanceTimer(1000);
@@ -391,6 +416,22 @@ describe('BlueveryCore', () => {
         }),
       });
     });
+    test('should return false if requireCheckBeforeBleProcess failed', async () => {
+      spiedRequireCheckBeforeBleProcess.mockImplementation(() => false);
+      const ret = await blueveryCore.writeValue({
+        writeValueParams: [
+          '1',
+          'dummySUUID',
+          'dummyCharaUUID',
+          'this is dummy data',
+        ],
+        writeValueOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+      });
+      expect(ret).toBe(false);
+    });
+
     test('should return if value exists', async () => {
       const ret = await blueveryCore.writeValue({
         writeValueParams: [
@@ -528,6 +569,18 @@ describe('BlueveryCore', () => {
         }),
       });
     });
+
+    test('should return false if requireCheckBeforeBleProcess failed', async () => {
+      spiedRequireCheckBeforeBleProcess.mockImplementation(() => false);
+      const ret = await blueveryCore.readValue({
+        readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
+        readValueOptions: {},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+      });
+      expect(ret).toBe(false);
+    });
+
     test('should return if value exists', async () => {
       const ret = await blueveryCore.readValue({
         readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
@@ -633,6 +686,20 @@ describe('BlueveryCore', () => {
           },
         }),
       });
+    });
+
+    test('should return false if requireCheckBeforeBleProcess failed', async () => {
+      spiedRequireCheckBeforeBleProcess.mockImplementation(() => false);
+      const ret = await blueveryCore.connect({
+        bondingParams: ['1', ''],
+        bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        connectParams: ['1'],
+        connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+      });
+
+      expect(ret).toBe(false);
     });
 
     test('connect: shoube be early return if already connected the peripheral', async () => {
@@ -924,6 +991,30 @@ describe('BlueveryCore', () => {
       expect(BleManager.stopNotification).toBeCalled();
       expect(mockRemoveFn).toBeCalled();
       expect(spyReceivingCharaValueState.mock.calls[0][0]).toBe(false);
+    });
+  });
+
+  describe('clearScannedPeripherals', () => {
+    test('should clear scanned peripherals', () => {
+      const dummySate = createInitialState();
+      dummySate.scannedPeripherals.dummy = {
+        id: '1',
+        rssi: 1,
+        advertising: {},
+        name: 'testPeripheral1',
+      };
+      blueveryCore = new BlueveryCore({
+        BlueveryState,
+        blueveryListeners: new BlueveryListeners(),
+        store: proxy({bluevery: dummySate}),
+      });
+      expect(
+        Object.values(blueveryCore.getState().scannedPeripherals),
+      ).toHaveLength(1);
+      blueveryCore.clearScannedPeripherals();
+      expect(
+        Object.values(blueveryCore.getState().scannedPeripherals),
+      ).toHaveLength(0);
     });
   });
 });
