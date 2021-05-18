@@ -22,7 +22,7 @@ export const onDiscoverPeripheral = (
   peripheral: Peripheral,
   peripheralInfoHandler: (peripheralInfo: PeripheralInfo) => unknown,
 ) => {
-  console.log('Got ble peripheral', peripheral);
+  //console.log('Got ble peripheral', peripheral);
 
   const peripheralInfo: PeripheralInfo = peripheral;
   if (!peripheralInfo.name) {

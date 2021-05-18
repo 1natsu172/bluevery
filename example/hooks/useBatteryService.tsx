@@ -25,14 +25,12 @@ export const useBatteryService: (props: Props) => BleController = ({
 
   const onConnectPeripheral = useCallback(
     async (peripheralInfo: PeripheralInfo) => {
-      console.log('onConnectPeripheral');
       try {
         await bluevery.connect({
           connectParams: [peripheralInfo.id],
           retrieveServicesParams: [peripheralInfo.id],
           bondingParams: [peripheralInfo.id, peripheralInfo.id],
         });
-        console.log('connected');
         const value = await bluevery.readValue({
           readValueParams: [
             peripheralInfo.id,
@@ -41,6 +39,7 @@ export const useBatteryService: (props: Props) => BleController = ({
           ],
           retrieveServicesParams: [peripheralInfo.id],
         });
+        //console.log('value: ', value);
         setCharacteristicValues((prev) => {
           return {
             ...prev,
