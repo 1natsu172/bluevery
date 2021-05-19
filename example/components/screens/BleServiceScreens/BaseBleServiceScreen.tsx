@@ -1,12 +1,9 @@
 import React, {useEffect} from 'react';
 import {TabView} from 'react-native-tab-view';
-
 import {bluevery, PeripheralInfo, useBlueveryState} from 'bluevery';
-import {
-  ScannedPeripheralList,
-  ManagingPeripheralList,
-  TabViews,
-} from './components';
+import {ScannedPeripheralList, ManagingPeripheralList, TabViews} from '../..';
+import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
+import {HermesAnnounce} from '../../';
 
 type Props = {
   onConnectPeripheral: (peripheralInfo: PeripheralInfo) => Promise<void>;
@@ -28,7 +25,7 @@ type Props = {
   onError: (error: Error) => void;
 };
 
-export const BleControl: React.VFC<Props> = (props) => {
+export const BaseBleServiceScreen: React.VFC<Props> = (props) => {
   const bleState = useBlueveryState();
 
   const routes = React.useMemo(
@@ -115,6 +112,16 @@ export const BleControl: React.VFC<Props> = (props) => {
     };
   }, []);
 
-  /* @ts-expect-error */
-  return <TabViews routes={routes} scenes={renderScene} />;
+  return (
+    <SafeAreaView style={styles.mainContentContainer}>
+      <StatusBar barStyle="dark-content" />
+      {/* @ts-expect-error */}
+      <TabViews routes={routes} scenes={renderScene} />
+      <HermesAnnounce />
+    </SafeAreaView>
+  );
 };
+
+const styles = StyleSheet.create({
+  mainContentContainer: {flex: 1},
+});

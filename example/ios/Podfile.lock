@@ -261,6 +261,8 @@ PODS:
     - React
   - react-native-pager-view (5.1.7):
     - React-Core
+  - react-native-safe-area-context (3.2.0):
+    - React-Core
   - React-RCTActionSheet (0.63.2):
     - React-Core/RCTActionSheetHeaders (= 0.63.2)
   - React-RCTAnimation (0.63.2):
@@ -321,7 +323,42 @@ PODS:
     - React-Core (= 0.63.2)
     - React-cxxreact (= 0.63.2)
     - React-jsi (= 0.63.2)
+  - RNCMaskedView (0.1.11):
+    - React
+  - RNGestureHandler (1.10.3):
+    - React-Core
   - RNPermissions (2.2.2):
+    - React-Core
+  - RNReanimated (2.1.0):
+    - DoubleConversion
+    - FBLazyVector
+    - FBReactNativeSpec
+    - Folly
+    - glog
+    - RCTRequired
+    - RCTTypeSafety
+    - React
+    - React-callinvoker
+    - React-Core
+    - React-Core/DevSupport
+    - React-Core/RCTWebSocket
+    - React-CoreModules
+    - React-cxxreact
+    - React-jsi
+    - React-jsiexecutor
+    - React-jsinspector
+    - React-RCTActionSheet
+    - React-RCTAnimation
+    - React-RCTBlob
+    - React-RCTImage
+    - React-RCTLinking
+    - React-RCTNetwork
+    - React-RCTSettings
+    - React-RCTText
+    - React-RCTVibration
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - RNScreens (3.2.0):
     - React-Core
   - RNVectorIcons (8.1.0):
     - React-Core
@@ -398,6 +435,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-ble-manager (from `../node_modules/react-native-ble-manager`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
+  - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
   - React-RCTBlob (from `../node_modules/react-native/Libraries/Blob`)
@@ -408,7 +446,11 @@ DEPENDENCIES:
   - React-RCTText (from `../node_modules/react-native/Libraries/Text`)
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
+  - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
+  - RNReanimated (from `../node_modules/react-native-reanimated`)
+  - RNScreens (from `../node_modules/react-native-screens`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - UMAppLoader (from `../node_modules/unimodules-app-loader/ios`)
   - UMBarCodeScannerInterface (from `../node_modules/unimodules-barcode-scanner-interface/ios`)
@@ -491,6 +533,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-ble-manager"
   react-native-pager-view:
     :path: "../node_modules/react-native-pager-view"
+  react-native-safe-area-context:
+    :path: "../node_modules/react-native-safe-area-context"
   React-RCTActionSheet:
     :path: "../node_modules/react-native/Libraries/ActionSheetIOS"
   React-RCTAnimation:
@@ -511,8 +555,16 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/Vibration"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNCMaskedView:
+    :path: "../node_modules/@react-native-community/masked-view"
+  RNGestureHandler:
+    :path: "../node_modules/react-native-gesture-handler"
   RNPermissions:
     :path: "../node_modules/react-native-permissions"
+  RNReanimated:
+    :path: "../node_modules/react-native-reanimated"
+  RNScreens:
+    :path: "../node_modules/react-native-screens"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
   UMAppLoader:
@@ -581,6 +633,7 @@ SPEC CHECKSUMS:
   React-jsinspector: b14e62ebe7a66e9231e9581279909f2fc3db6606
   react-native-ble-manager: a0d0ee16185d281d55dfeb76dab387541eed201e
   react-native-pager-view: c60a26be051a4b88427f2475e173b5c112e98d17
+  react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
   React-RCTActionSheet: 910163b6b09685a35c4ebbc52b66d1bfbbe39fc5
   React-RCTAnimation: 9a883bbe1e9d2e158d4fb53765ed64c8dc2200c6
   React-RCTBlob: 39cf0ece1927996c4466510e25d2105f67010e13
@@ -591,7 +644,11 @@ SPEC CHECKSUMS:
   React-RCTText: 1b6773e776e4b33f90468c20fe3b16ca3e224bb8
   React-RCTVibration: 4d2e726957f4087449739b595f107c0d4b6c2d2d
   ReactCommon: a0a1edbebcac5e91338371b72ffc66aa822792ce
+  RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
+  RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
   RNPermissions: 5df468064df661a4c8c017e2791ce90d7695eea5
+  RNReanimated: 70f662b5232dd5d19ccff581e919a54ea73df51c
+  RNScreens: c277bfc4b5bb7c2fe977d19635df6f974f95dfd6
   RNVectorIcons: 31cebfcf94e8cf8686eb5303ae0357da64d7a5a4
   UMAppLoader: fe2708bb0ac5cd70052bc207d06aa3b7e72b9e97
   UMBarCodeScannerInterface: 79f92bea5f7af39b381a4c82298105ceb537408a
