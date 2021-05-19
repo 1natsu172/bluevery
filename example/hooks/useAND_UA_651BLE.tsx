@@ -116,7 +116,7 @@ export const useAND_UA_651BLE = ({onError}: Props) => {
         onError(error);
       }
     },
-    [],
+    [onError],
   );
 
   const onConnectPeripheral = useCallback(
@@ -148,7 +148,7 @@ export const useAND_UA_651BLE = ({onError}: Props) => {
         onError(error);
       }
     },
-    [],
+    [onError],
   );
 
   return {

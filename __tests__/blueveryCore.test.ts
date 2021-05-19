@@ -996,12 +996,16 @@ describe('BlueveryCore', () => {
 
   describe('clearScannedPeripherals', () => {
     test('should clear scanned peripherals', () => {
-      const dummyState = createInitialState({ scannedPeripherals: {['1']:{
-        id: '1',
-        rssi: 1,
-        advertising: {},
-        name: 'testPeripheral1',
-      }}});
+      const dummyState = createInitialState({
+        scannedPeripherals: {
+          ['1']: {
+            id: '1',
+            rssi: 1,
+            advertising: {},
+            name: 'testPeripheral1',
+          },
+        },
+      });
       blueveryCore = new BlueveryCore({
         BlueveryState,
         blueveryListeners: new BlueveryListeners(),

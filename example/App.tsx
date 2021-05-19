@@ -117,6 +117,8 @@ const App = () => {
       console.log('cleanup: initAndScan');
       bluevery.stopBluevery();
     };
+    // intent run once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

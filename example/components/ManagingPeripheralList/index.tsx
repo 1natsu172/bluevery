@@ -35,7 +35,7 @@ export const ManagingPeripheralList: React.VFC<Props> = ({
         ? receiveCharacteristicHandlersMap[detectedKey]
         : undefined;
     },
-    [],
+    [receiveCharacteristicHandlersMap],
   );
 
   return (

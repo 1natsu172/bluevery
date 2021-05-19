@@ -12,6 +12,7 @@
     "test:type": "tsd",
     "test:all": "jest && tsd",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:quiet": "yarn lint --quiet",
     "typecheck": "tsc --noEmit",
     "build": "yarn build:clean && tsc --build",
     "build:clean": "rm -rf ./dist"
