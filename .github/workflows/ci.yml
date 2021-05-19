@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Run lint
-        run: yarn run lint
+        run: yarn run lint:quiet
 
   type_check:
     name: "type check"

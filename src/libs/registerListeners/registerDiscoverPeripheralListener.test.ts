@@ -24,6 +24,8 @@ const samplePeripheralInfo: PeripheralInfo = {
   rssi: 42,
   advertising: {isConnectable: true},
 };
+// NOTE:FIXME: 使ってないけど用意だけしておきたいのでignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sampleUnknownPeripheralInfo: PeripheralInfo = {
   id: '42',
   rssi: 42,
