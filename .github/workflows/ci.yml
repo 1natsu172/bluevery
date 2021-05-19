@@ -27,7 +27,7 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Install dependencies
         run: yarn install
-      - name: Run type check
+      - name: Run lint
         run: yarn run lint
 
   type_check:
@@ -71,6 +71,8 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Install dependencies
         run: yarn install
+      - name: Build to outDir
+        run: yarn build
       - name: Run tests of type
         run: yarn test:type
       - name: Run tests and collect coverage
