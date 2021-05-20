@@ -15,7 +15,7 @@ export const MainStackScreen = () => {
       {Object.entries({
         ...BleServiceScreens,
       }).map(([name, component]) => (
-        <Stack.Screen name={name} component={component} />
+        <Stack.Screen key={name} name={name} component={component} />
       ))}
     </Stack.Navigator>
   );
