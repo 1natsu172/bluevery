@@ -32,7 +32,6 @@ import {
 import {BlueveryState as _BlueveryState} from './blueveryState';
 import {BlueveryListeners as _BlueveryListeners} from './blueveryListeners';
 import autoBind from 'auto-bind';
-import {DEFAULT_OMOIYARI_TIME} from './constants';
 
 type ConstructorArgs = {
   BlueveryState: typeof _BlueveryState;

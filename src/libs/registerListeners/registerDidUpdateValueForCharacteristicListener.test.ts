@@ -1,12 +1,4 @@
-// import {Peripheral} from 'react-native-ble-manager';
-// import {PeripheralInfo} from '../../interface';
-// import {
-//   createHandleDiscoverPeripheral,
-//   createPeripheralInfoHandler,
-//   onDiscoverPeripheral,
-//   // registerDiscoverPeripheralListener,
-// } from './registerDiscoverPeripheralListener';
-
-describe.skip('registerDiscoverPeripheralListener,', () => {
-  test.skip('');
+describe('registerDiscoverPeripheralListener,', () => {
+  // eslint-disable-next-line jest/no-disabled-tests
+  test.skip('covered by integration', () => {});
 });

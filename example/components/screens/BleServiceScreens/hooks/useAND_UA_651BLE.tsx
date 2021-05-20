@@ -119,7 +119,7 @@ export const useAND_UA_651BLE: (props: Props) => BleController = ({
         onError(error);
       }
     },
-    [],
+    [onError],
   );
 
   const onConnectPeripheral = useCallback(
@@ -151,7 +151,7 @@ export const useAND_UA_651BLE: (props: Props) => BleController = ({
         onError(error);
       }
     },
-    [],
+    [onError],
   );
 
   return {

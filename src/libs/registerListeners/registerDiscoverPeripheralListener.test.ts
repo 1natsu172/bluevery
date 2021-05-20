@@ -24,6 +24,8 @@ const samplePeripheralInfo: PeripheralInfo = {
   rssi: 42,
   advertising: {isConnectable: true},
 };
+// NOTE:FIXME: 使ってないけど用意だけしておきたいのでignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sampleUnknownPeripheralInfo: PeripheralInfo = {
   id: '42',
   rssi: 42,
@@ -132,4 +134,7 @@ describe('createHandleDiscoverPeripheral,', () => {
   });
 });
 
-describe.skip('registerDiscoverPeripheralListener,', () => {});
+describe('registerDiscoverPeripheralListener,', () => {
+  // eslint-disable-next-line jest/no-disabled-tests
+  test.skip('covered by integration', () => {});
+});
