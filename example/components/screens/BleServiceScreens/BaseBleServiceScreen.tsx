@@ -110,7 +110,7 @@ export const BaseBleServiceScreen: React.VFC<Props> = (props) => {
       console.log('cleanup: initAndScan');
       bluevery.stopBluevery();
     };
-  }, []);
+  }, [props]);
 
   return (
     <SafeAreaView style={styles.mainContentContainer}>

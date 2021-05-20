@@ -50,7 +50,7 @@ export const useBatteryService: (props: Props) => BleController = ({
         onError(error);
       }
     },
-    [],
+    [onError],
   );
   return {
     onConnectPeripheral,
