@@ -7,14 +7,16 @@ import {Item} from './Item';
 type Props = {
   peripheralsMap: State['managingPeripherals'];
   characteristicValuesMap: {[key in PeripheralId]: unknown[] | undefined};
-  receiveCharacteristicHandlersMap: {
-    [key in PeripheralId]?: {
-      name: string;
-      onReceiveCharacteristicValue: (
-        peripheralInfo: PeripheralInfo,
-      ) => Promise<void>;
-    };
-  };
+  receiveCharacteristicHandlersMap:
+    | undefined
+    | {
+        [key in PeripheralId]?: {
+          name: string;
+          onReceiveCharacteristicValue: (
+            peripheralInfo: PeripheralInfo,
+          ) => Promise<void>;
+        };
+      };
 };
 
 export const ManagingPeripheralList: React.VFC<Props> = ({
@@ -28,12 +30,14 @@ export const ManagingPeripheralList: React.VFC<Props> = ({
 
   const getReceiveCharacteristicHandler = useCallback(
     (peripheralName: string | undefined) => {
-      const detectedKey = Object.keys(
-        receiveCharacteristicHandlersMap,
-      ).find((key) => peripheralName?.includes(key));
-      return detectedKey
-        ? receiveCharacteristicHandlersMap[detectedKey]
-        : undefined;
+      if (receiveCharacteristicHandlersMap) {
+        const detectedKey = Object.keys(
+          receiveCharacteristicHandlersMap,
+        ).find((key) => peripheralName?.includes(key));
+        return detectedKey
+          ? receiveCharacteristicHandlersMap[detectedKey]
+          : undefined;
+      }
     },
     [receiveCharacteristicHandlersMap],
   );
