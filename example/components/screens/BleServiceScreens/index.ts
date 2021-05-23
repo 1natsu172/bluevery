@@ -1,7 +1,7 @@
 import {BatteryServiceScreen} from './BatteryServiceScreen';
-import {UA_651BLEScreen} from './UA_651BLEScreen';
+import {AND_UA_651BLEScreen} from './AND_UA_651BLEScreen';
 
 export const BleServiceScreens = {
-  UA_651BLE: UA_651BLEScreen,
+  AND_UA_651BLE: AND_UA_651BLEScreen,
   BatteryService: BatteryServiceScreen,
 };
