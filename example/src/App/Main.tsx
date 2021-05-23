@@ -10,16 +10,16 @@
 import 'react-native-gesture-handler';
 import React from 'react';
 import {useKeepAwake} from 'expo-keep-awake';
-import {MainStackScreen} from './components';
+import {MainStack} from '../navigations';
 import {NavigationContainer} from '@react-navigation/native';
 
-const App = () => {
+const Main = () => {
   useKeepAwake();
   return (
     <NavigationContainer>
-      <MainStackScreen />
+      <MainStack />
     </NavigationContainer>
   );
 };
 
-export default App;
+export default Main;

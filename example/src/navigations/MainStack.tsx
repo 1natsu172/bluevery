@@ -1,11 +1,10 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {SelectServiceScreen} from './SelectServiceScreen';
-import {BleServiceScreens} from './BleServiceScreens';
+import {SelectServiceScreen, BleServiceScreens} from '../screens';
 
 const Stack = createStackNavigator();
 
-export const MainStackScreen = () => {
+export const MainStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
