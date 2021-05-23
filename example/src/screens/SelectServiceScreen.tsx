@@ -2,7 +2,7 @@ import {useNavigation} from '@react-navigation/core';
 import React from 'react';
 import {SafeAreaView, StyleSheet, StatusBar, Button} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
-import {HermesAnnounce} from '../';
+import {HermesAnnounce} from '../components/HermesAnnounce';
 import {BleServiceScreens} from './BleServiceScreens';
 
 // ES6 以降は Object.getOwnPropertyNames は定義順で保証される

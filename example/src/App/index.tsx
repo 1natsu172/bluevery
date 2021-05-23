@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 import {ErrorBoundary, FallbackProps} from 'react-error-boundary';
 import {Provider as RNPaperProvider, DefaultTheme} from 'react-native-paper';
-import App from './App';
+import Main from './Main';
 
 type Props = {};
 
@@ -30,11 +30,11 @@ const ErrorFallback: React.VFC<FallbackProps> = ({
   );
 };
 
-export function AppContainer(_props: Props) {
+export function App(_props: Props) {
   return (
     <RNPaperProvider theme={theme}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <App />
+        <Main />
       </ErrorBoundary>
     </RNPaperProvider>
   );

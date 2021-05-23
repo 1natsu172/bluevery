@@ -1,9 +1,13 @@
 import React, {useEffect} from 'react';
 import {TabView} from 'react-native-tab-view';
 import {bluevery, PeripheralInfo, useBlueveryState} from 'bluevery';
-import {ScannedPeripheralList, ManagingPeripheralList, TabViews} from '../..';
+import {
+  ScannedPeripheralList,
+  ManagingPeripheralList,
+  TabViews,
+} from '../../components';
 import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
-import {HermesAnnounce} from '../../';
+import {HermesAnnounce} from '../../components/HermesAnnounce';
 
 type Props = {
   onConnectPeripheral: (peripheralInfo: PeripheralInfo) => Promise<void>;
