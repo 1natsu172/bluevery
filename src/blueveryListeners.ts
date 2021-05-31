@@ -31,7 +31,11 @@ export class BlueveryListeners {
     peripheralId: PeripheralId,
     key: Key,
   ) {
-    this.publicListeners[peripheralId]?.[key]?.remove();
+    const subscription = this.publicListeners[peripheralId]?.[key];
+    if (subscription) {
+      subscription.remove();
+      delete this.publicListeners[peripheralId]?.[key];
+    }
   }
 
   removePeripheralPublicSubscription(peripheralId: PeripheralId) {
@@ -41,12 +45,14 @@ export class BlueveryListeners {
         listener?.remove();
       });
     }
+    delete this.publicListeners[peripheralId];
   }
 
   removeAllSubscriptions() {
     Object.values(this.internalListeners).forEach((listener) => {
       listener?.remove();
     });
+    this.internalListeners = {};
     Object.values(this.publicListeners).forEach((subscriptions) => {
       if (subscriptions) {
         Object.values(subscriptions).forEach((listener) => {
@@ -54,5 +60,6 @@ export class BlueveryListeners {
         });
       }
     });
+    this.publicListeners = {};
   }
 }
