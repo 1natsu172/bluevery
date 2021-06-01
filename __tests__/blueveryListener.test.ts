@@ -57,6 +57,7 @@ describe('BlueveryListener', () => {
         'receivingForCharacteristicValueListener',
       );
 
+      expect(blueveryListener.publicListeners).toStrictEqual({1: {}});
       expect(mockEmitter.remove).toBeCalledTimes(1);
     });
   });
@@ -84,6 +85,7 @@ describe('BlueveryListener', () => {
 
       blueveryListener.removePeripheralPublicSubscription('1');
 
+      expect(blueveryListener.publicListeners).toStrictEqual({});
       expect(mockEmitter1.remove).toHaveBeenCalledTimes(1);
       expect(mockEmitter2.remove).toHaveBeenCalledTimes(1);
     });
@@ -125,6 +127,8 @@ describe('BlueveryListener', () => {
 
       blueveryListener.removeAllSubscriptions();
 
+      expect(blueveryListener.internalListeners).toStrictEqual({});
+      expect(blueveryListener.publicListeners).toStrictEqual({});
       expect(mockEmitter1.remove).toHaveBeenCalledTimes(1);
       expect(mockEmitter2.remove).toHaveBeenCalledTimes(1);
       expect(mockEmitter3.remove).toHaveBeenCalledTimes(1);
