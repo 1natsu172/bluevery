@@ -1,7 +1,12 @@
 import {useNavigation} from '@react-navigation/core';
 import React from 'react';
-import {SafeAreaView, StyleSheet, StatusBar, Button} from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
+import {
+  SafeAreaView,
+  StyleSheet,
+  StatusBar,
+  Button,
+  FlatList,
+} from 'react-native';
 import {HermesAnnounce} from '../components/HermesAnnounce';
 import {BleServiceScreens} from './BleServiceScreens';
 
@@ -15,9 +20,10 @@ export const SelectServiceScreen = () => {
       <StatusBar barStyle="dark-content" />
       <FlatList
         data={ServiceNames}
+        keyExtractor={(name, index) => name + index}
         renderItem={({item}) => (
           <Button
-            key={item.id}
+            key={item}
             title={item}
             onPress={() => navigation.navigate(item)}
           />
