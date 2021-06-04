@@ -719,7 +719,8 @@ describe('BlueveryCore', () => {
     });
 
     test('connect: should be change connect of state the managing peripheral', async () => {
-      const spyConnectState = jest.fn();
+      mockPlatform('android', 10);
+      const spyState = jest.fn();
       blueveryCore = new BlueveryCore({
         store: proxy({bluevery: createInitialState()}),
 
@@ -730,7 +731,7 @@ describe('BlueveryCore', () => {
           managingPeripherals: {['1']: dummyPeripheralInfo('1')},
         }),
         onChangeStateHandler: (state) => {
-          spyConnectState(state.managingPeripherals['1'].connect);
+          spyState(state.managingPeripherals['1']);
         },
       });
       // check initial status
@@ -746,9 +747,12 @@ describe('BlueveryCore', () => {
         retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
       });
 
-      expect(spyConnectState.mock.calls[0][0]).toBe(undefined);
-      expect(spyConnectState.mock.calls[1][0]).toBe('connecting');
-      expect(spyConnectState.mock.calls[2][0]).toBe('connected');
+      expect(spyState.mock.calls[0][0].connect).toBe(undefined);
+      expect(spyState.mock.calls[1][0].connect).toBe('connecting');
+      expect(spyState.mock.calls[2][0].connect).toBe('connected');
+      expect(spyState.mock.calls[3][0].retrieveServices).toBe('retrieving');
+      expect(spyState.mock.calls[4][0].retrieveServices).toBe('retrieved');
+      expect(spyState.mock.calls[5][0].bonded).toBe(true);
     });
 
     test('connect: should be throw if not found peripheral in scannedPeripherals', async () => {

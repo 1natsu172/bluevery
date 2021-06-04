@@ -298,16 +298,9 @@ export class BlueveryCore {
     }
     this.state.setPeripheralToManagingPeripherals(peripheral);
 
-    this.state.setManagingPeripheralConnecting(targetPeripheralId);
-
     const _connect = toBetterPromise(
       toThrowErrorIfRejected(BleManager.connect),
       connectOptions,
-    );
-
-    const _retrieveServices = toBetterPromise(
-      toThrowErrorIfRejected(BleManager.retrieveServices),
-      retrieveServicesOptions,
     );
 
     const _bonding = toBetterPromise(
@@ -315,12 +308,23 @@ export class BlueveryCore {
       bondingOptions,
     );
 
-    await _connect(...connectParams);
-    await _retrieveServices(...retrieveServicesParams);
-    if (Platform.OS === 'android') {
-      await _bonding(...bondingParams);
+    try {
+      this.state.setManagingPeripheralConnecting(targetPeripheralId);
+      await _connect(...connectParams).then(() => {
+        this.state.setManagingPeripheralConnected(targetPeripheralId);
+      });
+      await this.retrieveServices(
+        retrieveServicesParams,
+        retrieveServicesOptions,
+      );
+      if (Platform.OS === 'android') {
+        await _bonding(...bondingParams);
+        this.state.setPeripheralIsBonded(targetPeripheralId);
+      }
+    } catch (error) {
+      this.state.setManagingPeripheralFailedConnect(targetPeripheralId);
+      throw error;
     }
-    this.state.setManagingPeripheralConnected(targetPeripheralId);
   }
 
   /**
