@@ -755,6 +755,42 @@ describe('BlueveryCore', () => {
       expect(spyState.mock.calls[5][0].bonded).toBe(true);
     });
 
+    test('connect: should be throw error and state change to failed', async () => {
+      // @ts-expect-error
+      BleManager.connect.mockImplementationOnce(async () => {
+        throw new Error('fixture error');
+      });
+
+      const spyState = jest.fn();
+      blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
+        blueveryListeners: new BlueveryListeners(),
+        BlueveryState,
+        initialState: createInitialState({
+          scannedPeripherals: {['1']: dummyPeripheralInfo('1')},
+          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
+        }),
+        onChangeStateHandler: (state) => {
+          spyState(state.managingPeripherals['1']);
+        },
+      });
+
+      const connect = blueveryCore.connect({
+        bondingParams: ['1', ''],
+        bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        connectParams: ['1'],
+        connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+      });
+
+      await expect(connect).rejects.toThrow('fixture error');
+      expect(spyState.mock.calls[0][0].connect).toBe(undefined);
+      expect(spyState.mock.calls[1][0].connect).toBe('connecting');
+      expect(spyState.mock.calls[2][0].connect).toBe('failed');
+    });
+
     test('connect: should be throw if not found peripheral in scannedPeripherals', async () => {
       const connecting = blueveryCore.connect({
         bondingParams: ['1', ''],
