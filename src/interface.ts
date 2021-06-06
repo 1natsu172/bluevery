@@ -71,14 +71,31 @@ export type BleManagerParams = MethodParamsRecord<TBleManager>;
  * Bluevery each method options map
  */
 export interface BlueveryMethodOptions {
-  scan: ToBetterOptions;
+  scan: {
+    /**
+     * @description
+     * Important: The seconds setting is a second, not a millisecond!
+     */
+    scanningSettings: BleManagerParams['scan'];
+    /**
+     * @description Important: this is millisecond. interval that scan between scan. default is `0` = no interval.
+     */
+    intervalLength?: number;
+    /**
+     * @description count of interval iteration. default is `1` = only once scan.
+     */
+    iterations?: number;
+  };
+  // Note: connectはiOSで失敗してもタイムアウトしないので、タイムアウトするようにする
   connect: ToBetterOptionsWithMustTimeout;
+  // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
   retrieveServices: ToBetterOptionsWithMustTimeout;
   read: ToBetterOptions & {
     advanceRetryCondition?: InspectorFn<typeof BleManager.read>;
   };
   write: ToBetterOptions;
+  // Note: 無限にbondingして返ってこないケースがあるので、タイムアウトするようにする
   createBond: ToBetterOptionsWithMustTimeout;
-  startNotification: ToBetterOptions;
-  stopNotification: ToBetterOptions;
+  startNotification: {};
+  stopNotification: {};
 }
