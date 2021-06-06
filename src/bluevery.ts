@@ -1,7 +1,6 @@
 import {Peripheral} from 'react-native-ble-manager';
 import promiseInterval from 'interval-promise';
 import autoBind from 'auto-bind';
-import deepmerge from 'deepmerge';
 import {BlueveryCore, BlueveryCore as _BlueveryCore} from './blueveryCore';
 import {BlueveryState as _BlueveryState} from './blueveryState';
 import {BlueveryListeners as _BlueveryListeners} from './blueveryListeners';
@@ -14,7 +13,7 @@ import {
   PublicListeners,
   BlueveryMethodOptions,
 } from './interface';
-import {applyOmoiyari} from './utils';
+import {applyOmoiyari, createBlueveryMethodOption} from './utils';
 import {DEFAULT_OMOIYARI_TIME} from './constants';
 
 type __ConstructorsAndInstances__ = {
@@ -97,21 +96,7 @@ export class Bluevery {
     discoverHandler,
     matchFn,
   }: {
-    scanOptions: {
-      /**
-       * @description
-       * Important: The seconds setting is a second, not a millisecond!
-       */
-      scanningSettings: BleManagerParams['scan'];
-      /**
-       * @description Important: this is millisecond. interval that scan between scan. default is `0` = no interval.
-       */
-      intervalLength?: number;
-      /**
-       * @description count of interval iteration. default is `1` = only once scan.
-       */
-      iterations?: number;
-    };
+    scanOptions: BlueveryMethodOptions['scan'];
     discoverHandler?: (peripheralInfo: PeripheralInfo) => any;
     matchFn?: (peripheral: Peripheral) => boolean;
   }) {
@@ -168,31 +153,19 @@ export class Bluevery {
      */
     bondingOptions?: BlueveryMethodOptions['createBond'];
   }) {
-    // Note: connectはiOSで失敗してもタイムアウトしないので、タイムアウトするようにする
-    const _connectOptions = deepmerge<BlueveryMethodOptions['connect']>(
-      {
-        retryOptions: {factor: 1, retries: 4},
-        timeoutOptions: {timeoutMilliseconds: 8000},
-      },
-      connectOptions || {},
+    const _connectOptions = createBlueveryMethodOption(
+      'connect',
+      connectOptions,
     );
-    // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
-    const _retrieveServicesOptions = deepmerge<
-      BlueveryMethodOptions['retrieveServices']
-    >(
-      {
-        retryOptions: {factor: 1, retries: 4},
-        timeoutOptions: {timeoutMilliseconds: 5000},
-      },
-      retrieveServicesOptions || {},
+
+    const _retrieveServicesOptions = createBlueveryMethodOption(
+      'retrieveServices',
+      retrieveServicesOptions,
     );
-    // Note: 無限にbondingして返ってこないケースがあるので、タイムアウトするようにする
-    const _bondingOptions = deepmerge<BlueveryMethodOptions['createBond']>(
-      {
-        retryOptions: {factor: 1, retries: 4},
-        timeoutOptions: {timeoutMilliseconds: 10000},
-      },
-      bondingOptions || {},
+
+    const _bondingOptions = createBlueveryMethodOption(
+      'createBond',
+      bondingOptions,
     );
 
     await this.core?.connect({
@@ -233,14 +206,9 @@ export class Bluevery {
     const [targetPeripheralId] = startNotificationParams;
 
     // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
-    const _retrieveServicesOptions = deepmerge<
-      BlueveryMethodOptions['retrieveServices']
-    >(
-      {
-        retryOptions: {factor: 1, retries: 4},
-        timeoutOptions: {timeoutMilliseconds: 5000},
-      },
-      retrieveServicesOptions || {},
+    const _retrieveServicesOptions = createBlueveryMethodOption(
+      'retrieveServices',
+      retrieveServicesOptions,
     );
 
     do {
@@ -287,26 +255,14 @@ export class Bluevery {
      */
     retrieveServicesOptions?: BlueveryMethodOptions['retrieveServices'];
   }) {
-    const _readValueOptions = deepmerge<
-      Parameters<
-        InstanceType<typeof BlueveryCore>['readValue']
-      >[0]['readValueOptions']
-    >(
-      {
-        retryOptions: {factor: 1, retries: 4},
-      },
-      readValueOptions || {},
+    const _readValueOptions = createBlueveryMethodOption(
+      'read',
+      readValueOptions,
     );
 
-    // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
-    const _retrieveServicesOptions = deepmerge<
-      BlueveryMethodOptions['retrieveServices']
-    >(
-      {
-        retryOptions: {factor: 1, retries: 4},
-        timeoutOptions: {timeoutMilliseconds: 5000},
-      },
-      retrieveServicesOptions || {},
+    const _retrieveServicesOptions = createBlueveryMethodOption(
+      'retrieveServices',
+      retrieveServicesOptions,
     );
 
     return await this.core?.readValue({
@@ -332,21 +288,14 @@ export class Bluevery {
      */
     retrieveServicesOptions?: BlueveryMethodOptions['retrieveServices'];
   }) {
-    const _writeValueoptions = deepmerge<BlueveryMethodOptions['write']>(
-      {
-        retryOptions: {factor: 1, retries: 4},
-      },
-      writeValueOptions || {},
+    const _writeValueoptions = createBlueveryMethodOption(
+      'write',
+      writeValueOptions,
     );
-    // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
-    const _retrieveServicesOptions = deepmerge<
-      BlueveryMethodOptions['retrieveServices']
-    >(
-      {
-        retryOptions: {factor: 1, retries: 4},
-        timeoutOptions: {timeoutMilliseconds: 5000},
-      },
-      retrieveServicesOptions || {},
+
+    const _retrieveServicesOptions = createBlueveryMethodOption(
+      'retrieveServices',
+      retrieveServicesOptions,
     );
 
     return await this.core?.writeValue({
