@@ -33,7 +33,9 @@ export function createBlueveryMethodOption<
   MethodName extends keyof BlueveryMethodOptions
 >(
   methodName: MethodName,
-  overrideOptions: BlueveryMethodOptions[typeof methodName] | undefined,
+  overrideOptions:
+    | Partial<BlueveryMethodOptions[typeof methodName]>
+    | undefined,
 ) {
   return deepmerge<BlueveryMethodOptions[typeof methodName]>(
     defaultBlueveryMethodOptions[methodName],
