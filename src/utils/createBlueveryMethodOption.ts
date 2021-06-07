@@ -40,5 +40,7 @@ export function createBlueveryMethodOption<
   return deepmerge<BlueveryMethodOptions[typeof methodName]>(
     defaultBlueveryMethodOptions[methodName],
     overrideOptions || {},
+    // @see https://github.com/TehShrike/deepmerge#arraymerge-example-overwrite-target-array
+    {arrayMerge: (_destinationArray, sourceArray, _options) => sourceArray},
   );
 }
