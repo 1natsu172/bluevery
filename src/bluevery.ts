@@ -96,11 +96,15 @@ export class Bluevery {
     discoverHandler,
     matchFn,
   }: {
-    scanOptions: BlueveryMethodOptions['scan'];
+    scanOptions?: Partial<BlueveryMethodOptions['scan']>;
     discoverHandler?: (peripheralInfo: PeripheralInfo) => any;
     matchFn?: (peripheral: Peripheral) => boolean;
   }) {
-    const {scanningSettings, intervalLength = 0, iterations = 1} = scanOptions;
+    const {
+      scanningSettings,
+      intervalLength,
+      iterations,
+    } = createBlueveryMethodOption('scan', scanOptions);
 
     const intervalScan = () =>
       promiseInterval(

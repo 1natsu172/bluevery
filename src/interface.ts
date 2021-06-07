@@ -69,6 +69,7 @@ export type BleManagerParams = MethodParamsRecord<TBleManager>;
 
 /**
  * Bluevery each method options map
+ * @description It must be an Option type used by the core. It should not be an Option type provided to the user.
  */
 export interface BlueveryMethodOptions {
   scan: {
@@ -80,11 +81,11 @@ export interface BlueveryMethodOptions {
     /**
      * @description Important: this is millisecond. interval that scan between scan. default is `0` = no interval.
      */
-    intervalLength?: number;
+    intervalLength: number;
     /**
      * @description count of interval iteration. default is `1` = only once scan.
      */
-    iterations?: number;
+    iterations: number;
   };
   // Note: connectはiOSで失敗してもタイムアウトしないので、タイムアウトするようにする
   connect: ToBetterOptionsWithMustTimeout;
