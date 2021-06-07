@@ -27,4 +27,20 @@ describe('createBlueveryMethodOption', () => {
       ...willBeMerged.retryOptions,
     });
   });
+
+  test('Arrays should be used as passed without merging', () => {
+    const willBeMerged: BlueveryMethodOptions['scan'] = {
+      scanningSettings: [['fixture'], 200, true],
+      intervalLength: 100,
+      iterations: 10,
+    };
+
+    const option = createBlueveryMethodOption('scan', willBeMerged);
+
+    expect(option.intervalLength).toStrictEqual(willBeMerged.intervalLength);
+    expect(option.iterations).toStrictEqual(willBeMerged.iterations);
+    expect(option.scanningSettings).toStrictEqual(
+      willBeMerged.scanningSettings,
+    );
+  });
 });
