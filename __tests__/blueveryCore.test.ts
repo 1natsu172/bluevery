@@ -339,7 +339,7 @@ describe('BlueveryCore', () => {
         expect(spiedRequireCheckBeforeBleProcess).toBeCalledTimes(1);
       });
 
-      test('should call console.warn if BleManager.scan throw exception', async () => {
+      test.skip('should call console.warn if BleManager.scan throw exception', async () => {
         const orgScan = BleManager.scan;
         BleManager.scan = async () => {
           throw new Error();

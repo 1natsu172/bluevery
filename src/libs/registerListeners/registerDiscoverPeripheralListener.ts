@@ -2,6 +2,7 @@
 import {EmitterSubscription, NativeEventEmitter} from 'react-native';
 import {Peripheral} from 'react-native-ble-manager';
 import {PeripheralInfo} from '../../interface';
+import {debugBlueveryListener} from '../../utils';
 
 export const createPeripheralInfoHandler = ({
   setPeripheralToScannedPeripherals,
@@ -22,7 +23,7 @@ export const onDiscoverPeripheral = (
   peripheral: Peripheral,
   peripheralInfoHandler: (peripheralInfo: PeripheralInfo) => unknown,
 ) => {
-  console.log('Got ble peripheral', peripheral);
+  debugBlueveryListener('onDiscoverPeripheral: got peripehral', peripheral);
 
   const peripheralInfo: PeripheralInfo = peripheral;
   if (!peripheralInfo.name) {

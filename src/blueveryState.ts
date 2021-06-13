@@ -3,6 +3,7 @@ import {snapshot, subscribe} from 'valtio';
 import autoBind from 'auto-bind';
 import {Permission} from 'react-native-permissions';
 import {Peripheral} from 'react-native-ble-manager';
+import {debugBlueveryState} from './utils';
 
 export function createInitialState(overrideState?: Partial<State>): State {
   return {
@@ -35,6 +36,7 @@ export class BlueveryState {
     initialState?: State;
     onChangeStateHandler?: (state: State) => unknown;
   }) {
+    debugBlueveryState('construct start');
     this._storeRef = store;
 
     if (initialState) {
@@ -52,6 +54,7 @@ export class BlueveryState {
     );
     this._savedInitialState = createInitialState(initialState);
     autoBind(this);
+    debugBlueveryState('construct end');
   }
 
   /**
@@ -74,6 +77,10 @@ export class BlueveryState {
       ...peripheralInfo,
     };
     this.mutationState.managingPeripherals[peripheralId] = processedPeripheral;
+    debugBlueveryState(
+      'set peripheralInfo to ManagingPeripherals',
+      processedPeripheral,
+    );
   }
 
   /**
@@ -102,6 +109,7 @@ export class BlueveryState {
    * reset to initial state
    */
   resetState() {
+    debugBlueveryState('resetState');
     this.reInitState(this._savedInitialState);
   }
 
@@ -112,6 +120,7 @@ export class BlueveryState {
     this._savedInitialState = newInitialState;
     this._storeRef.bluevery = newInitialState;
     this.mutationState = this._storeRef.bluevery;
+    debugBlueveryState('reInitState', newInitialState);
   }
 
   /**

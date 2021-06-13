@@ -89,6 +89,7 @@ export const BaseBleServiceScreen: React.VFC<Props> = (props) => {
     const initAndScan = async () => {
       try {
         await bluevery.init({
+          __DEBUG: 'bluevery,bluevery:*',
           onDisconnectPeripheralHandler: (p) => {
             console.log(`${p.peripheral} is dosconnected`);
           },
