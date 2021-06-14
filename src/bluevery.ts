@@ -53,6 +53,7 @@ export class Bluevery {
   }
 
   private initialized: boolean = false;
+  private isStopScanInterval: boolean = false;
 
   /**
    * ↓ Primitive APIs
@@ -118,7 +119,13 @@ export class Bluevery {
 
     const intervalScan = () =>
       promiseInterval(
-        async () => {
+        async (intervalCount, stopInterval) => {
+          debugBluevery(`startScan: scan interval count: ${intervalCount}`);
+          if (this.isStopScanInterval === true) {
+            debugBluevery(`startScan: stop scan interval`);
+            stopInterval();
+            return; // stop immediate
+          }
           debugBluevery('startScan: ordered a scan to core');
           await this.core?.scan({
             scanningSettings,
@@ -136,8 +143,18 @@ export class Bluevery {
 
     // Initialize the list before scan
     this.core?.clearScannedPeripherals();
+    // Initialize the stop interval flag before scan
+    this.isStopScanInterval = false;
     await omoiyariIntervalScan();
     debugBluevery('startScan: scan interval finished');
+  }
+
+  async stopScan() {
+    debugBluevery('stopScan: start');
+    // tell the interval function
+    this.isStopScanInterval = true;
+    this.core?.cleanupScan();
+    debugBluevery('stopScan: end');
   }
 
   async connect({

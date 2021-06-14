@@ -392,6 +392,16 @@ describe('BlueveryCore', () => {
     });
   });
 
+  describe('cleanupScan', () => {
+    jest.useFakeTimers();
+    test('should be resolved immediately the awaiting task of scan', async () => {
+      const scanTask = blueveryCore.scan({scanningSettings: [[], 1]});
+      await flushPromisesAdvanceTimer(50);
+      await blueveryCore.cleanupScan();
+      await expect(scanTask).toResolve();
+    });
+  });
+
   describe('writeValue', () => {
     beforeEach(() => {
       blueveryCore = new BlueveryCore({

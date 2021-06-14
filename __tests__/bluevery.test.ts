@@ -354,6 +354,83 @@ describe('bluevery: commands APIs', () => {
         jest.runAllTimers();
         expect(clearScannedPeripheralsFn).toBeCalledTimes(1);
       });
+
+      test('should change isStopScanInterval to false', () => {
+        // @ts-expect-error -- テストのためにprivateプロパティアクセスしている
+        bluevery.isStopScanInterval = true;
+        // @ts-expect-error -- テストのためにprivateプロパティアクセスしている
+        expect(bluevery.isStopScanInterval).toBe(true);
+
+        bluevery.startScan({
+          scanOptions: {
+            scanningSettings: [[], 1, true],
+            intervalLength: 0,
+            iterations: 1,
+          },
+        });
+        jest.runAllTimers();
+
+        // @ts-expect-error -- テストのためにprivateプロパティアクセスしている
+        expect(bluevery.isStopScanInterval).toBe(false);
+      });
+    });
+  });
+
+  describe('stopScan', () => {
+    jest.useFakeTimers();
+    const scanFn = jest.fn();
+    const initFn = jest.fn();
+    const clearScannedPeripheralsFn = jest.fn();
+    const cleanupScanFn = jest.fn();
+    const core = (jest.fn().mockImplementation(() => ({
+      listeners: {publicListeners: {}},
+      init: initFn,
+      scan: scanFn,
+      clearScannedPeripherals: clearScannedPeripheralsFn,
+      cleanupScan: cleanupScanFn,
+    })) as unknown) as typeof BlueveryCore;
+
+    beforeEach(async () => {
+      jest.clearAllMocks();
+      bluevery = new Bluevery({
+        BlueveryCore: core,
+        BlueveryState,
+        blueveryListeners: new BlueveryListeners(),
+        store: proxy({bluevery: createInitialState()}),
+      });
+      await bluevery.init();
+    });
+
+    test('stopScan: check calls', async () => {
+      //@ts-expect-error -- テストのためにprivateプロパティアクセスしている
+      expect(bluevery.isStopScanInterval).toBe(false);
+
+      await bluevery.stopScan();
+      //@ts-expect-error -- テストのためにprivateプロパティアクセスしている
+      expect(bluevery.isStopScanInterval).toBe(true);
+      expect(cleanupScanFn).toHaveBeenCalledTimes(1);
+    });
+
+    test('should stop interval', async () => {
+      bluevery.startScan({
+        scanOptions: {
+          scanningSettings: [[], 1, true],
+          intervalLength: 50,
+          iterations: 5,
+        },
+      });
+
+      await flushPromisesAdvanceTimer(50);
+      expect(scanFn).toHaveBeenCalledTimes(1);
+      await flushPromisesAdvanceTimer(50);
+      expect(scanFn).toHaveBeenCalledTimes(2);
+
+      await bluevery.stopScan();
+
+      // flush all times
+      jest.runAllTimers();
+      // but the call is still two times, because stopped the interval
+      expect(scanFn).toHaveBeenCalledTimes(2);
     });
   });
 
