@@ -13,6 +13,10 @@ import {
 import {MethodParamsRecord} from './utils/typeUtils/MethodParamsRecord';
 
 export type BlueveryOptions = {
+  /**
+   * @see https://github.com/visionmedia/debug#environment-variables
+   */
+  __DEBUG?: string;
   onDisconnectPeripheralHandler?: DisconnectedPeripheralHandler;
   onChangeStateHandler?: (state: State) => unknown;
   initialState?: State;

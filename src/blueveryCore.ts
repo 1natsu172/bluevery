@@ -25,6 +25,7 @@ import {
   createHandleDisconnectPeripheral,
 } from './libs';
 import {
+  debugBlueveryCore,
   toBetterPromise,
   toThrowErrorIfRejected,
   toInspectPromiseReturnValue,
@@ -58,6 +59,7 @@ export class BlueveryCore {
     onChangeStateHandler,
     store,
   }: ConstructorArgs) {
+    debugBlueveryCore('construct start');
     this.state = new BlueveryState({
       store,
       initialState,
@@ -65,9 +67,11 @@ export class BlueveryCore {
     });
     this.listeners = blueveryListeners;
     autoBind(this);
+    debugBlueveryCore('construct end');
   }
 
   async init(blueveryOptions?: BlueveryOptions) {
+    debugBlueveryCore('init: start');
     if (blueveryOptions) {
       this.setUserDefinedOptions(blueveryOptions);
     }
@@ -95,51 +99,82 @@ export class BlueveryCore {
     /**
      * init段階ですでにconnectedなperipheralを保存する
      */
+    debugBlueveryCore('init: already connected Peripherals to managing');
     await BleManager.getConnectedPeripherals([]).then((peripherals) => {
       peripherals.forEach((peripheral) => {
+        debugBlueveryCore('init: already connected Peripheral: ', peripheral);
         this.state.setPeripheralToManagingPeripherals(peripheral);
         this.state.setManagingPeripheralConnected(peripheral.id);
       });
     });
     if (Platform.OS === 'android') {
+      debugBlueveryCore('init: get already bonded Peripherals');
       await BleManager.getBondedPeripherals().then((peripherals) => {
         peripherals.forEach((peripheral) => {
+          debugBlueveryCore(
+            'init: already bonded Peripheral to managing',
+            peripheral,
+          );
           this.state.setPeripheralToManagingPeripherals(peripheral);
           this.state.setPeripheralIsBonded(peripheral.id);
         });
       });
     }
+    debugBlueveryCore('init: end');
   }
 
   stop() {
+    debugBlueveryCore('stop: start');
     this.listeners.removeAllSubscriptions();
     this.state.unsubscribeTheState();
+    debugBlueveryCore('stop: end');
   }
 
   setUserDefinedOptions(options: BlueveryOptions) {
+    debugBlueveryCore('setUserDefinedOptions: start');
     this.userDefinedOptions = options;
+    debugBlueveryCore('setUserDefinedOptions: end');
   }
 
   getState(): Readonly<State> {
+    debugBlueveryCore('getState');
     return this.state.getState();
   }
 
   clearScannedPeripherals(): void {
+    debugBlueveryCore('clearScannedPeripherals: start');
     this.state.clearScannedPeripherals();
+    debugBlueveryCore('clearScannedPeripherals: end');
   }
 
   private async requireCheckBeforeBleProcess() {
     /**
      * initialize managing
      */
+    debugBlueveryCore('requireCheckBeforeBleProcess: managing process start');
     await this.managing();
+    debugBlueveryCore(
+      'requireCheckBeforeBleProcess: managing process finished',
+    );
 
+    debugBlueveryCore(
+      'requireCheckBeforeBleProcess: checkAndRequestPermission',
+    );
     const [, , requestedButUngranted] = await this.checkAndRequestPermission();
+    debugBlueveryCore(
+      'requireCheckBeforeBleProcess: checkAndRequestPermission result',
+      requestedButUngranted,
+    );
     if (requestedButUngranted?.length) {
       return false;
     }
 
+    debugBlueveryCore('requireCheckBeforeBleProcess: checkBluetoothEnabled');
     const isEnableBluetooth = await this.checkBluetoothEnabled();
+    debugBlueveryCore(
+      'requireCheckBeforeBleProcess: checkBluetoothEnabled result',
+      isEnableBluetooth,
+    );
     if (!isEnableBluetooth) {
       return false;
     }
@@ -151,13 +186,18 @@ export class BlueveryCore {
   }
 
   private checkThePeripheralIsManaging(peripheralId: PeripheralId) {
+    debugBlueveryCore('checkThePeripheralIsManaging: start');
     if (!this.getState().managingPeripherals[peripheralId]) {
+      debugBlueveryCore('checkThePeripheralIsManaging: throw');
       throw new Error(`${peripheralId} is not found in managingPeripherals`);
     }
+    debugBlueveryCore('checkThePeripheralIsManaging: end');
   }
 
   private async checkBluetoothEnabled() {
+    debugBlueveryCore('checkBluetoothEnabled: start');
     const isEnabled = await checkBluetoothEnabled();
+    debugBlueveryCore('checkBluetoothEnabled: result', isEnabled);
     if (isEnabled) {
       this.state.setBluetoothEnabled();
     } else {
@@ -173,8 +213,15 @@ export class BlueveryCore {
       requestedButUngranted?: Permission[],
     ]
   > {
+    debugBlueveryCore('checkAndRequestPermission: check permission start');
     const [granted, ungranted] = await checkPermission();
+    debugBlueveryCore(
+      'checkAndRequestPermission: checked permission result',
+      granted,
+      ungranted,
+    );
     if (ungranted.length) {
+      debugBlueveryCore('checkAndRequestPermission: request permission start');
       const [
         requestedThenGranted,
         requestedButUngranted,
@@ -185,18 +232,28 @@ export class BlueveryCore {
       } else {
         this.state.setPermissionGranted();
       }
+
+      debugBlueveryCore(
+        'checkAndRequestPermission: requested permission result',
+        requestedThenGranted,
+        requestedButUngranted,
+      );
       return [granted, requestedThenGranted, requestedButUngranted];
     }
     this.state.setPermissionGranted();
+    debugBlueveryCore('checkAndRequestPermission: pass permission', granted);
     return [granted];
   }
 
   private async managing() {
+    debugBlueveryCore('managing: called');
     if (this.getState().managing === false) {
+      debugBlueveryCore('managing: starting');
       await BleManager.start().then(() => {
         this.state.onManaging();
       });
     }
+    debugBlueveryCore('managing: end');
   }
 
   async scan({
@@ -208,7 +265,9 @@ export class BlueveryCore {
     discoverHandler?: (peripheralInfo: PeripheralInfo) => any;
     matchFn?: (peripheral: Peripheral) => boolean;
   }): Promise<void | false> {
+    debugBlueveryCore('scan: called');
     if (!this.getState().scanning) {
+      debugBlueveryCore('scan: prepare');
       const peripheralInfoHandler = createPeripheralInfoHandler({
         setPeripheralToScannedPeripherals: this.state
           .setPeripheralToScannedPeripherals,
@@ -223,17 +282,19 @@ export class BlueveryCore {
       );
 
       const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
+      debugBlueveryCore('scan: isPassedRequireCheck', isPassedRequireCheck);
       if (isPassedRequireCheck === false) {
         return false;
       }
 
+      debugBlueveryCore('scan: start scanning');
       this.state.onScanning();
 
       const [, discoverPeripheralListener] = await Promise.all([
         // note: scan開始。promiseだがscan秒数待たないので後続処理でscan秒数を担保している
-        await BleManager.scan(...scanningSettings).catch((err) =>
-          console.warn(err),
-        ),
+        await BleManager.scan(...scanningSettings).catch((err) => {
+          debugBlueveryCore('scan: native scan but error caused', err);
+        }),
         // discover処理を登録
         registerDiscoverPeripheralListener(
           bleManagerEmitter,
@@ -247,11 +308,14 @@ export class BlueveryCore {
 
       // note: スキャン秒数の担保。指定秒数経ったらscan処理を終える
       const [, scanSeconds] = scanningSettings;
+      debugBlueveryCore('scan: awaiting for : ', scanSeconds);
       await delay(scanSeconds * 1000).then(this.cleanupScan);
+      debugBlueveryCore('scan: end');
     }
   }
 
   private cleanupScan() {
+    debugBlueveryCore('cleanupScan: start');
     return Promise.all([
       BleManager.stopScan(),
       this.listeners.internalListeners.discoverPeripheralListener?.remove(),
@@ -274,9 +338,11 @@ export class BlueveryCore {
     bondingParams: BleManagerParams['createBond'];
     bondingOptions: BlueveryMethodOptions['createBond'];
   }) {
+    debugBlueveryCore('connect: start', connectParams, retrieveServicesParams);
     const [targetPeripheralId] = connectParams;
     const [, serviceUUIDs] = retrieveServicesParams;
     const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
+    debugBlueveryCore('connect: isPassedRequireCheck', isPassedRequireCheck);
     if (isPassedRequireCheck === false) {
       return false;
     }
@@ -285,6 +351,7 @@ export class BlueveryCore {
       targetPeripheralId,
       serviceUUIDs || [],
     );
+    debugBlueveryCore('connect: isAlreadyConnected', isAlreadyConnected);
     if (isAlreadyConnected) {
       return false;
     }
@@ -309,8 +376,10 @@ export class BlueveryCore {
     );
 
     try {
+      debugBlueveryCore('connect: connect process start');
       this.state.setManagingPeripheralConnecting(targetPeripheralId);
       await _connect(...connectParams).then(() => {
+        debugBlueveryCore('connect: connect success');
         this.state.setManagingPeripheralConnected(targetPeripheralId);
       });
       await this.retrieveServices(
@@ -318,13 +387,19 @@ export class BlueveryCore {
         retrieveServicesOptions,
       );
       if (Platform.OS === 'android') {
+        debugBlueveryCore('connect: bonding');
         await _bonding(...bondingParams);
         this.state.setPeripheralIsBonded(targetPeripheralId);
       }
     } catch (error) {
+      debugBlueveryCore(
+        'connect: An error has occurred in the connect process',
+        error,
+      );
       this.state.setManagingPeripheralFailedConnect(targetPeripheralId);
       throw error;
     }
+    debugBlueveryCore('connect: connect process end');
   }
 
   /**
@@ -334,6 +409,7 @@ export class BlueveryCore {
     retrieveServicesParams: BleManagerParams['retrieveServices'],
     retrieveServicesOptions: BlueveryMethodOptions['retrieveServices'],
   ) {
+    debugBlueveryCore('retrieveServices: start', retrieveServicesParams);
     const [peripheralId] = retrieveServicesParams;
 
     const _retrieveServices = toBetterPromise(
@@ -341,9 +417,11 @@ export class BlueveryCore {
       retrieveServicesOptions,
     );
 
+    debugBlueveryCore('retrieveServices: retrieving');
     this.state.setManagingPeripheralRetrieving(peripheralId);
     await _retrieveServices(...retrieveServicesParams)
       .then((_peripheralInfo) => {
+        debugBlueveryCore('retrieveServices: retrieved success');
         this.state.setManagingPeripheralRetrieved(peripheralId);
       })
       .catch((error) => {
@@ -363,9 +441,11 @@ export class BlueveryCore {
     retrieveServicesParams: BleManagerParams['retrieveServices'];
     retrieveServicesOptions: BlueveryMethodOptions['retrieveServices'];
   }) {
+    debugBlueveryCore('writeValue: start', writeValueParams);
     const [peripheralId] = writeValueParams;
 
     const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
+    debugBlueveryCore('writeValue: isPassedRequireCheck', isPassedRequireCheck);
     if (isPassedRequireCheck === false) {
       return false;
     }
@@ -381,6 +461,7 @@ export class BlueveryCore {
      */
     // FIXME: selector化で吸収したら型もundefinedになりようがないので ! 消せる
     if (targetPeripheralId!.retrieveServices !== 'retrieved') {
+      debugBlueveryCore('writeValue: start retrieve');
       await this.retrieveServices(
         retrieveServicesParams,
         retrieveServicesOptions,
@@ -393,12 +474,15 @@ export class BlueveryCore {
     );
 
     try {
+      debugBlueveryCore('writeValue: writing');
       this.state.setPeripheralCommunicateIsWriting(peripheralId);
       return await _writeValue(...writeValueParams);
     } catch (error) {
+      debugBlueveryCore('writeValue: writing but error caused', error);
       throw error;
     } finally {
       this.state.setPeripheralCommunicateIsNon(peripheralId);
+      debugBlueveryCore('writeValue: write end');
     }
   }
 
@@ -413,9 +497,11 @@ export class BlueveryCore {
     retrieveServicesParams: BleManagerParams['retrieveServices'];
     retrieveServicesOptions: BlueveryMethodOptions['retrieveServices'];
   }) {
+    debugBlueveryCore('readValue: start', readValueParams);
     const [peripheralId] = readValueParams;
 
     const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
+    debugBlueveryCore('readValue: isPassedRequireCheck', isPassedRequireCheck);
     if (isPassedRequireCheck === false) {
       return false;
     }
@@ -431,6 +517,7 @@ export class BlueveryCore {
      */
     // FIXME: selector化で吸収したら型もundefinedになりようがないので ! 消せる
     if (targetPeripheralId!.retrieveServices !== 'retrieved') {
+      debugBlueveryCore('readValue: start retrieve');
       await this.retrieveServices(
         retrieveServicesParams,
         retrieveServicesOptions,
@@ -448,12 +535,15 @@ export class BlueveryCore {
     );
 
     try {
+      debugBlueveryCore('readValue: reading');
       this.state.setPeripheralCommunicateIsReading(peripheralId);
       return await _readValue(...readValueParams);
     } catch (error) {
+      debugBlueveryCore('readValue: reading but error caused', error);
       throw error;
     } finally {
       this.state.setPeripheralCommunicateIsNon(peripheralId);
+      debugBlueveryCore('readValue: read end');
     }
   }
 
@@ -468,6 +558,7 @@ export class BlueveryCore {
     retrieveServicesParams: BleManagerParams['retrieveServices'];
     retrieveServicesOptions: BlueveryMethodOptions['retrieveServices'];
   }) {
+    debugBlueveryCore('startNotification: called', startNotificationParams);
     const [peripheralId] = startNotificationParams;
 
     // FIXME: selector化
@@ -481,6 +572,7 @@ export class BlueveryCore {
      */
     // FIXME: selector化で吸収したら型もundefinedになりようがないので ! 消せる
     if (targetPeripheralId!.retrieveServices !== 'retrieved') {
+      debugBlueveryCore('startNotification: start retrieve');
       await this.retrieveServices(
         retrieveServicesParams,
         retrieveServicesOptions,
@@ -491,6 +583,9 @@ export class BlueveryCore {
      * startNotificationが複数回呼ばれた場合listenerを一度破棄しておく
      */
     if (this.listeners.publicListeners[peripheralId]) {
+      debugBlueveryCore(
+        'startNotification: already exist a listener, remove it',
+      );
       this.listeners.publicListeners[
         peripheralId
       ]?.receivingForCharacteristicValueListener?.remove();
@@ -506,8 +601,10 @@ export class BlueveryCore {
       'receivingForCharacteristicValueListener',
       notificationListener,
     );
+    debugBlueveryCore('startNotification: start');
     await BleManager.startNotification(...startNotificationParams);
     this.state.onReceivingForCharacteristicValue(peripheralId);
+    debugBlueveryCore('startNotification: end');
   }
 
   stopNotification({
@@ -515,6 +612,7 @@ export class BlueveryCore {
   }: {
     stopNotificationParams: BleManagerParams['stopNotification'];
   }) {
+    debugBlueveryCore('stopNotification: start', stopNotificationParams);
     const [peripheralId] = stopNotificationParams;
     return Promise.all([
       BleManager.stopNotification(...stopNotificationParams),

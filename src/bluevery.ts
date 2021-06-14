@@ -13,7 +13,12 @@ import {
   PublicListeners,
   BlueveryMethodOptions,
 } from './interface';
-import {applyOmoiyari, createBlueveryMethodOption} from './utils';
+import {
+  enableToDebug,
+  debugBluevery,
+  applyOmoiyari,
+  createBlueveryMethodOption,
+} from './utils';
 import {DEFAULT_OMOIYARI_TIME} from './constants';
 
 type __ConstructorsAndInstances__ = {
@@ -62,7 +67,9 @@ export class Bluevery {
    * TODO: more implements
    */
   stopBluevery() {
+    debugBluevery('stopBluevery: start');
     this.core?.stop?.();
+    debugBluevery('stopBluevery: end');
   }
 
   /**
@@ -70,6 +77,8 @@ export class Bluevery {
    */
 
   async init(blueveryOptions?: BlueveryOptions) {
+    enableToDebug(blueveryOptions?.__DEBUG);
+    debugBluevery('init: start', blueveryOptions);
     if (this.checkIsInitialized()) {
       return;
     }
@@ -89,6 +98,7 @@ export class Bluevery {
 
     await this.core.init(blueveryOptions);
     this.initialized = true;
+    debugBluevery('init: end', this.initialized);
   }
 
   async startScan({
@@ -109,11 +119,13 @@ export class Bluevery {
     const intervalScan = () =>
       promiseInterval(
         async () => {
+          debugBluevery('startScan: ordered a scan to core');
           await this.core?.scan({
             scanningSettings,
             discoverHandler,
             matchFn,
           });
+          debugBluevery('startScan: core scan finished');
         },
         intervalLength,
         {iterations: iterations},
@@ -125,6 +137,7 @@ export class Bluevery {
     // Initialize the list before scan
     this.core?.clearScannedPeripherals();
     await omoiyariIntervalScan();
+    debugBluevery('startScan: scan interval finished');
   }
 
   async connect({
@@ -157,6 +170,8 @@ export class Bluevery {
      */
     bondingOptions?: BlueveryMethodOptions['createBond'];
   }) {
+    debugBluevery('connect: start');
+
     const _connectOptions = createBlueveryMethodOption(
       'connect',
       connectOptions,
@@ -180,6 +195,7 @@ export class Bluevery {
       retrieveServicesParams,
       retrieveServicesOptions: _retrieveServicesOptions,
     });
+    debugBluevery('connect: end');
   }
 
   /**
@@ -207,6 +223,8 @@ export class Bluevery {
     startNotificationParams: BleManagerParams['startNotification'];
     receiveCharacteristicHandler: PublicHandlers['HandleDidUpdateValueForCharacteristic'];
   }) {
+    debugBluevery('receiveCharacteristicValue: start');
+
     const [targetPeripheralId] = startNotificationParams;
 
     // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
@@ -216,22 +234,35 @@ export class Bluevery {
     );
 
     do {
+      debugBluevery('receiveCharacteristicValue: do startScan');
       await this.startScan(scanParams);
+      debugBluevery(
+        'receiveCharacteristicValue: end startScan',
+        this.core?.getState().scannedPeripherals[targetPeripheralId],
+      );
     } while (
       // receive対象のperipheralが見つからなければdoし続ける(見つかるまでscanを繰り返す)
       this.core?.getState().scannedPeripherals[targetPeripheralId] === undefined
     );
 
     if (onCallBeforeStartNotification) {
+      debugBluevery(
+        'receiveCharacteristicValue: onCallBeforeStartNotification: ',
+        onCallBeforeStartNotification.name,
+      );
       await onCallBeforeStartNotification();
     }
 
+    debugBluevery(
+      'receiveCharacteristicValue: ordered a startNotification to core',
+    );
     await this.core?.startNotification({
       startNotificationParams,
       receiveCharacteristicHandler,
       retrieveServicesParams,
       retrieveServicesOptions: _retrieveServicesOptions,
     });
+    debugBluevery('receiveCharacteristicValue: core startNotification end');
   }
 
   async stopReceiveCharacteristicValue({
@@ -239,6 +270,9 @@ export class Bluevery {
   }: {
     stopNotificationParams: BleManagerParams['stopNotification'];
   }) {
+    debugBluevery(
+      'stopReceiveCharacteristicValue: ordered stopNotification to core',
+    );
     return await this.core?.stopNotification({stopNotificationParams});
   }
 
@@ -269,6 +303,7 @@ export class Bluevery {
       retrieveServicesOptions,
     );
 
+    debugBluevery('readValue: ordered readValue to core');
     return await this.core?.readValue({
       readValueParams,
       readValueOptions: _readValueOptions,
@@ -302,6 +337,7 @@ export class Bluevery {
       retrieveServicesOptions,
     );
 
+    debugBluevery('writeValue: ordered writeValue to core');
     return await this.core?.writeValue({
       writeValueParams,
       writeValueOptions: _writeValueoptions,

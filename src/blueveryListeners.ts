@@ -5,6 +5,7 @@ import {
   PublicListeners,
   PublicSubscriptions,
 } from './interface';
+import {debugBlueveryListener} from './utils';
 
 export class BlueveryListeners {
   publicListeners: PublicListeners = {};
@@ -18,12 +19,19 @@ export class BlueveryListeners {
     key: Key,
     value: PublicSubscriptions[Key],
   ) {
+    debugBlueveryListener(
+      'set to publicListeners that',
+      peripheralId,
+      key,
+      value,
+    );
     _set(this.publicListeners, `${peripheralId}.${key}`, value);
   }
   setAnyInternalSubscription<Key extends keyof InternalListeners>(
     key: Key,
     value: InternalListeners[Key],
   ) {
+    debugBlueveryListener('set to internalListeners that', key, value);
     _set(this.internalListeners, `${key}`, value);
   }
 
@@ -31,16 +39,30 @@ export class BlueveryListeners {
     peripheralId: PeripheralId,
     key: Key,
   ) {
+    debugBlueveryListener('remove from publicListeners', peripheralId, key);
     const subscription = this.publicListeners[peripheralId]?.[key];
     if (subscription) {
+      debugBlueveryListener(
+        'match the remove target subscription',
+        peripheralId,
+        key,
+      );
       subscription.remove();
       delete this.publicListeners[peripheralId]?.[key];
     }
   }
 
   removePeripheralPublicSubscription(peripheralId: PeripheralId) {
+    debugBlueveryListener(
+      'remove public subscription of peripheral',
+      peripheralId,
+    );
     const subscription = this.publicListeners[peripheralId];
     if (subscription) {
+      debugBlueveryListener(
+        'match the remove target subscriptions',
+        peripheralId,
+      );
       Object.values(subscription).forEach((listener) => {
         listener?.remove();
       });
@@ -49,6 +71,7 @@ export class BlueveryListeners {
   }
 
   removeAllSubscriptions() {
+    debugBlueveryListener('remove all subscriptions');
     Object.values(this.internalListeners).forEach((listener) => {
       listener?.remove();
     });
