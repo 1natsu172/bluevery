@@ -25,6 +25,7 @@ export type BleDataWeightMeasurment = {
 
 /**
  * BLE 体重測定値をシリアライズ・デシリアライズをする
+ * Note: userID, bmi, height に未対応。
  */
 export class BleWeightScaleMeasurementSerializer extends BaseBleDataSerializer<
   BleDataWeightMeasurment
