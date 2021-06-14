@@ -292,8 +292,9 @@ export class BlueveryCore {
 
       const [, discoverPeripheralListener] = await Promise.all([
         // note: scan開始。promiseだがscan秒数待たないので後続処理でscan秒数を担保している
-        await BleManager.scan(...scanningSettings).catch((err) => {
-          debugBlueveryCore('scan: native scan but error caused', err);
+        await BleManager.scan(...scanningSettings).catch((error) => {
+          debugBlueveryCore('scan: native scan but error caused', error);
+          throw error;
         }),
         // discover処理を登録
         registerDiscoverPeripheralListener(
