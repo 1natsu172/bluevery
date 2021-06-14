@@ -1,6 +1,7 @@
 import {useCallback, useState} from 'react';
 import {bluevery, PeripheralId, PeripheralInfo} from 'bluevery';
 import {BleController} from './type';
+import {BleWeightScaleMeasurementSerializer} from 'src/ble-data';
 
 export const BP_MONITOR_NAME_AND = 'A&D_UC-352BLE';
 export const BP_SERVICE_UUID = '180A';
@@ -100,10 +101,16 @@ export const useAND_UC_352BLE: (props: Props) => BleController = ({
               res.service.includes(BP_SERVICE_UUID) &&
               res.characteristic.includes(BP_MEASUREMENT_CHARECTERISTIC_UUID)
             ) {
-              // TODO: ここで valueを処理する。ただし、valueは anyになっている
               console.log(
                 `match the ${peripheralInfo.id} / ${BP_SERVICE_UUID} / ${BP_MEASUREMENT_CHARECTERISTIC_UUID}`,
                 res.value,
+              );
+              const serializer = new BleWeightScaleMeasurementSerializer();
+              const weightMeasurement = serializer.deserialize(
+                res.value as number[],
+              );
+              console.log(
+                `weightMeasurement: ${JSON.stringify(weightMeasurement)}`,
               );
               setCharacteristicValues((prev) => {
                 return {
