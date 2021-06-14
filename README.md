@@ -64,3 +64,16 @@ Edit your app `Info.plist`
 	<string>EDIT YOUR TEXT</string>
   <!-- 🚨 Keep only the permissions used in your app 🚨 -->
 ```
+
+## Output debug log for development
+
+Pass the debug namespace into the init options.
+
+https://github.com/visionmedia/debug#environment-variables
+
+```javascript
+await bluevery.init({
+  __DEBUG: 'bluevery,bluevery:*',
+  // ...other options
+})
+```
