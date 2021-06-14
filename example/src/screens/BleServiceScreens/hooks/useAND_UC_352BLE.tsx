@@ -100,6 +100,7 @@ export const useAND_UC_352BLE: (props: Props) => BleController = ({
               res.service.includes(BP_SERVICE_UUID) &&
               res.characteristic.includes(BP_MEASUREMENT_CHARECTERISTIC_UUID)
             ) {
+              // TODO: ここで valueを処理する。ただし、valueは anyになっている
               console.log(
                 `match the ${peripheralInfo.id} / ${BP_SERVICE_UUID} / ${BP_MEASUREMENT_CHARECTERISTIC_UUID}`,
                 res.value,
