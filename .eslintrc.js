@@ -9,6 +9,5 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   rules: {
     'no-unsafe-finally': 'error',
-    'require-await': 'error'
   },
 };
