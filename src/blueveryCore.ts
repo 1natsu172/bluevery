@@ -52,6 +52,8 @@ export class BlueveryCore {
   private state: _BlueveryState;
   listeners: _BlueveryListeners;
 
+  private delayInstanceOfScan: ReturnType<typeof delay> | undefined;
+
   constructor({
     BlueveryState,
     blueveryListeners,
@@ -123,10 +125,13 @@ export class BlueveryCore {
     debugBlueveryCore('init: end');
   }
 
-  stop() {
+  async stop() {
     debugBlueveryCore('stop: start');
-    this.listeners.removeAllSubscriptions();
-    this.state.unsubscribeTheState();
+    await Promise.all([
+      this.listeners.removeAllSubscriptions(),
+      this.state.unsubscribeTheState(),
+      this.cleanupScan(),
+    ]);
     debugBlueveryCore('stop: end');
   }
 
@@ -310,14 +315,16 @@ export class BlueveryCore {
       // note: スキャン秒数の担保。指定秒数経ったらscan処理を終える
       const [, scanSeconds] = scanningSettings;
       debugBlueveryCore('scan: awaiting for : ', scanSeconds);
-      await delay(scanSeconds * 1000).then(this.cleanupScan);
+      this.delayInstanceOfScan = delay(scanSeconds * 1000);
+      await this.delayInstanceOfScan.then(this.cleanupScan);
       debugBlueveryCore('scan: end');
     }
   }
 
-  private cleanupScan() {
+  cleanupScan() {
     debugBlueveryCore('cleanupScan: start');
     return Promise.all([
+      this.delayInstanceOfScan?.clear(),
       BleManager.stopScan(),
       this.listeners.internalListeners.discoverPeripheralListener?.remove(),
       this.state.offScanning(),
