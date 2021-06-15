@@ -18,6 +18,7 @@ const nativeEventEmitter = new NativeEventEmitter();
 let bluevery: Bluevery;
 let spiedApplyOmoiyari: jest.SpyInstance;
 let spiedCoreInit: jest.SpyInstance;
+let spiedCoreCleanupScan: jest.SpyInstance;
 beforeEach(async () => {
   // cleanup spies
   jest.restoreAllMocks();
@@ -26,6 +27,8 @@ beforeEach(async () => {
   spiedCoreInit = jest
     .spyOn(BlueveryCore.prototype, 'init')
     .mockImplementation(async () => {});
+
+  spiedCoreCleanupScan = jest.spyOn(BlueveryCore.prototype, 'cleanupScan');
 
   bluevery = new Bluevery({
     BlueveryCore,
@@ -111,6 +114,8 @@ describe('bluevery: primitive APIs', () => {
       mockInternalSubscriptions.forEach((subscription) =>
         expect(subscription).toBeCalled(),
       );
+
+      expect(spiedCoreCleanupScan).toBeCalledTimes(1);
 
       // @ts-expect-error テストのためにprivateプロパティアクセスしている
       bluevery.core.state.offScanning();
