@@ -125,10 +125,13 @@ export class BlueveryCore {
     debugBlueveryCore('init: end');
   }
 
-  stop() {
+  async stop() {
     debugBlueveryCore('stop: start');
-    this.listeners.removeAllSubscriptions();
-    this.state.unsubscribeTheState();
+    await Promise.all([
+      this.listeners.removeAllSubscriptions(),
+      this.state.unsubscribeTheState(),
+      this.cleanupScan(),
+    ]);
     debugBlueveryCore('stop: end');
   }
 

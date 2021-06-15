@@ -67,9 +67,9 @@ export class Bluevery {
    * Force stop Bluevery's operation completely.
    * TODO: more implements
    */
-  stopBluevery() {
+  async stopBluevery() {
     debugBluevery('stopBluevery: start');
-    this.core?.stop?.();
+    await this.core?.stop?.();
     debugBluevery('stopBluevery: end');
   }
 

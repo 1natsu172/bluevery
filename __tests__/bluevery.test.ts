@@ -36,7 +36,7 @@ beforeEach(async () => {
 });
 afterEach(async () => {
   // NOTE: トップレベルbeforeEachで1度initしてるのでtestするたびに以前のリスナーがどんどん残ってしまう。なので各test後に毎回stopしておく
-  bluevery.stopBluevery();
+  await bluevery.stopBluevery();
 });
 
 describe('truthExportedBluevery', () => {
@@ -97,12 +97,12 @@ describe('bluevery: primitive APIs', () => {
       await bluevery.init({onChangeStateHandler});
     });
 
-    test('should stop bluevery completely', () => {
+    test('should stop bluevery completely', async () => {
       // @ts-expect-error テストのためにprivateプロパティアクセスしている
       bluevery.core.state.onScanning();
       expect(onChangeStateHandler).toBeCalledTimes(1);
 
-      bluevery.stopBluevery();
+      await bluevery.stopBluevery();
 
       mockPublicSubscriptions.forEach((subscription) =>
         expect(subscription).toBeCalled(),
