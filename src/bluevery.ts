@@ -153,7 +153,7 @@ export class Bluevery {
     debugBluevery('stopScan: start');
     // tell the interval function
     this.isStopScanInterval = true;
-    this.core?.cleanupScan();
+    await this.core?.cleanupScan();
     debugBluevery('stopScan: end');
   }
 
