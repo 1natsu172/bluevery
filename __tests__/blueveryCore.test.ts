@@ -1,3 +1,4 @@
+/*eslint require-await: "off"*/
 import {proxy} from 'valtio';
 import {BlueveryCore} from '../src/blueveryCore';
 import {BlueveryState, createInitialState} from '../src/blueveryState';

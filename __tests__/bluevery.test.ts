@@ -1,3 +1,4 @@
+/*eslint require-await: "off"*/
 import 'jest-extended';
 import {proxy} from 'valtio';
 import {bluevery as truthExportedBluevery} from '../src';
