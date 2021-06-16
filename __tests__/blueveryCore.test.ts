@@ -339,22 +339,16 @@ describe('BlueveryCore', () => {
         expect(spiedRequireCheckBeforeBleProcess).toBeCalledTimes(1);
       });
 
-      test.skip('should call console.warn if BleManager.scan throw exception', async () => {
-        const orgScan = BleManager.scan;
-        BleManager.scan = async () => {
-          throw new Error();
-        };
-        const orgWarn = console.warn;
-        const mockWarn = jest.fn();
-        console.warn = mockWarn;
-        try {
-          blueveryCore.scan({scanningSettings: [[], 1]});
-          await flushPromisesAdvanceTimer(1000);
-        } finally {
-          BleManager.scan = orgScan;
-          console.warn = orgWarn;
-        }
-        expect(mockWarn).toBeCalledTimes(1);
+      test('should throw if BleManager.scan throw exception', async () => {
+        // @ts-expect-error -- mocked at jest.setup.js
+        BleManager.scan.mockImplementationOnce(async () => {
+          throw new Error('fixture error');
+        });
+
+        const scanning = blueveryCore.scan({scanningSettings: [[], 1]});
+        await flushPromisesAdvanceTimer(1000);
+
+        await expect(scanning).rejects.toThrowError('fixture error');
       });
 
       test('should call cleanupScan at the end of process', async () => {
@@ -395,6 +389,16 @@ describe('BlueveryCore', () => {
           expect(BleManager.scan).toBeCalled();
         });
       });
+    });
+  });
+
+  describe('cleanupScan', () => {
+    jest.useFakeTimers();
+    test('should be resolved immediately the awaiting task of scan', async () => {
+      const scanTask = blueveryCore.scan({scanningSettings: [[], 1]});
+      await flushPromisesAdvanceTimer(50);
+      await blueveryCore.cleanupScan();
+      await expect(scanTask).toResolve();
     });
   });
 
@@ -534,7 +538,7 @@ describe('BlueveryCore', () => {
     });
 
     test('writeValue: should throw if error occured', async () => {
-      // @ts-expect-error
+      // @ts-expect-error -- mocked at jest.setup.js
       BleManager.write.mockImplementationOnce(async () => {
         throw new Error('fixture error');
       });
@@ -658,7 +662,7 @@ describe('BlueveryCore', () => {
     });
 
     test('readValue: should throw if error occured', async () => {
-      // @ts-expect-error
+      // @ts-expect-error -- mocked at jest.setup.js
       BleManager.read.mockImplementationOnce(async () => {
         throw new Error('fixture error');
       });
@@ -756,7 +760,7 @@ describe('BlueveryCore', () => {
     });
 
     test('connect: should be throw error and state change to failed', async () => {
-      // @ts-expect-error
+      // @ts-expect-error -- mocked at jest.setup.js
       BleManager.connect.mockImplementationOnce(async () => {
         throw new Error('fixture error');
       });
@@ -879,7 +883,7 @@ describe('BlueveryCore', () => {
     });
 
     test('should throw if error occured', async () => {
-      // @ts-expect-error
+      // @ts-expect-error -- mocked at jest.setup.js
       BleManager.retrieveServices.mockImplementationOnce(async () => {
         throw new Error('fixture error');
       });
