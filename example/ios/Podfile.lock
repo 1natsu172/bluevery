@@ -85,11 +85,11 @@ PODS:
   - OpenSSL-Universal (1.0.2.20):
     - OpenSSL-Universal/Static (= 1.0.2.20)
   - OpenSSL-Universal/Static (1.0.2.20)
-  - Permission-BluetoothPeripheral (2.2.2):
+  - Permission-BluetoothPeripheral (3.0.4):
     - RNPermissions
-  - Permission-LocationWhenInUse (2.2.2):
+  - Permission-LocationWhenInUse (3.0.4):
     - RNPermissions
-  - Permission-Notifications (2.2.2):
+  - Permission-Notifications (3.0.4):
     - RNPermissions
   - RCTRequired (0.63.2)
   - RCTTypeSafety (0.63.2):
@@ -327,7 +327,7 @@ PODS:
     - React
   - RNGestureHandler (1.10.3):
     - React-Core
-  - RNPermissions (2.2.2):
+  - RNPermissions (3.0.4):
     - React-Core
   - RNReanimated (2.1.0):
     - DoubleConversion
@@ -418,9 +418,9 @@ DEPENDENCIES:
   - FlipperKit/SKIOSNetworkPlugin (~> 0.41.1)
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
-  - Permission-BluetoothPeripheral (from `../node_modules/react-native-permissions/ios/BluetoothPeripheral.podspec`)
-  - Permission-LocationWhenInUse (from `../node_modules/react-native-permissions/ios/LocationWhenInUse.podspec`)
-  - Permission-Notifications (from `../node_modules/react-native-permissions/ios/Notifications.podspec`)
+  - Permission-BluetoothPeripheral (from `../node_modules/react-native-permissions/ios/BluetoothPeripheral/Permission-BluetoothPeripheral.podspec`)
+  - Permission-LocationWhenInUse (from `../node_modules/react-native-permissions/ios/LocationWhenInUse/Permission-LocationWhenInUse.podspec`)
+  - Permission-Notifications (from `../node_modules/react-native-permissions/ios/Notifications/Permission-Notifications.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
   - React (from `../node_modules/react-native/`)
@@ -504,11 +504,11 @@ EXTERNAL SOURCES:
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   Permission-BluetoothPeripheral:
-    :path: "../node_modules/react-native-permissions/ios/BluetoothPeripheral.podspec"
+    :path: "../node_modules/react-native-permissions/ios/BluetoothPeripheral/Permission-BluetoothPeripheral.podspec"
   Permission-LocationWhenInUse:
-    :path: "../node_modules/react-native-permissions/ios/LocationWhenInUse.podspec"
+    :path: "../node_modules/react-native-permissions/ios/LocationWhenInUse/Permission-LocationWhenInUse.podspec"
   Permission-Notifications:
-    :path: "../node_modules/react-native-permissions/ios/Notifications.podspec"
+    :path: "../node_modules/react-native-permissions/ios/Notifications/Permission-Notifications.podspec"
   RCTRequired:
     :path: "../node_modules/react-native/Libraries/RCTRequired"
   RCTTypeSafety:
@@ -618,9 +618,9 @@ SPEC CHECKSUMS:
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
   OpenSSL-Universal: ff34003318d5e1163e9529b08470708e389ffcdd
-  Permission-BluetoothPeripheral: 73e80c434beef6570ba7c322a6882a8d46c2c4d3
-  Permission-LocationWhenInUse: 871e81c06c1fc578353fce962d5d8e6efa697f1a
-  Permission-Notifications: 9c6b5cc4f0e6599e9fc3395b77cebddc48f1be41
+  Permission-BluetoothPeripheral: 742b306312f329b809e2f62e475b0b61b206962b
+  Permission-LocationWhenInUse: ebef6bf8a123d382f25e9990468cfc8a76fbadf5
+  Permission-Notifications: 5b4a12a9b52866667423c93d3af8e43b81872cf4
   RCTRequired: f13f25e7b12f925f1f6a6a8c69d929a03c0129fe
   RCTTypeSafety: 44982c5c8e43ff4141eb519a8ddc88059acd1f3a
   React: e1c65dd41cb9db13b99f24608e47dd595f28ca9a
@@ -646,7 +646,7 @@ SPEC CHECKSUMS:
   ReactCommon: a0a1edbebcac5e91338371b72ffc66aa822792ce
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
-  RNPermissions: 5df468064df661a4c8c017e2791ce90d7695eea5
+  RNPermissions: c46788f4cd402287425983e04a4c9bb4356036eb
   RNReanimated: 70f662b5232dd5d19ccff581e919a54ea73df51c
   RNScreens: c277bfc4b5bb7c2fe977d19635df6f974f95dfd6
   RNVectorIcons: 31cebfcf94e8cf8686eb5303ae0357da64d7a5a4
@@ -666,6 +666,6 @@ SPEC CHECKSUMS:
   Yoga: 7740b94929bbacbddda59bf115b5317e9a161598
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: bdfc89ff73b1b60c94804b18ba344d3cb3c48469
+PODFILE CHECKSUM: d1cd210d2ec526c73551aa5d838fe8ed61847e19
 
 COCOAPODS: 1.10.1

@@ -29,9 +29,9 @@ target 'example' do
   end
 
   permissions_path = '../node_modules/react-native-permissions/ios'
-  pod 'Permission-BluetoothPeripheral', :path => "#{permissions_path}/BluetoothPeripheral.podspec"
-  pod 'Permission-LocationWhenInUse', :path => "#{permissions_path}/LocationWhenInUse.podspec"
-  pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications.podspec"
+  pod 'Permission-BluetoothPeripheral', :path => "#{permissions_path}/BluetoothPeripheral/Permission-BluetoothPeripheral.podspec"
+  pod 'Permission-LocationWhenInUse', :path => "#{permissions_path}/LocationWhenInUse/Permission-LocationWhenInUse.podspec"
+  pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications/Permission-Notifications.podspec"
 
 end
 

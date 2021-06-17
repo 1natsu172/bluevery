@@ -6521,10 +6521,10 @@ react-native-ble-manager@^7.3.1:
   resolved "https://registry.yarnpkg.com/react-native-ble-manager/-/react-native-ble-manager-7.4.1.tgz#062c13614e0e627a4d2648075716e02938d44a13"
   integrity sha512-d9VS9y11SKxU6eUBIlUYrGo3kJKtGfuLJ4eDV7corETARz8JRWd5a/lXO5uqvyNP2lV5w3SiuycOJXEZdX7sow==
 
-react-native-permissions@^2.2.0:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-2.2.2.tgz#3d2a63f6b7d6be52fc86e30f77412a9566283028"
-  integrity sha512-ihf4shQDSX5Oo9ChQXb9kr13mmyyNem5MaEvOpr3dCjhBOBWyEMztXm9/uPK1Qg5PsNpaYLa1KpcPZDCw87LXg==
+react-native-permissions@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-3.0.4.tgz#7771d28899d7d2b75fd2a70cd3f86d44c90397ec"
+  integrity sha512-GMd0l0TA/qupidGFfKAVNaboewQkJSW+l3ndwv1cu+tBGI+TRfJdMjg8Q714wn9roZlXsZ3z407qT2xPdQmGdg==
 
 react-native@0.63.2:
   version "0.63.2"
