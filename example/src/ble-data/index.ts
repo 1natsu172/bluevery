@@ -1,2 +1,2 @@
 export * from './BleTimestamp';
-export * from './BleWeightScaleMeasurement';
+export * from './BleWeightMeasurementSerializer';

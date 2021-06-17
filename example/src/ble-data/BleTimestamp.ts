@@ -3,7 +3,7 @@ import {BaseBleDataSerializer} from './BaseBleDataSerializer';
 /**
  * BLE Timestamp をシリアライズ・デシリアライズする
  */
-export class BleTimestampSerializer extends BaseBleDataSerializer<Date> {
+export class BleDateTimeSerializer extends BaseBleDataSerializer<Date> {
   /**
    * 以下の形式のbyte arrayをDateに変換する。year が Little Endianであることを考慮する。
    * |year (16bit)|month(8bit)|day(8bit)|hours(8bit)|minutes(8bit)|seconds(8bit)|

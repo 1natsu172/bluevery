@@ -1,5 +1,5 @@
 import {BaseBleDataSerializer} from './BaseBleDataSerializer';
-import {BleTimestampSerializer} from './BleTimestamp';
+import {BleDateTimeSerializer} from './BleTimestamp';
 
 type BleWeightScaleMeasurementUnit = 'SI' | 'Imperial';
 
@@ -8,7 +8,7 @@ type BleWeightScaleMeasurementUnit = 'SI' | 'Imperial';
  * https://www.bluetooth.com/wp-content/uploads/Sitecore-Media-Library/Gatt/Xml/Characteristics/org.bluetooth.characteristic.weight_measurement.xml
  * https://stackoverflow.com/questions/63771111/bluetooth-low-energy-weight-measurement-characteristic-timestamps
  */
-export type BleDataWeightMeasurment = {
+export type BleWeightMeasurment = {
   flags: {
     measurmentUnits: BleWeightScaleMeasurementUnit;
     timeStampPresent: boolean;
@@ -27,10 +27,10 @@ export type BleDataWeightMeasurment = {
  * BLE 体重測定値をシリアライズ・デシリアライズをする
  * Note: userID, bmi, height に未対応。
  */
-export class BleWeightScaleMeasurementSerializer extends BaseBleDataSerializer<
-  BleDataWeightMeasurment
+export class BleWeightMeasurementSerializer extends BaseBleDataSerializer<
+  BleWeightMeasurment
 > {
-  deserialize(bytes: number[]): BleDataWeightMeasurment {
+  deserialize(bytes: number[]): BleWeightMeasurment {
     const bitFlag = bytes[0];
     const measurmentUnits = this.bitCheck(bitFlag, 0) ? 'Imperial' : 'SI';
     const timeStampPresent = this.bitCheck(bitFlag, 1);
@@ -40,7 +40,7 @@ export class BleWeightScaleMeasurementSerializer extends BaseBleDataSerializer<
       bytes.slice(1, 3),
       measurmentUnits,
     );
-    const timestamp = new BleTimestampSerializer().deserialize(
+    const timestamp = new BleDateTimeSerializer().deserialize(
       bytes.slice(3, 10),
     );
 
@@ -58,7 +58,7 @@ export class BleWeightScaleMeasurementSerializer extends BaseBleDataSerializer<
       height: NaN,
     };
   }
-  serialize(_: BleDataWeightMeasurment): number[] {
+  serialize(_: BleWeightMeasurment): number[] {
     throw new Error('Method not implemented.');
   }
 
