@@ -223,6 +223,10 @@ export class BlueveryState {
   }
 
   setPeripheralToScannedPeripherals(peripheral: Peripheral) {
+    if (this.getState().scannedPeripherals[peripheral.id]) {
+      return;
+    }
+    debugBlueveryState('set to scannedPeripherals', peripheral);
     this.mutationState.scannedPeripherals[peripheral.id] = peripheral;
   }
   clearScannedPeripherals() {

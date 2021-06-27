@@ -409,6 +409,18 @@ describe('BlueveryState', () => {
         dummyPeripheralInfo,
       );
     });
+    test('should does not set Peripheral if already exist the peripheral in scannedPeripherals', () => {
+      const willSamePeripheral: PeripheralInfo = {
+        ...dummyPeripheralInfo,
+        rssi: 10000,
+      };
+
+      blueveryState.setPeripheralToScannedPeripherals(dummyPeripheralInfo);
+      expect(blueveryState.getState().scannedPeripherals['1'].rssi).toBe(1);
+
+      blueveryState.setPeripheralToScannedPeripherals(willSamePeripheral);
+      expect(blueveryState.getState().scannedPeripherals['1'].rssi).toBe(1);
+    });
   });
   describe('clearScannedPeripherals', () => {
     test('should clear current Peripherals', () => {
