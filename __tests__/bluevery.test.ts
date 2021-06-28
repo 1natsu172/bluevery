@@ -180,7 +180,10 @@ describe('bluevery: commands APIs', () => {
       const state = bluevery.core.getState();
       expect(state.managingPeripherals.tester1.connect).toBe('disconnected');
       expect(optionalDisconnectHandler).toBeCalled();
-      expect(bluevery.publicListeners[testerPeripheral.id]).toBe(undefined);
+      // @ts-expect-error -- testのためcoreにアクセスしている
+      expect(bluevery.core.listeners.publicListeners[testerPeripheral.id]).toBe(
+        undefined,
+      );
     });
 
     describe('save the already connected & bonded peripherals at init', () => {

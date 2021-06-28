@@ -596,9 +596,10 @@ export class BlueveryCore {
       debugBlueveryCore(
         'startNotification: already exist a listener, remove it',
       );
-      this.listeners.publicListeners[
-        peripheralId
-      ]?.receivingForCharacteristicValueListener?.remove();
+      this.listeners.removeAnyPublicSubscription(
+        peripheralId,
+        'receivingForCharacteristicValueListener',
+      );
       this.state.offReceivingForCharacteristicValue(peripheralId);
     }
 
@@ -626,9 +627,10 @@ export class BlueveryCore {
     const [peripheralId] = stopNotificationParams;
     return Promise.all([
       BleManager.stopNotification(...stopNotificationParams),
-      this.listeners.publicListeners[
-        peripheralId
-      ]?.receivingForCharacteristicValueListener?.remove(),
+      this.listeners.removeAnyPublicSubscription(
+        peripheralId,
+        'receivingForCharacteristicValueListener',
+      ),
       this.state.offReceivingForCharacteristicValue(peripheralId),
     ]);
   }
