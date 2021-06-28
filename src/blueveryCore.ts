@@ -326,7 +326,9 @@ export class BlueveryCore {
     return Promise.all([
       this.delayInstanceOfScan?.clear(),
       BleManager.stopScan(),
-      this.listeners.internalListeners.discoverPeripheralListener?.remove(),
+      this.listeners.removeAnyInternalSubscription(
+        'discoverPeripheralListener',
+      ),
       this.state.offScanning(),
     ]);
   }
