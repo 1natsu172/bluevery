@@ -52,6 +52,16 @@ export class BlueveryListeners {
     }
   }
 
+  removeAnyInternalSubscription<Key extends keyof InternalListeners>(key: Key) {
+    debugBlueveryListener('remove from internalListeners', key);
+    const subscription = this.internalListeners[key];
+    if (subscription) {
+      debugBlueveryListener('match the remove target subscription', key);
+      subscription.remove();
+      delete this.internalListeners[key];
+    }
+  }
+
   removePeripheralPublicSubscription(peripheralId: PeripheralId) {
     debugBlueveryListener(
       'remove public subscription of peripheral',

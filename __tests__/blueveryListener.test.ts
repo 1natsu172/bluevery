@@ -62,6 +62,26 @@ describe('BlueveryListener', () => {
     });
   });
 
+  describe('removeAnyInternalSubscription', () => {
+    test('should remove any internal subscription', () => {
+      const mockEmitter = mockEmitterSubscription();
+      blueveryListener.internalListeners = {
+        discoverPeripheralListener: mockEmitter,
+      };
+
+      expect(
+        blueveryListener.internalListeners.discoverPeripheralListener,
+      ).toBe(mockEmitter);
+
+      blueveryListener.removeAnyInternalSubscription(
+        'discoverPeripheralListener',
+      );
+
+      expect(blueveryListener.internalListeners).toStrictEqual({});
+      expect(mockEmitter.remove).toBeCalledTimes(1);
+    });
+  });
+
   describe('removePeripheralPublicSubscription', () => {
     test('should remove public subscription of the peripheral', () => {
       const mockEmitter1 = mockEmitterSubscription();
