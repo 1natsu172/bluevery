@@ -463,7 +463,7 @@ describe('bluevery: commands APIs', () => {
 
     describe('writeValue: positive pattern', () => {
       test('should return value if exist', async () => {
-        const wrote = await bluevery.writeValue({
+        const wrote = bluevery.writeValue({
           writeValueParams: [
             'dummyPid',
             'dummySUuid',
@@ -472,13 +472,14 @@ describe('bluevery: commands APIs', () => {
           ],
           retrieveServicesParams: ['dummyPid'],
         });
-        expect(wrote).toBe('wrote to peripheral');
+        jest.runAllTimers();
+        await expect(wrote).resolves.toBe('wrote to peripheral');
       });
     });
 
     describe('writeValue: check calls', () => {
       test('should call core#writeValue', async () => {
-        await bluevery.writeValue({
+        bluevery.writeValue({
           writeValueParams: [
             'dummyPid',
             'dummySUuid',
@@ -487,7 +488,8 @@ describe('bluevery: commands APIs', () => {
           ],
           retrieveServicesParams: ['dummyPid'],
         });
-        expect(writeValueFn).toBeCalled();
+        jest.runAllTimers();
+        await expect(writeValueFn).toBeCalled();
       });
     });
   });
@@ -513,21 +515,23 @@ describe('bluevery: commands APIs', () => {
 
     describe('readValue: positive pattern', () => {
       test('should return value if exist', async () => {
-        const read = await bluevery.readValue({
+        const read = bluevery.readValue({
           readValueParams: ['dummyPid', 'dummySUuid', 'dummyCharaValue'],
           retrieveServicesParams: ['dummyPid'],
         });
-        expect(read).toBe('read to peripheral');
+        jest.runAllTimers();
+        await expect(read).resolves.toBe('read to peripheral');
       });
     });
 
     describe('readValue: check calls', () => {
       test('should call core#readValue', async () => {
-        await bluevery.readValue({
+        bluevery.readValue({
           readValueParams: ['dummyPid', 'dummySUuid', 'dummyCharaValue'],
           retrieveServicesParams: ['dummyPid'],
         });
-        expect(readValueFn).toBeCalled();
+        jest.runAllTimers();
+        await expect(readValueFn).toBeCalled();
       });
     });
   });
@@ -553,7 +557,7 @@ describe('bluevery: commands APIs', () => {
 
     describe('connect: check calls', () => {
       beforeEach(async () => {
-        await bluevery.connect({
+        bluevery.connect({
           retrieveServicesParams: ['1'],
           connectParams: ['1'],
           bondingParams: ['1', 'test'],
@@ -561,6 +565,7 @@ describe('bluevery: commands APIs', () => {
       });
 
       test('should call core#connect', async () => {
+        jest.runAllTimers();
         expect(connectFn).toBeCalled();
       });
     });
