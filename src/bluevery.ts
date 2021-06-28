@@ -10,7 +10,6 @@ import {
   PeripheralInfo,
   Store,
   PublicHandlers,
-  PublicListeners,
   BlueveryMethodOptions,
 } from './interface';
 import {
@@ -33,7 +32,6 @@ export class Bluevery {
   private __constructorsAndInstances__: __ConstructorsAndInstances__;
   private __DO_NOT_DIRECT_USE_STORE__: Store;
   private core: _BlueveryCore | undefined;
-  publicListeners: PublicListeners | undefined;
 
   constructor({
     BlueveryCore,
@@ -95,7 +93,6 @@ export class Bluevery {
       initialState: blueveryOptions?.initialState,
       onChangeStateHandler: blueveryOptions?.onChangeStateHandler,
     });
-    this.publicListeners = this.core.listeners.publicListeners;
 
     await this.core.init(blueveryOptions);
     this.initialized = true;
