@@ -5,23 +5,28 @@ import {Bluevery} from '../src/bluevery';
 import {BlueveryCore} from '../src/blueveryCore';
 import {BlueveryState, createInitialState} from '../src/blueveryState';
 import {BlueveryListeners} from '../src/blueveryListeners';
-import * as omoiyarify from '../src/utils/omoiyarify';
+import {applyOmoiyari} from '../src/utils';
 import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
 import {dummyPeripheralInfo} from './__utils__/dummyPeripheralInfo';
 import {mockPlatform} from './__utils__/mockPlatform';
 import {EmitterSubscription, NativeEventEmitter} from 'react-native';
 import {DisconnectedPeripheralInfo} from '../src/libs';
 
+jest.mock('../src/utils', () => ({
+  __esModule: true,
+  ...jest.requireActual('../src/utils'),
+  applyOmoiyari: jest.fn(require('../src/utils/omoiyarify').mockOmoiyarify),
+}));
+
 const nativeEventEmitter = new NativeEventEmitter();
 
 let bluevery: Bluevery;
-let spiedApplyOmoiyari: jest.SpyInstance;
 let spiedCoreInit: jest.SpyInstance;
 let spiedCoreCleanupScan: jest.SpyInstance;
 beforeEach(async () => {
   // cleanup spies
   jest.restoreAllMocks();
-  spiedApplyOmoiyari = jest.spyOn(omoiyarify, 'applyOmoiyari');
+
   // NOTE: core#initでdisconnectのリスナーが張られるが、removeされないまま残ってしまうと他のテストがコケるのでメソッド自体モックしておく。実体実行したいテストでのみrestoreするようにする。
   spiedCoreInit = jest
     .spyOn(BlueveryCore.prototype, 'init')
@@ -323,7 +328,7 @@ describe('bluevery: commands APIs', () => {
           },
         });
         jest.runAllTimers();
-        expect(spiedApplyOmoiyari).toBeCalledTimes(1);
+        expect(applyOmoiyari).toBeCalledTimes(1);
       });
 
       test('should behave omoiyari with 1sec', async () => {
@@ -463,7 +468,7 @@ describe('bluevery: commands APIs', () => {
 
     describe('writeValue: positive pattern', () => {
       test('should return value if exist', async () => {
-        const wrote = bluevery.writeValue({
+        const wrote = await bluevery.writeValue({
           writeValueParams: [
             'dummyPid',
             'dummySUuid',
@@ -472,14 +477,13 @@ describe('bluevery: commands APIs', () => {
           ],
           retrieveServicesParams: ['dummyPid'],
         });
-        jest.runAllTimers();
-        await expect(wrote).resolves.toBe('wrote to peripheral');
+        expect(wrote).toBe('wrote to peripheral');
       });
     });
 
     describe('writeValue: check calls', () => {
       test('should call core#writeValue', async () => {
-        bluevery.writeValue({
+        await bluevery.writeValue({
           writeValueParams: [
             'dummyPid',
             'dummySUuid',
@@ -488,8 +492,7 @@ describe('bluevery: commands APIs', () => {
           ],
           retrieveServicesParams: ['dummyPid'],
         });
-        jest.runAllTimers();
-        await expect(writeValueFn).toBeCalled();
+        expect(writeValueFn).toBeCalled();
       });
     });
   });
@@ -515,23 +518,21 @@ describe('bluevery: commands APIs', () => {
 
     describe('readValue: positive pattern', () => {
       test('should return value if exist', async () => {
-        const read = bluevery.readValue({
+        const read = await bluevery.readValue({
           readValueParams: ['dummyPid', 'dummySUuid', 'dummyCharaValue'],
           retrieveServicesParams: ['dummyPid'],
         });
-        jest.runAllTimers();
-        await expect(read).resolves.toBe('read to peripheral');
+        expect(read).toBe('read to peripheral');
       });
     });
 
     describe('readValue: check calls', () => {
       test('should call core#readValue', async () => {
-        bluevery.readValue({
+        await bluevery.readValue({
           readValueParams: ['dummyPid', 'dummySUuid', 'dummyCharaValue'],
           retrieveServicesParams: ['dummyPid'],
         });
-        jest.runAllTimers();
-        await expect(readValueFn).toBeCalled();
+        expect(readValueFn).toBeCalled();
       });
     });
   });
@@ -557,7 +558,7 @@ describe('bluevery: commands APIs', () => {
 
     describe('connect: check calls', () => {
       beforeEach(async () => {
-        bluevery.connect({
+        await bluevery.connect({
           retrieveServicesParams: ['1'],
           connectParams: ['1'],
           bondingParams: ['1', 'test'],
@@ -565,7 +566,6 @@ describe('bluevery: commands APIs', () => {
       });
 
       test('should call core#connect', async () => {
-        jest.runAllTimers();
         expect(connectFn).toBeCalled();
       });
     });
