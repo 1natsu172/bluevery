@@ -12,6 +12,13 @@ import {dummyPeripheralInfo} from './__utils__/dummyPeripheralInfo';
 import BleManager from 'react-native-ble-manager';
 import {EmitterSubscription} from 'react-native';
 import {mockPlatform} from './__utils__/mockPlatform';
+import {DEFAULT_OMOIYARI_TIME} from '../src/constants';
+
+jest.mock('../src/utils', () => ({
+  __esModule: true,
+  ...jest.requireActual('../src/utils'),
+  applyOmoiyari: jest.fn(require('../src/utils/omoiyarify').mockOmoiyarify),
+}));
 
 jest.mock('../src/libs', () => ({
   __esModule: true,
@@ -431,7 +438,10 @@ describe('BlueveryCore', () => {
         ],
         writeValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
       expect(ret).toBe(false);
     });
@@ -446,7 +456,10 @@ describe('BlueveryCore', () => {
         ],
         writeValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
       expect(ret).toStrictEqual([[1], [2], [3]]);
     });
@@ -461,7 +474,10 @@ describe('BlueveryCore', () => {
         ],
         writeValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
 
       expect(spiedRetrieveServices).toBeCalled();
@@ -477,7 +493,10 @@ describe('BlueveryCore', () => {
         ],
         writeValueOptions: {},
         retrieveServicesParams: ['2'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
 
       expect(spiedRetrieveServices).not.toBeCalled();
@@ -510,7 +529,10 @@ describe('BlueveryCore', () => {
         ],
         writeValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
       // first communicate status (retrieveのコールがあるのでcommunicateの呼ばれるタイミングは実装によって左右される)
       expect(spyCommunicateStatus.mock.calls[2][0]).toBe('writing');
@@ -530,7 +552,10 @@ describe('BlueveryCore', () => {
         ],
         writeValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
       expect(BleManager.write).toBeCalled();
       expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
@@ -552,7 +577,10 @@ describe('BlueveryCore', () => {
         ],
         writeValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
       await expect(_write).rejects.toThrow('fixture error');
     });
@@ -580,7 +608,10 @@ describe('BlueveryCore', () => {
         readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
         readValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
       expect(ret).toBe(false);
     });
@@ -590,7 +621,10 @@ describe('BlueveryCore', () => {
         readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
         readValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
       expect(ret).toStrictEqual([[1], [2], [3]]);
     });
@@ -600,7 +634,10 @@ describe('BlueveryCore', () => {
         readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
         readValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
 
       expect(spiedRetrieveServices).toBeCalled();
@@ -611,7 +648,10 @@ describe('BlueveryCore', () => {
         readValueParams: ['2', 'dummySUUID', 'dummyCharaUUID'],
         readValueOptions: {},
         retrieveServicesParams: ['2'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
 
       expect(spiedRetrieveServices).not.toBeCalled();
@@ -639,7 +679,10 @@ describe('BlueveryCore', () => {
         readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
         readValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
       // first communicate status (retrieveのコールがあるのでcommunicateの呼ばれるタイミングは実装によって左右される)
       expect(spyCommunicateStatus.mock.calls[2][0]).toBe('reading');
@@ -654,7 +697,10 @@ describe('BlueveryCore', () => {
         readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
         readValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
       expect(BleManager.read).toBeCalled();
       expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
@@ -671,7 +717,10 @@ describe('BlueveryCore', () => {
         readValueParams: ['1', 'dummySUUID', 'dummyCharaUUID'],
         readValueOptions: {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
       await expect(_read).rejects.toThrow('fixture error');
     });
@@ -696,11 +745,20 @@ describe('BlueveryCore', () => {
       spiedRequireCheckBeforeBleProcess.mockImplementationOnce(() => false);
       const ret = await blueveryCore.connect({
         bondingParams: ['1', ''],
-        bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        bondingOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
         connectParams: ['1'],
-        connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        connectOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
 
       expect(ret).toBe(false);
@@ -712,11 +770,20 @@ describe('BlueveryCore', () => {
 
       const ret = await blueveryCore.connect({
         bondingParams: ['1', ''],
-        bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        bondingOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
         connectParams: ['1'],
-        connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        connectOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
 
       expect(ret).toBe(false);
@@ -744,11 +811,20 @@ describe('BlueveryCore', () => {
       );
       await blueveryCore.connect({
         bondingParams: ['1', ''],
-        bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        bondingOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
         connectParams: ['1'],
-        connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        connectOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
 
       expect(spyState.mock.calls[0][0].connect).toBe(undefined);
@@ -782,11 +858,20 @@ describe('BlueveryCore', () => {
 
       const connect = blueveryCore.connect({
         bondingParams: ['1', ''],
-        bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        bondingOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
         connectParams: ['1'],
-        connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        connectOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
 
       await expect(connect).rejects.toThrow('fixture error');
@@ -798,11 +883,20 @@ describe('BlueveryCore', () => {
     test('connect: should be throw if not found peripheral in scannedPeripherals', async () => {
       const connecting = blueveryCore.connect({
         bondingParams: ['1', ''],
-        bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        bondingOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
         connectParams: ['2'],
-        connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        connectOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
       await expect(connecting).rejects.toThrow();
     });
@@ -812,11 +906,18 @@ describe('BlueveryCore', () => {
         mockPlatform('ios', 10);
         await blueveryCore.connect({
           bondingParams: ['1', ''],
-          bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+          bondingOptions: {
+            omoiyariTime: DEFAULT_OMOIYARI_TIME,
+            timeoutOptions: {timeoutMilliseconds: 1000},
+          },
           connectParams: ['1'],
-          connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+          connectOptions: {
+            omoiyariTime: DEFAULT_OMOIYARI_TIME,
+            timeoutOptions: {timeoutMilliseconds: 1000},
+          },
           retrieveServicesParams: ['1'],
           retrieveServicesOptions: {
+            omoiyariTime: DEFAULT_OMOIYARI_TIME,
             timeoutOptions: {timeoutMilliseconds: 1000},
           },
         });
@@ -829,11 +930,18 @@ describe('BlueveryCore', () => {
         mockPlatform('android', 10);
         await blueveryCore.connect({
           bondingParams: ['1', ''],
-          bondingOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+          bondingOptions: {
+            omoiyariTime: DEFAULT_OMOIYARI_TIME,
+            timeoutOptions: {timeoutMilliseconds: 1000},
+          },
           connectParams: ['1'],
-          connectOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+          connectOptions: {
+            omoiyariTime: DEFAULT_OMOIYARI_TIME,
+            timeoutOptions: {timeoutMilliseconds: 1000},
+          },
           retrieveServicesParams: ['1'],
           retrieveServicesOptions: {
+            omoiyariTime: DEFAULT_OMOIYARI_TIME,
             timeoutOptions: {timeoutMilliseconds: 1000},
           },
         });
@@ -869,6 +977,7 @@ describe('BlueveryCore', () => {
 
     test('check calls', async () => {
       await blueveryCore.retrieveServices(['1'], {
+        omoiyariTime: DEFAULT_OMOIYARI_TIME,
         timeoutOptions: {timeoutMilliseconds: 1000},
       });
       expect(BleManager.retrieveServices).toBeCalled();
@@ -876,6 +985,7 @@ describe('BlueveryCore', () => {
 
     test('should change state of peripheral retrieveServices', async () => {
       await blueveryCore.retrieveServices(['1'], {
+        omoiyariTime: DEFAULT_OMOIYARI_TIME,
         timeoutOptions: {timeoutMilliseconds: 1000},
       });
       expect(spyRetrieveServicesState.mock.calls[0][0]).toBe('retrieving');
@@ -889,6 +999,7 @@ describe('BlueveryCore', () => {
       });
 
       const _retrieve = blueveryCore.retrieveServices(['1'], {
+        omoiyariTime: DEFAULT_OMOIYARI_TIME,
         timeoutOptions: {timeoutMilliseconds: 1000},
       });
       await expect(_retrieve).rejects.toThrow('fixture error');
@@ -945,7 +1056,10 @@ describe('BlueveryCore', () => {
         startNotificationParams: ['1', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
       expect(mockRemoveFn).toBeCalled();
       // listenerがremoveされたタイミングのstateの変化をassertしている。実装の順番に左右されるテストにならざるを得ない。
@@ -957,7 +1071,10 @@ describe('BlueveryCore', () => {
         startNotificationParams: ['1', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
 
       expect(spiedRetrieveServices).toBeCalled();
@@ -968,7 +1085,10 @@ describe('BlueveryCore', () => {
         startNotificationParams: ['2', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
         retrieveServicesParams: ['2'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
 
       expect(spiedRetrieveServices).not.toBeCalled();
@@ -979,7 +1099,10 @@ describe('BlueveryCore', () => {
         startNotificationParams: ['1', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
       expect(
         blueveryListeners.publicListeners['1']
@@ -996,7 +1119,10 @@ describe('BlueveryCore', () => {
         startNotificationParams: ['1', 'test', 'test'],
         receiveCharacteristicHandler: () => {},
         retrieveServicesParams: ['1'],
-        retrieveServicesOptions: {timeoutOptions: {timeoutMilliseconds: 1000}},
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
       });
 
       expect(BleManager.startNotification).toBeCalled();

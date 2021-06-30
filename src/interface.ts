@@ -92,15 +92,21 @@ export interface BlueveryMethodOptions {
     iterations: number;
   };
   // Note: connectはiOSで失敗してもタイムアウトしないので、タイムアウトするようにする
-  connect: ToBetterOptionsWithMustTimeout;
+  connect: ToBetterOptionsWithMustTimeout & {
+    omoiyariTime: number;
+  };
   // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
-  retrieveServices: ToBetterOptionsWithMustTimeout;
+  retrieveServices: ToBetterOptionsWithMustTimeout & {
+    omoiyariTime: number;
+  };
   read: ToBetterOptions & {
     advanceRetryCondition?: InspectorFn<typeof BleManager.read>;
   };
   write: ToBetterOptions;
   // Note: 無限にbondingして返ってこないケースがあるので、タイムアウトするようにする
-  createBond: ToBetterOptionsWithMustTimeout;
+  createBond: ToBetterOptionsWithMustTimeout & {
+    omoiyariTime: number;
+  };
   startNotification: {};
   stopNotification: {};
 }

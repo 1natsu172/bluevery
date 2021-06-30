@@ -1,4 +1,4 @@
-import {omoiyarify} from './omoiyarify';
+import {mockOmoiyarify, omoiyarify} from './omoiyarify';
 import inRange from 'in-range';
 import timeSpan from 'time-span';
 
@@ -49,5 +49,14 @@ describe('omoiyari', () => {
     const pRet = await omoiyariPromiseFn('l', 'g', 't', 'm');
     expect(ret).toEqual('passed: 1, 2, 3, 4');
     expect(pRet).toEqual('p-passed: l, g, t, m');
+  });
+});
+
+describe('mockOmoiyarify', () => {
+  test('should not omoiyari, bypass fn', async () => {
+    const fn = jest.fn(() => 'fixture');
+    const mocked = mockOmoiyarify(fn);
+    const ret = await mocked();
+    expect(ret).toBe('fixture');
   });
 });
