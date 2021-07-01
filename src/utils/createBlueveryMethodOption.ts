@@ -1,5 +1,6 @@
 import deepmerge from 'deepmerge';
 import {BlueveryMethodOptions} from '../interface';
+import {DEFAULT_OMOIYARI_TIME} from '../constants';
 
 export const defaultBlueveryMethodOptions: BlueveryMethodOptions = {
   scan: {
@@ -10,14 +11,17 @@ export const defaultBlueveryMethodOptions: BlueveryMethodOptions = {
   retrieveServices: {
     retryOptions: {factor: 1, retries: 4},
     timeoutOptions: {timeoutMilliseconds: 5000},
+    omoiyariTime: DEFAULT_OMOIYARI_TIME,
   },
   connect: {
     retryOptions: {factor: 1, retries: 4},
     timeoutOptions: {timeoutMilliseconds: 8000},
+    omoiyariTime: DEFAULT_OMOIYARI_TIME,
   },
   createBond: {
     retryOptions: {factor: 1, retries: 4},
     timeoutOptions: {timeoutMilliseconds: 10000},
+    omoiyariTime: DEFAULT_OMOIYARI_TIME,
   },
   read: {
     retryOptions: {factor: 1, retries: 4},

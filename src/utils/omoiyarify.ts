@@ -10,6 +10,18 @@ import pTap from 'p-tap';
 //     .then(pTap(() => delay(time)));
 // }
 
+/**
+ * @description mock for testing, reason so actual module is use promise delay(setTimeout).
+ */
+export function mockOmoiyarify<ArgsType extends unknown[], ReturnValue>(
+  fn: (...args: ArgsType) => PromiseLike<ReturnValue> | ReturnValue,
+) {
+  return (...args: ArgsType) =>
+    Promise.resolve()
+      .then(() => fn(...args))
+      .then(pTap(() => {}));
+}
+
 function omoiyarify<ArgsType extends unknown[], ReturnValue>(
   fn: (...args: ArgsType) => PromiseLike<ReturnValue> | ReturnValue,
   {time}: {time: number},

@@ -1,7 +1,7 @@
 import {Peripheral} from 'react-native-ble-manager';
 import promiseInterval from 'interval-promise';
 import autoBind from 'auto-bind';
-import {BlueveryCore, BlueveryCore as _BlueveryCore} from './blueveryCore';
+import {BlueveryCore as _BlueveryCore} from './blueveryCore';
 import {BlueveryState as _BlueveryState} from './blueveryState';
 import {BlueveryListeners as _BlueveryListeners} from './blueveryListeners';
 import {
@@ -100,10 +100,12 @@ export class Bluevery {
   }
 
   async startScan({
+    omoiyariTime = DEFAULT_OMOIYARI_TIME,
     scanOptions,
     discoverHandler,
     matchFn,
   }: {
+    omoiyariTime?: number;
     scanOptions?: Partial<BlueveryMethodOptions['scan']>;
     discoverHandler?: (peripheralInfo: PeripheralInfo) => any;
     matchFn?: (peripheral: Peripheral) => boolean;
@@ -135,7 +137,7 @@ export class Bluevery {
         {iterations: iterations},
       );
     const omoiyariIntervalScan = applyOmoiyari(intervalScan, {
-      time: DEFAULT_OMOIYARI_TIME,
+      time: omoiyariTime,
     });
 
     // Initialize the list before scan
@@ -155,6 +157,7 @@ export class Bluevery {
   }
 
   async connect({
+    omoiyariTime = DEFAULT_OMOIYARI_TIME,
     connectParams,
     connectOptions,
     bondingParams,
@@ -162,6 +165,7 @@ export class Bluevery {
     retrieveServicesParams,
     retrieveServicesOptions,
   }: {
+    omoiyariTime?: number;
     connectParams: BleManagerParams['connect'];
     /**
      * @description connect must have timeout
@@ -201,7 +205,13 @@ export class Bluevery {
       bondingOptions,
     );
 
-    await this.core?.connect({
+    if (this.core?.connect === undefined) {
+      throw new Error('this.core?.connect is undefined');
+    }
+    const omoiyariConnect = applyOmoiyari(this.core?.connect, {
+      time: omoiyariTime,
+    });
+    await omoiyariConnect({
       connectParams,
       connectOptions: _connectOptions,
       bondingParams,
@@ -291,15 +301,15 @@ export class Bluevery {
   }
 
   async readValue({
+    omoiyariTime = DEFAULT_OMOIYARI_TIME,
     readValueParams,
     readValueOptions,
     retrieveServicesParams,
     retrieveServicesOptions,
   }: {
+    omoiyariTime?: number;
     readValueParams: BleManagerParams['read'];
-    readValueOptions?: Parameters<
-      InstanceType<typeof BlueveryCore>['readValue']
-    >[0]['readValueOptions'];
+    readValueOptions?: BlueveryMethodOptions['read'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
     /**
      * @description retrieveServices must have timeout
@@ -317,8 +327,15 @@ export class Bluevery {
       retrieveServicesOptions,
     );
 
+    if (this.core?.readValue === undefined) {
+      throw new Error('this.core?.readValue is undefined');
+    }
+
     debugBluevery('readValue: ordered readValue to core');
-    return await this.core?.readValue({
+    const omoiyariReadValue = applyOmoiyari(this.core?.readValue, {
+      time: omoiyariTime,
+    });
+    return await omoiyariReadValue({
       readValueParams,
       readValueOptions: _readValueOptions,
       retrieveServicesParams,
@@ -327,11 +344,13 @@ export class Bluevery {
   }
 
   async writeValue({
+    omoiyariTime = DEFAULT_OMOIYARI_TIME,
     writeValueParams,
     writeValueOptions,
     retrieveServicesParams,
     retrieveServicesOptions,
   }: {
+    omoiyariTime?: number;
     writeValueParams: BleManagerParams['write'];
     writeValueOptions?: BlueveryMethodOptions['write'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
@@ -351,8 +370,15 @@ export class Bluevery {
       retrieveServicesOptions,
     );
 
+    if (this.core?.writeValue === undefined) {
+      throw new Error('this.core?.writeValue is undefined');
+    }
+
     debugBluevery('writeValue: ordered writeValue to core');
-    return await this.core?.writeValue({
+    const omoiyariWriteValue = applyOmoiyari(this.core.writeValue, {
+      time: omoiyariTime,
+    });
+    return await omoiyariWriteValue({
       writeValueParams,
       writeValueOptions: _writeValueoptions,
       retrieveServicesParams,
