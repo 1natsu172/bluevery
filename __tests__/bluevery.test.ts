@@ -481,6 +481,27 @@ describe('bluevery: commands APIs', () => {
       });
     });
 
+    describe('writeValue: negative pattern', () => {
+      test('should throw if not found core method', async () => {
+        bluevery = new Bluevery({
+          BlueveryCore: core,
+          BlueveryState,
+          blueveryListeners: new BlueveryListeners(),
+          store: proxy({bluevery: createInitialState()}),
+        });
+        const ret = bluevery.writeValue({
+          writeValueParams: [
+            'dummyPid',
+            'dummySUuid',
+            'dummyCharaValue',
+            'this is data',
+          ],
+          retrieveServicesParams: ['dummyPid'],
+        });
+        await expect(ret).rejects.toThrow('this.core?.writeValue is undefined');
+      });
+    });
+
     describe('writeValue: check calls', () => {
       test('should call core#writeValue', async () => {
         await bluevery.writeValue({
@@ -526,6 +547,22 @@ describe('bluevery: commands APIs', () => {
       });
     });
 
+    describe('readValue: negative pattern', () => {
+      test('should throw if not found core method', async () => {
+        bluevery = new Bluevery({
+          BlueveryCore: core,
+          BlueveryState,
+          blueveryListeners: new BlueveryListeners(),
+          store: proxy({bluevery: createInitialState()}),
+        });
+        const ret = bluevery.readValue({
+          readValueParams: ['dummyPid', 'dummySUuid', 'dummyCharaValue'],
+          retrieveServicesParams: ['dummyPid'],
+        });
+        await expect(ret).rejects.toThrow('this.core?.readValue is undefined');
+      });
+    });
+
     describe('readValue: check calls', () => {
       test('should call core#readValue', async () => {
         await bluevery.readValue({
@@ -567,6 +604,23 @@ describe('bluevery: commands APIs', () => {
 
       test('should call core#connect', async () => {
         expect(connectFn).toBeCalled();
+      });
+    });
+
+    describe('connect: negative pattern', () => {
+      test('should throw if not found core method', async () => {
+        bluevery = new Bluevery({
+          BlueveryCore: core,
+          BlueveryState,
+          blueveryListeners: new BlueveryListeners(),
+          store: proxy({bluevery: createInitialState()}),
+        });
+        const ret = bluevery.connect({
+          retrieveServicesParams: ['1'],
+          connectParams: ['1'],
+          bondingParams: ['1', 'test'],
+        });
+        await expect(ret).rejects.toThrow('this.core?.connect is undefined');
       });
     });
   });
