@@ -43,6 +43,7 @@ describe('BlueveryListener', () => {
   describe('removeAnyPublicSubscription', () => {
     test('should remove any public subscription', () => {
       const mockEmitter = mockEmitterSubscription();
+      // @ts-expect-error -- testのためにreadonlyオブジェクトへ初期値設定している
       blueveryListener.publicListeners = {
         '1': {receivingForCharacteristicValueListener: mockEmitter},
       };
@@ -62,15 +63,36 @@ describe('BlueveryListener', () => {
     });
   });
 
+  describe('removeAnyInternalSubscription', () => {
+    test('should remove any internal subscription', () => {
+      const mockEmitter = mockEmitterSubscription();
+      // @ts-expect-error -- testのためにreadonlyオブジェクトへ初期値設定している
+      blueveryListener.internalListeners = {
+        discoverPeripheralListener: mockEmitter,
+      };
+
+      expect(
+        blueveryListener.internalListeners.discoverPeripheralListener,
+      ).toBe(mockEmitter);
+
+      blueveryListener.removeAnyInternalSubscription(
+        'discoverPeripheralListener',
+      );
+
+      expect(blueveryListener.internalListeners).toStrictEqual({});
+      expect(mockEmitter.remove).toBeCalledTimes(1);
+    });
+  });
+
   describe('removePeripheralPublicSubscription', () => {
     test('should remove public subscription of the peripheral', () => {
       const mockEmitter1 = mockEmitterSubscription();
       const mockEmitter2 = mockEmitterSubscription();
 
+      // @ts-expect-error -- testのためにreadonlyオブジェクトへ初期値設定している
       blueveryListener.publicListeners = {
         '1': {
           receivingForCharacteristicValueListener: mockEmitter1,
-          // @ts-expect-error テスト用に独自にプロパティを足しているので正しい
           dummyListener: mockEmitter2,
         },
       };
@@ -98,13 +120,14 @@ describe('BlueveryListener', () => {
       const mockEmitter3 = mockEmitterSubscription();
       const mockEmitter4 = mockEmitterSubscription();
 
+      // @ts-expect-error -- testのためにreadonlyオブジェクトへ初期値設定している
       blueveryListener.publicListeners = {
         '1': {
           receivingForCharacteristicValueListener: mockEmitter1,
-          // @ts-expect-error テスト用に独自にプロパティを足しているので正しい
           dummyListener: mockEmitter2,
         },
       };
+      // @ts-expect-error -- testのためにreadonlyオブジェクトへ初期値設定している
       blueveryListener.internalListeners = {
         disconnectPeripheralListener: mockEmitter3,
         discoverPeripheralListener: mockEmitter4,

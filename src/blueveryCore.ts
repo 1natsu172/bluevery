@@ -29,6 +29,7 @@ import {
   toBetterPromise,
   toThrowErrorIfRejected,
   toInspectPromiseReturnValue,
+  applyOmoiyari,
 } from './utils';
 import {BlueveryState as _BlueveryState} from './blueveryState';
 import {BlueveryListeners as _BlueveryListeners} from './blueveryListeners';
@@ -326,7 +327,9 @@ export class BlueveryCore {
     return Promise.all([
       this.delayInstanceOfScan?.clear(),
       BleManager.stopScan(),
-      this.listeners.internalListeners.discoverPeripheralListener?.remove(),
+      this.listeners.removeAnyInternalSubscription(
+        'discoverPeripheralListener',
+      ),
       this.state.offScanning(),
     ]);
   }
@@ -373,14 +376,20 @@ export class BlueveryCore {
     }
     this.state.setPeripheralToManagingPeripherals(peripheral);
 
-    const _connect = toBetterPromise(
-      toThrowErrorIfRejected(BleManager.connect),
-      connectOptions,
+    const _connect = applyOmoiyari(
+      toBetterPromise(
+        toThrowErrorIfRejected(BleManager.connect),
+        connectOptions,
+      ),
+      {time: connectOptions.omoiyariTime},
     );
 
-    const _bonding = toBetterPromise(
-      toThrowErrorIfRejected(BleManager.createBond),
-      bondingOptions,
+    const _bonding = applyOmoiyari(
+      toBetterPromise(
+        toThrowErrorIfRejected(BleManager.createBond),
+        bondingOptions,
+      ),
+      {time: bondingOptions.omoiyariTime},
     );
 
     try {
@@ -420,9 +429,12 @@ export class BlueveryCore {
     debugBlueveryCore('retrieveServices: start', retrieveServicesParams);
     const [peripheralId] = retrieveServicesParams;
 
-    const _retrieveServices = toBetterPromise(
-      toThrowErrorIfRejected(BleManager.retrieveServices),
-      retrieveServicesOptions,
+    const _retrieveServices = applyOmoiyari(
+      toBetterPromise(
+        toThrowErrorIfRejected(BleManager.retrieveServices),
+        retrieveServicesOptions,
+      ),
+      {time: retrieveServicesOptions.omoiyariTime},
     );
 
     debugBlueveryCore('retrieveServices: retrieving');
@@ -594,9 +606,10 @@ export class BlueveryCore {
       debugBlueveryCore(
         'startNotification: already exist a listener, remove it',
       );
-      this.listeners.publicListeners[
-        peripheralId
-      ]?.receivingForCharacteristicValueListener?.remove();
+      this.listeners.removeAnyPublicSubscription(
+        peripheralId,
+        'receivingForCharacteristicValueListener',
+      );
       this.state.offReceivingForCharacteristicValue(peripheralId);
     }
 
@@ -624,9 +637,10 @@ export class BlueveryCore {
     const [peripheralId] = stopNotificationParams;
     return Promise.all([
       BleManager.stopNotification(...stopNotificationParams),
-      this.listeners.publicListeners[
-        peripheralId
-      ]?.receivingForCharacteristicValueListener?.remove(),
+      this.listeners.removeAnyPublicSubscription(
+        peripheralId,
+        'receivingForCharacteristicValueListener',
+      ),
       this.state.offReceivingForCharacteristicValue(peripheralId),
     ]);
   }

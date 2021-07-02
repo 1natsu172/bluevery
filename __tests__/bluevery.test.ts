@@ -5,23 +5,28 @@ import {Bluevery} from '../src/bluevery';
 import {BlueveryCore} from '../src/blueveryCore';
 import {BlueveryState, createInitialState} from '../src/blueveryState';
 import {BlueveryListeners} from '../src/blueveryListeners';
-import * as omoiyarify from '../src/utils/omoiyarify';
+import {applyOmoiyari} from '../src/utils';
 import {flushPromisesAdvanceTimer} from './__utils__/flushPromisesAdvanceTimer';
 import {dummyPeripheralInfo} from './__utils__/dummyPeripheralInfo';
 import {mockPlatform} from './__utils__/mockPlatform';
 import {EmitterSubscription, NativeEventEmitter} from 'react-native';
 import {DisconnectedPeripheralInfo} from '../src/libs';
 
+jest.mock('../src/utils', () => ({
+  __esModule: true,
+  ...jest.requireActual('../src/utils'),
+  applyOmoiyari: jest.fn(require('../src/utils/omoiyarify').mockOmoiyarify),
+}));
+
 const nativeEventEmitter = new NativeEventEmitter();
 
 let bluevery: Bluevery;
-let spiedApplyOmoiyari: jest.SpyInstance;
 let spiedCoreInit: jest.SpyInstance;
 let spiedCoreCleanupScan: jest.SpyInstance;
 beforeEach(async () => {
   // cleanup spies
   jest.restoreAllMocks();
-  spiedApplyOmoiyari = jest.spyOn(omoiyarify, 'applyOmoiyari');
+
   // NOTE: core#initでdisconnectのリスナーが張られるが、removeされないまま残ってしまうと他のテストがコケるのでメソッド自体モックしておく。実体実行したいテストでのみrestoreするようにする。
   spiedCoreInit = jest
     .spyOn(BlueveryCore.prototype, 'init')
@@ -180,7 +185,10 @@ describe('bluevery: commands APIs', () => {
       const state = bluevery.core.getState();
       expect(state.managingPeripherals.tester1.connect).toBe('disconnected');
       expect(optionalDisconnectHandler).toBeCalled();
-      expect(bluevery.publicListeners[testerPeripheral.id]).toBe(undefined);
+      // @ts-expect-error -- testのためcoreにアクセスしている
+      expect(bluevery.core.listeners.publicListeners[testerPeripheral.id]).toBe(
+        undefined,
+      );
     });
 
     describe('save the already connected & bonded peripherals at init', () => {
@@ -320,7 +328,7 @@ describe('bluevery: commands APIs', () => {
           },
         });
         jest.runAllTimers();
-        expect(spiedApplyOmoiyari).toBeCalledTimes(1);
+        expect(applyOmoiyari).toBeCalledTimes(1);
       });
 
       test('should behave omoiyari with 1sec', async () => {
@@ -473,6 +481,27 @@ describe('bluevery: commands APIs', () => {
       });
     });
 
+    describe('writeValue: negative pattern', () => {
+      test('should throw if not found core method', async () => {
+        bluevery = new Bluevery({
+          BlueveryCore: core,
+          BlueveryState,
+          blueveryListeners: new BlueveryListeners(),
+          store: proxy({bluevery: createInitialState()}),
+        });
+        const ret = bluevery.writeValue({
+          writeValueParams: [
+            'dummyPid',
+            'dummySUuid',
+            'dummyCharaValue',
+            'this is data',
+          ],
+          retrieveServicesParams: ['dummyPid'],
+        });
+        await expect(ret).rejects.toThrow('this.core?.writeValue is undefined');
+      });
+    });
+
     describe('writeValue: check calls', () => {
       test('should call core#writeValue', async () => {
         await bluevery.writeValue({
@@ -518,6 +547,22 @@ describe('bluevery: commands APIs', () => {
       });
     });
 
+    describe('readValue: negative pattern', () => {
+      test('should throw if not found core method', async () => {
+        bluevery = new Bluevery({
+          BlueveryCore: core,
+          BlueveryState,
+          blueveryListeners: new BlueveryListeners(),
+          store: proxy({bluevery: createInitialState()}),
+        });
+        const ret = bluevery.readValue({
+          readValueParams: ['dummyPid', 'dummySUuid', 'dummyCharaValue'],
+          retrieveServicesParams: ['dummyPid'],
+        });
+        await expect(ret).rejects.toThrow('this.core?.readValue is undefined');
+      });
+    });
+
     describe('readValue: check calls', () => {
       test('should call core#readValue', async () => {
         await bluevery.readValue({
@@ -559,6 +604,23 @@ describe('bluevery: commands APIs', () => {
 
       test('should call core#connect', async () => {
         expect(connectFn).toBeCalled();
+      });
+    });
+
+    describe('connect: negative pattern', () => {
+      test('should throw if not found core method', async () => {
+        bluevery = new Bluevery({
+          BlueveryCore: core,
+          BlueveryState,
+          blueveryListeners: new BlueveryListeners(),
+          store: proxy({bluevery: createInitialState()}),
+        });
+        const ret = bluevery.connect({
+          retrieveServicesParams: ['1'],
+          connectParams: ['1'],
+          bondingParams: ['1', 'test'],
+        });
+        await expect(ret).rejects.toThrow('this.core?.connect is undefined');
       });
     });
   });

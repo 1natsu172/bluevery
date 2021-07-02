@@ -8,8 +8,8 @@ import {
 import {debugBlueveryListener} from './utils';
 
 export class BlueveryListeners {
-  publicListeners: PublicListeners = {};
-  internalListeners: InternalListeners = {};
+  readonly publicListeners: PublicListeners = {};
+  readonly internalListeners: InternalListeners = {};
 
   /**
    * @description setProperty util method
@@ -52,6 +52,16 @@ export class BlueveryListeners {
     }
   }
 
+  removeAnyInternalSubscription<Key extends keyof InternalListeners>(key: Key) {
+    debugBlueveryListener('remove from internalListeners', key);
+    const subscription = this.internalListeners[key];
+    if (subscription) {
+      debugBlueveryListener('match the remove target subscription', key);
+      subscription.remove();
+      delete this.internalListeners[key];
+    }
+  }
+
   removePeripheralPublicSubscription(peripheralId: PeripheralId) {
     debugBlueveryListener(
       'remove public subscription of peripheral',
@@ -70,19 +80,23 @@ export class BlueveryListeners {
     delete this.publicListeners[peripheralId];
   }
 
+  private removeAllInternalSubscriptions() {
+    (Object.keys(this.internalListeners) as Array<
+      keyof InternalListeners
+    >).forEach((key) => {
+      this.removeAnyInternalSubscription(key);
+    });
+  }
+
+  private removeAllPublicSubscriptions() {
+    Object.keys(this.publicListeners).forEach((peripheralKeys) => {
+      this.removePeripheralPublicSubscription(peripheralKeys);
+    });
+  }
+
   removeAllSubscriptions() {
     debugBlueveryListener('remove all subscriptions');
-    Object.values(this.internalListeners).forEach((listener) => {
-      listener?.remove();
-    });
-    this.internalListeners = {};
-    Object.values(this.publicListeners).forEach((subscriptions) => {
-      if (subscriptions) {
-        Object.values(subscriptions).forEach((listener) => {
-          listener?.remove();
-        });
-      }
-    });
-    this.publicListeners = {};
+    this.removeAllInternalSubscriptions();
+    this.removeAllPublicSubscriptions();
   }
 }
