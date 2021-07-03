@@ -54,6 +54,7 @@ export const useAND_UA_651BLE: (props: Props) => BleController = ({
               connectParams: [peripheralInfo.id],
               retrieveServicesParams: [peripheralInfo.id],
               retrieveServicesOptions: {
+                omoiyariTime: 3000,
                 retryOptions: {retries: 15},
                 timeoutOptions: {timeoutMilliseconds: 10000},
               },
@@ -84,6 +85,7 @@ export const useAND_UA_651BLE: (props: Props) => BleController = ({
           },
           retrieveServicesParams: [peripheralInfo.id],
           retrieveServicesOptions: {
+            omoiyariTime: 3000,
             retryOptions: {retries: 15},
             timeoutOptions: {timeoutMilliseconds: 10000},
           },

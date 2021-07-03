@@ -4,7 +4,7 @@ import {BleController} from './type';
 import {BleWeightMeasurementSerializer} from '../../../ble-data';
 
 export const BP_MONITOR_NAME_AND = 'A&D_UC-352BLE';
-export const BP_SERVICE_UUID = '180A';
+export const BP_SERVICE_UUID = '181D';
 /**
  * BLE(GATT)のキャラクタリスティックUUID: タイムスタンプ
  */
@@ -48,13 +48,16 @@ export const useAND_UC_352BLE: (props: Props) => BleController = ({
 
   const onReceiveCharacteristicValue = useCallback(
     async (peripheralInfo: PeripheralInfo) => {
+      console.log('onReceiveCharacteristicValue');
       try {
         await bluevery.receiveCharacteristicValue({
           onCallBeforeStartNotification: async () => {
+            await bluevery.stopScan();
             await bluevery.connect({
               connectParams: [peripheralInfo.id],
               retrieveServicesParams: [peripheralInfo.id],
               retrieveServicesOptions: {
+                omoiyariTime: 3000,
                 retryOptions: {retries: 15},
                 timeoutOptions: {timeoutMilliseconds: 10000},
               },
@@ -78,6 +81,7 @@ export const useAND_UC_352BLE: (props: Props) => BleController = ({
               ],
               retrieveServicesParams: [peripheralInfo.id],
             });
+            //await bluevery.disconnect(peripheralInfo.id);
           },
           scanParams: {
             scanOptions: {
@@ -86,6 +90,7 @@ export const useAND_UC_352BLE: (props: Props) => BleController = ({
           },
           retrieveServicesParams: [peripheralInfo.id],
           retrieveServicesOptions: {
+            omoiyariTime: 3000,
             retryOptions: {retries: 15},
             timeoutOptions: {timeoutMilliseconds: 10000},
           },
@@ -134,11 +139,13 @@ export const useAND_UC_352BLE: (props: Props) => BleController = ({
   const onConnectPeripheral = useCallback(
     async (peripheralInfo: PeripheralInfo) => {
       try {
+        console.log(`start connect`);
         await bluevery.connect({
           connectParams: [peripheralInfo.id],
           retrieveServicesParams: [peripheralInfo.id],
           bondingParams: [peripheralInfo.id, peripheralInfo.id],
         });
+        console.log(`end connect`);
         await bluevery.writeValue({
           writeValueParams: [
             peripheralInfo.id,
@@ -148,7 +155,8 @@ export const useAND_UC_352BLE: (props: Props) => BleController = ({
           ],
           retrieveServicesParams: [peripheralInfo.id],
         });
-        await bluevery.readValue({
+        console.log(`reade value: end write value`);
+        const value = await bluevery.readValue({
           readValueParams: [
             peripheralInfo.id,
             BP_SERVICE_UUID,
@@ -156,6 +164,7 @@ export const useAND_UC_352BLE: (props: Props) => BleController = ({
           ],
           retrieveServicesParams: [peripheralInfo.id],
         });
+        console.log(`reade value: ${JSON.stringify(value)}`);
       } catch (error) {
         onError(error);
       }
