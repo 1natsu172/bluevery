@@ -15,10 +15,10 @@ export async function checkPermission(): Promise<
        * Android < 10では、ACCESS_FINE_LOCATIONが必要
        * https://developer.android.com/guide/topics/connectivity/bluetooth?hl=ja
        */
-      PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-      PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION,
+      'android.permission.ACCESS_FINE_LOCATION',
+      'android.permission.ACCESS_COARSE_LOCATION',
     ],
-  });
+  }) as Permission[];
   if (!permissionTargets) {
     throw Error('permission targets not found');
   }

@@ -65,14 +65,14 @@ describe('checkPermission', () => {
     test('Android: should be return tuple(granted & others): both granted', async () => {
       mockPlatform('android', 10);
       mockCheckMultiple({
-        [PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION]: 'granted',
-        [PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION]: 'granted',
+        'android.permission.ACCESS_FINE_LOCATION': 'granted',
+        'android.permission.ACCESS_COARSE_LOCATION': 'granted',
       });
       const checked = await checkPermission();
       expect(checked).toStrictEqual([
         [
-          PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-          PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION,
+          'android.permission.ACCESS_FINE_LOCATION',
+          'android.permission.ACCESS_COARSE_LOCATION',
         ],
         [],
       ]);
@@ -81,28 +81,28 @@ describe('checkPermission', () => {
     test('Android: should be return tuple(granted & others): one side each', async () => {
       mockPlatform('android', 10);
       mockCheckMultiple({
-        [PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION]: 'granted',
-        [PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION]: 'denied',
+        'android.permission.ACCESS_FINE_LOCATION': 'granted',
+        'android.permission.ACCESS_COARSE_LOCATION': 'denied',
       });
       const checked = await checkPermission();
       expect(checked).toStrictEqual([
-        [PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION],
-        [PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION],
+        ['android.permission.ACCESS_FINE_LOCATION'],
+        ['android.permission.ACCESS_COARSE_LOCATION'],
       ]);
     });
 
     test('Android: should be return tuple(granted & others): both not granted', async () => {
       mockPlatform('android', 10);
       mockCheckMultiple({
-        [PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION]: 'blocked',
-        [PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION]: 'blocked',
+        'android.permission.ACCESS_FINE_LOCATION': 'blocked',
+        'android.permission.ACCESS_COARSE_LOCATION': 'blocked',
       });
       const checked = await checkPermission();
       expect(checked).toStrictEqual([
         [],
         [
-          PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-          PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION,
+          'android.permission.ACCESS_FINE_LOCATION',
+          'android.permission.ACCESS_COARSE_LOCATION',
         ],
       ]);
     });
