@@ -16,7 +16,7 @@ target 'example' do
 
   target 'exampleTests' do
     inherit! :complete
-    # Pods for testingd
+    # Pods for testing
   end
 
   # Enables Flipper.
