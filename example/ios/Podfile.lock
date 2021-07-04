@@ -427,9 +427,9 @@ DEPENDENCIES:
   - FlipperKit/SKIOSNetworkPlugin (= 0.87.0)
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
-  - Permission-BluetoothPeripheral (from `../node_modules/react-native-permissions/ios/BluetoothPeripheral/Permission-BluetoothPeripheral.podspec`)
-  - Permission-LocationWhenInUse (from `../node_modules/react-native-permissions/ios/LocationWhenInUse/Permission-LocationWhenInUse.podspec`)
-  - Permission-Notifications (from `../node_modules/react-native-permissions/ios/Notifications/Permission-Notifications.podspec`)
+  - Permission-BluetoothPeripheral (from `../node_modules/react-native-permissions/ios/BluetoothPeripheral`)
+  - Permission-LocationWhenInUse (from `../node_modules/react-native-permissions/ios/LocationWhenInUse`)
+  - Permission-Notifications (from `../node_modules/react-native-permissions/ios/Notifications`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
   - React (from `../node_modules/react-native/`)
@@ -513,11 +513,11 @@ EXTERNAL SOURCES:
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   Permission-BluetoothPeripheral:
-    :path: "../node_modules/react-native-permissions/ios/BluetoothPeripheral/Permission-BluetoothPeripheral.podspec"
+    :path: "../node_modules/react-native-permissions/ios/BluetoothPeripheral"
   Permission-LocationWhenInUse:
-    :path: "../node_modules/react-native-permissions/ios/LocationWhenInUse/Permission-LocationWhenInUse.podspec"
+    :path: "../node_modules/react-native-permissions/ios/LocationWhenInUse"
   Permission-Notifications:
-    :path: "../node_modules/react-native-permissions/ios/Notifications/Permission-Notifications.podspec"
+    :path: "../node_modules/react-native-permissions/ios/Notifications"
   RCTRequired:
     :path: "../node_modules/react-native/Libraries/RCTRequired"
   RCTTypeSafety:
@@ -675,6 +675,6 @@ SPEC CHECKSUMS:
   Yoga: 7740b94929bbacbddda59bf115b5317e9a161598
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: bbfb81792b8f9c85a399d75cb55f86e66d317ab7
+PODFILE CHECKSUM: d365429634963b5414e1a50561eb6f54be317980
 
 COCOAPODS: 1.10.1
