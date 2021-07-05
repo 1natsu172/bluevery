@@ -115,7 +115,9 @@ export const BaseBleServiceScreen: React.VFC<Props> = (props) => {
       console.log('cleanup: initAndScan');
       bluevery.stopBluevery();
     };
-  }, [props]);
+    // propsをdepsに含めると、receiveCharacteristicValueしたときにここのeffectが走ってしまうので1回だけに絞る
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <SafeAreaView style={styles.mainContentContainer}>
