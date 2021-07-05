@@ -8,17 +8,17 @@ import RNPermissions, {
 export async function checkPermission(): Promise<
   [granted: Permission[], ungranted: Permission[]]
 > {
-  const permissionTargets = Platform.select({
+  const permissionTargets = Platform.select<Permission[]>({
     ios: [PERMISSIONS.IOS.BLUETOOTH_PERIPHERAL],
     android: [
       /**
        * Android < 10では、ACCESS_FINE_LOCATIONが必要
        * https://developer.android.com/guide/topics/connectivity/bluetooth?hl=ja
        */
-      'android.permission.ACCESS_FINE_LOCATION',
-      'android.permission.ACCESS_COARSE_LOCATION',
+      PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+      PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION,
     ],
-  }) as Permission[];
+  });
   if (!permissionTargets) {
     throw Error('permission targets not found');
   }
