@@ -1,17 +1,18 @@
 import {useCallback, useState} from 'react';
 import {bluevery, PeripheralId, PeripheralInfo} from 'bluevery';
 import {BleController} from './type';
+import {BleWeightMeasurementSerializer} from '../../../ble-data';
 
-export const BP_MONITOR_NAME_AND = 'A&D_UA-651BLE';
-export const BP_SERVICE_UUID = '1810';
+export const BP_MONITOR_NAME_AND = 'A&D_UC-352BLE';
+export const BP_SERVICE_UUID = '181D';
 /**
  * BLE(GATT)のキャラクタリスティックUUID: タイムスタンプ
  */
 export const BP_DATETIME_CHARECTERISTIC_UUID = '2a08';
 /**
- * BLE(GATT)のキャラクタリスティックUUID: 血圧測定データ
+ * BLE(GATT)のキャラクタリスティックUUID: 体重測定データ
  */
-export const BP_MEASUREMENT_CHARECTERISTIC_UUID = '2a35';
+export const BP_MEASUREMENT_CHARECTERISTIC_UUID = '2A9D';
 
 /**
  * Dateを以下の形式のbyte arrayに変換する
@@ -31,12 +32,12 @@ export const timeToByteArray = (d: Date) => {
 };
 
 /**
- * hook for A&D_UA-651BLE
+ * hook for A&D_UC-352BLE
  */
 type Props = {
   onError: (error: Error) => unknown;
 };
-export const useAND_UA_651BLE: (props: Props) => BleController = ({
+export const useAND_UC_352BLE: (props: Props) => BleController = ({
   onError,
 }: Props) => {
   const [characteristicValues, setCharacteristicValues] = useState<
@@ -47,9 +48,11 @@ export const useAND_UA_651BLE: (props: Props) => BleController = ({
 
   const onReceiveCharacteristicValue = useCallback(
     async (peripheralInfo: PeripheralInfo) => {
+      console.log('onReceiveCharacteristicValue');
       try {
         await bluevery.receiveCharacteristicValue({
           onCallBeforeStartNotification: async () => {
+            await bluevery.stopScan();
             await bluevery.connect({
               connectParams: [peripheralInfo.id],
               retrieveServicesParams: [peripheralInfo.id],
@@ -69,6 +72,7 @@ export const useAND_UA_651BLE: (props: Props) => BleController = ({
               ],
               retrieveServicesParams: [peripheralInfo.id],
             });
+            // Note: readする必要はある？
             await bluevery.readValue({
               readValueParams: [
                 peripheralInfo.id,
@@ -77,6 +81,7 @@ export const useAND_UA_651BLE: (props: Props) => BleController = ({
               ],
               retrieveServicesParams: [peripheralInfo.id],
             });
+            //await bluevery.disconnect(peripheralInfo.id);
           },
           scanParams: {
             scanOptions: {
@@ -105,6 +110,13 @@ export const useAND_UA_651BLE: (props: Props) => BleController = ({
                 `match the ${peripheralInfo.id} / ${BP_SERVICE_UUID} / ${BP_MEASUREMENT_CHARECTERISTIC_UUID}`,
                 res.value,
               );
+              const serializer = new BleWeightMeasurementSerializer();
+              const weightMeasurement = serializer.deserialize(
+                res.value as number[],
+              );
+              console.log(
+                `weightMeasurement: ${JSON.stringify(weightMeasurement)}`,
+              );
               setCharacteristicValues((prev) => {
                 return {
                   ...prev,
@@ -127,11 +139,13 @@ export const useAND_UA_651BLE: (props: Props) => BleController = ({
   const onConnectPeripheral = useCallback(
     async (peripheralInfo: PeripheralInfo) => {
       try {
+        console.log(`start connect`);
         await bluevery.connect({
           connectParams: [peripheralInfo.id],
           retrieveServicesParams: [peripheralInfo.id],
           bondingParams: [peripheralInfo.id, peripheralInfo.id],
         });
+        console.log(`end connect`);
         await bluevery.writeValue({
           writeValueParams: [
             peripheralInfo.id,
@@ -141,7 +155,8 @@ export const useAND_UA_651BLE: (props: Props) => BleController = ({
           ],
           retrieveServicesParams: [peripheralInfo.id],
         });
-        await bluevery.readValue({
+        console.log(`reade value: end write value`);
+        const value = await bluevery.readValue({
           readValueParams: [
             peripheralInfo.id,
             BP_SERVICE_UUID,
@@ -149,6 +164,7 @@ export const useAND_UA_651BLE: (props: Props) => BleController = ({
           ],
           retrieveServicesParams: [peripheralInfo.id],
         });
+        console.log(`reade value: ${JSON.stringify(value)}`);
       } catch (error) {
         onError(error);
       }

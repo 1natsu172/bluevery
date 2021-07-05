@@ -8,7 +8,7 @@ import RNPermissions, {
 export async function checkPermission(): Promise<
   [granted: Permission[], ungranted: Permission[]]
 > {
-  const permissionTargets = Platform.select({
+  const permissionTargets = Platform.select<Permission[]>({
     ios: [PERMISSIONS.IOS.BLUETOOTH_PERIPHERAL],
     android: [
       /**

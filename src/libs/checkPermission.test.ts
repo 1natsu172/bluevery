@@ -1,9 +1,5 @@
-import {
-  PERMISSIONS,
-  RESULTS,
-  Permission,
-  checkMultiple,
-} from 'react-native-permissions';
+import {RESULTS, Permission, checkMultiple} from 'react-native-permissions';
+import {PERMISSIONS} from 'react-native-permissions/mock';
 import {checkPermission} from './checkPermission';
 import {mockPlatform} from '../../__tests__/__utils__/mockPlatform';
 
