@@ -95,6 +95,8 @@ export interface BlueveryMethodOptions {
   connect: ToBetterOptionsWithMustTimeout & {
     omoiyariTime: number;
   };
+  disconnect: ToBetterOptions & {};
+
   // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
   retrieveServices: ToBetterOptionsWithMustTimeout & {
     omoiyariTime: number;

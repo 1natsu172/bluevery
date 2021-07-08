@@ -222,6 +222,31 @@ export class Bluevery {
     debugBluevery('connect: end');
   }
 
+  async disconnect({
+    disconnectParams,
+    disconnectOptions,
+  }: {
+    disconnectParams: BleManagerParams['disconnect'];
+    disconnectOptions?: BlueveryMethodOptions['disconnect'];
+  }) {
+    debugBluevery('disconnect: start');
+
+    const _disconnectOptions = createBlueveryMethodOption(
+      'disconnect',
+      disconnectOptions,
+    );
+
+    if (this.core?.disconnect === undefined) {
+      throw new Error('this.core?.disconnect is undefined');
+    }
+
+    await this.core?.disconnect({
+      disconnectParams,
+      disconnectOptions: _disconnectOptions,
+    });
+    debugBluevery('disconnect: end');
+  }
+
   /**
    * NOTE: connect, bondingはconnectメソッドで必要で、connectメソッド側でオプションのデフォルト値は吸収しているのでこのメソッドで設定しないのは意図的。
    */
