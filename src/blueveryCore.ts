@@ -453,17 +453,20 @@ export class BlueveryCore {
 
     try {
       debugBlueveryCore('disconnect: disconnect process start');
-      this.state.setManagingPeripheralConnecting(targetPeripheralId);
+      console.log('disconnectParams:', JSON.stringify(disconnectParams));
+      // TODO: disconnect が undefinedになってしまっている
+      BleManager.disconnect('1', true);
+      /*
       await _disconnect(...disconnectParams).then(() => {
         debugBlueveryCore('disconnect: disconnect success');
         this.state.setManagingPeripheralDisconnected(targetPeripheralId);
       });
+      */
     } catch (error) {
       debugBlueveryCore(
         'disconnect: An error has occurred in the disconnect process',
         error,
       );
-      this.state.setManagingPeripheralFailedConnect(targetPeripheralId);
       throw error;
     }
     debugBlueveryCore('disconnect: disconnect process end');
