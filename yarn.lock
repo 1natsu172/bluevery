@@ -6426,10 +6426,10 @@ prop-types@^15.6.2, prop-types@^15.7.2:
     object-assign "^4.1.1"
     react-is "^16.8.1"
 
-proxy-compare@1.1.6:
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/proxy-compare/-/proxy-compare-1.1.6.tgz#dd7737be611a9d7142fae10dbc6d0ceb74ad6da0"
-  integrity sha512-V65euKrKgKjVyEh5+4nVlAf4dHJ6Q0cF77MCeZiJaOldAl9lndy/u270SJneHiz3UkVcSIhxfOKY7aFkrMyo5g==
+proxy-compare@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/proxy-compare/-/proxy-compare-2.0.1.tgz#3ae19cf47f64e89bd60fe4f57afd124f733ef64f"
+  integrity sha512-uXj3TtWdR1S2SNwJKbgJB+1FJm9HM3sFzlVc8W6PZvU6ogt9mlkb1WwZQpuKFLkDS6LKY4+FBE18K6ZArphnHA==
 
 pseudomap@^1.0.2:
   version "1.0.2"
@@ -7942,12 +7942,12 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
-valtio@^1.0.0:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/valtio/-/valtio-1.0.4.tgz#facc9c4e4fb1afb7a5503d72051356a3d1ca061f"
-  integrity sha512-hdnNFwoQNJXTHGI43i+X6l+cNB5K+hmg66RNzclQZf8JtvRSvqpRE/o5LP8ITHI1fu7sgk29ofVxBmp+vUwF4g==
+valtio@1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/valtio/-/valtio-1.0.7.tgz#bbcf1bdf722923d1a3b91452c05936c6ab127b21"
+  integrity sha512-zaaM+QiE6P0pBllFIyDnbjaRILEYsy1YYJf6F1D8dsADKxL2r+Fb3SupM8SHQn2tNx4cbSTu9aarOaoiH+X1dg==
   dependencies:
-    proxy-compare "1.1.6"
+    proxy-compare "2.0.1"
 
 vary@~1.1.2:
   version "1.1.2"
