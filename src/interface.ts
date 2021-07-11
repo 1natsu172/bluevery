@@ -72,10 +72,10 @@ export type TBleManager = typeof BleManager;
 export type BleManagerParams = MethodParamsRecord<TBleManager>;
 
 /**
- * Bluevery each method options map
+ * BlueveryCore each method options map
  * @description It must be an Option type used by the core. It should not be an Option type provided to the user.
  */
-export interface BlueveryMethodOptions {
+export interface BlueveryCoreMethodOptions {
   scan: {
     /**
      * @description
@@ -109,4 +109,17 @@ export interface BlueveryMethodOptions {
   };
   startNotification: {};
   stopNotification: {};
+}
+
+/**
+ * Bluevery each method options map
+ * @description each method options for the user-land
+ */
+export interface BlueveryMethodOptions {
+  scan: Partial<BlueveryCoreMethodOptions['scan']>;
+  connect: Partial<BlueveryCoreMethodOptions['connect']>;
+  retrieveServices: Partial<BlueveryCoreMethodOptions['retrieveServices']>;
+  createBond: Partial<BlueveryCoreMethodOptions['createBond']>;
+  read: Partial<BlueveryCoreMethodOptions['read']>;
+  write: Partial<BlueveryCoreMethodOptions['write']>;
 }
