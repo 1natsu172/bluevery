@@ -1,17 +1,18 @@
-import {BlueveryMethodOptions} from '../interface';
+import {BlueveryCoreMethodOptions} from '../interface';
 import {
-  createBlueveryMethodOption,
-  defaultBlueveryMethodOptions,
-} from './createBlueveryMethodOption';
+  createBlueveryCoreMethodOption,
+  defaultBlueveryCoreMethodOptions,
+} from './createBlueveryCoreMethodOption';
 
-describe('createBlueveryMethodOption', () => {
+describe('createBlueveryCoreMethodOption', () => {
   test('should can be undefined the overwrite option', () => {
-    const option = createBlueveryMethodOption('connect', undefined);
-    expect(option).toStrictEqual(defaultBlueveryMethodOptions.connect);
+    const option = createBlueveryCoreMethodOption('connect', undefined);
+    expect(option).toStrictEqual(defaultBlueveryCoreMethodOptions.connect);
   });
 
   test('should be merge passed options with default options', () => {
-    const willBeMerged: BlueveryMethodOptions['connect'] = {
+    const willBeMerged: BlueveryCoreMethodOptions['connect'] = {
+      omoiyariTime: 1000,
       retryOptions: {retries: 100, randomize: true},
       timeoutOptions: {
         timeoutMilliseconds: 60000,
@@ -19,7 +20,7 @@ describe('createBlueveryMethodOption', () => {
       },
     };
 
-    const option = createBlueveryMethodOption('connect', willBeMerged);
+    const option = createBlueveryCoreMethodOption('connect', willBeMerged);
 
     expect(option.timeoutOptions).toStrictEqual(willBeMerged.timeoutOptions);
     expect(option.retryOptions).toStrictEqual({
@@ -29,13 +30,13 @@ describe('createBlueveryMethodOption', () => {
   });
 
   test('Arrays should be used as passed without merging', () => {
-    const willBeMerged: BlueveryMethodOptions['scan'] = {
+    const willBeMerged: BlueveryCoreMethodOptions['scan'] = {
       scanningSettings: [['fixture'], 200, true],
       intervalLength: 100,
       iterations: 10,
     };
 
-    const option = createBlueveryMethodOption('scan', willBeMerged);
+    const option = createBlueveryCoreMethodOption('scan', willBeMerged);
 
     expect(option.intervalLength).toStrictEqual(willBeMerged.intervalLength);
     expect(option.iterations).toStrictEqual(willBeMerged.iterations);
