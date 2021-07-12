@@ -2,7 +2,7 @@
 
 # Bluevery
 
-The ble communicate utility on react-native.
+bluevery is an easier library that aims to reduce the frustration of ble communication on react-native.
 
 **This library is a wrapper library that uses [react-native-ble-manager](https://github.com/innoveit/react-native-ble-manager).**
 
