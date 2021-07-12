@@ -19,6 +19,10 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           registry-url: 'https://registry.npmjs.org'
+      - name: Setup git user config
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
       - name: Install node_modules
         run: yarn
       - name: Build
@@ -34,3 +38,11 @@ jobs:
         run: yarn publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
+      - name: "Push bumped commit"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub Actionsのsecretにデフォで生えてるTOKEN。 ghコマンド使うなら必要
+        run: |
+          if ! git diff master origin/master --exit-code --quiet
+          then
+            git push origin master
+          fi
