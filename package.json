@@ -47,7 +47,7 @@
     "@types/jest": "26.0.24",
     "@types/lodash.set": "^4.3.6",
     "@types/react-native": "0.64.12",
-    "@types/react-test-renderer": "^16.9.2",
+    "@types/react-test-renderer": "17.0.1",
     "@typescript-eslint/eslint-plugin": "4.6.0",
     "@typescript-eslint/parser": "4.6.0",
     "babel-jest": "^25.1.0",
