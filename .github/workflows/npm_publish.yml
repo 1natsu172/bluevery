@@ -1,0 +1,48 @@
+# When a github release is published, will publish the package in a release tag driven.
+name: publish a package
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [14.x]
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Setup git user config
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+      - name: Install node_modules
+        run: yarn
+      - name: Build
+        # this is like the --if-present
+        run : yarn build || true
+      - name: Bump package version
+        run: |
+          # bump and don't create git tag
+          yarn version --new-version ${{ github.event.release.tag_name }} --no-git-tag-version
+      - name: Can Publish?
+        run : npx can-npm-publish --verbose
+      - name: Publish to npm
+        run: yarn publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
+      - name: "Push bumped commit"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub Actionsのsecretにデフォで生えてるTOKEN。 ghコマンド使うなら必要
+        run: |
+          if ! git diff master origin/master --exit-code --quiet
+          then
+            git push origin master
+          fi
