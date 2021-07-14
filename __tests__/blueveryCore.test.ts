@@ -953,6 +953,201 @@ describe('BlueveryCore', () => {
     });
   });
 
+  describe('disconect', () => {
+    beforeEach(() => {
+      blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
+        blueveryListeners: new BlueveryListeners(),
+        BlueveryState,
+        initialState: createInitialState({
+          scannedPeripherals: {
+            ['1']: dummyPeripheralInfo('1'),
+          },
+        }),
+      });
+    });
+
+    test('disconnect: should return false if requireCheckBeforeBleProcess failed', async () => {
+      spiedRequireCheckBeforeBleProcess.mockImplementationOnce(() => false);
+      const ret = await blueveryCore.disconnect({
+        disconnectParams: ['1'],
+        disconnectOptions: {
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
+      });
+
+      expect(ret).toBe(false);
+    });
+
+    test('disconnect: shoube be early return if not connected the peripheral', async () => {
+      // @ts-expect-error mocked at jest.setup.js
+      BleManager.isPeripheralConnected.mockImplementationOnce(() => false);
+      const ret = await blueveryCore.disconnect({
+        disconnectParams: ['1'],
+        disconnectOptions: {
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
+      });
+
+      expect(ret).toBe(false);
+    });
+
+    test('disconnect: should be change disconnect of state the managing peripheral', async () => {
+      mockPlatform('android', 10);
+      const spyState = jest.fn();
+      blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
+        blueveryListeners: new BlueveryListeners(),
+        BlueveryState,
+        initialState: createInitialState({
+          scannedPeripherals: {['1']: dummyPeripheralInfo('1')},
+          managingPeripherals: {
+            ['1']: {...dummyPeripheralInfo('1'), connect: 'connected'},
+          },
+        }),
+        onChangeStateHandler: (state) => {
+          spyState(state.managingPeripherals['1']);
+        },
+      });
+      // check initial status
+      expect(blueveryCore.getState().managingPeripherals['1'].connect).toBe(
+        'connected',
+      );
+      // @ts-expect-error mocked at jest.setup.js
+      //BleManager.disconnect.mockImplementationOnce(async () => {});
+      // @ts-expect-error -- mocked at jest.setup.js
+      BleManager.isPeripheralConnected.mockImplementationOnce(() => true);
+      await blueveryCore.disconnect({
+        disconnectParams: ['1'],
+        disconnectOptions: {
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
+      });
+
+      expect(spyState.mock.calls[0][0].connect).toBe(undefined);
+      expect(spyState.mock.calls[1][0].connect).toBe('disconnected');
+    });
+
+    test('connect: should be throw error and state change to failed', async () => {
+      // @ts-expect-error -- mocked at jest.setup.js
+      BleManager.connect.mockImplementationOnce(async () => {
+        throw new Error('fixture error');
+      });
+
+      const spyState = jest.fn();
+      blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
+        blueveryListeners: new BlueveryListeners(),
+        BlueveryState,
+        initialState: createInitialState({
+          scannedPeripherals: {['1']: dummyPeripheralInfo('1')},
+          managingPeripherals: {['1']: dummyPeripheralInfo('1')},
+        }),
+        onChangeStateHandler: (state) => {
+          spyState(state.managingPeripherals['1']);
+        },
+      });
+
+      const connect = blueveryCore.connect({
+        bondingParams: ['1', ''],
+        bondingOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
+        connectParams: ['1'],
+        connectOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
+      });
+
+      await expect(connect).rejects.toThrow('fixture error');
+      expect(spyState.mock.calls[0][0].connect).toBe(undefined);
+      expect(spyState.mock.calls[1][0].connect).toBe('connecting');
+      expect(spyState.mock.calls[2][0].connect).toBe('failed');
+    });
+
+    test('connect: should be throw if not found peripheral in scannedPeripherals', async () => {
+      const connecting = blueveryCore.connect({
+        bondingParams: ['1', ''],
+        bondingOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
+        connectParams: ['2'],
+        connectOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
+        retrieveServicesParams: ['1'],
+        retrieveServicesOptions: {
+          omoiyariTime: DEFAULT_OMOIYARI_TIME,
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
+      });
+      await expect(connecting).rejects.toThrow();
+    });
+
+    describe('connect: check calls', () => {
+      test('iOS', async () => {
+        mockPlatform('ios', 10);
+        await blueveryCore.connect({
+          bondingParams: ['1', ''],
+          bondingOptions: {
+            omoiyariTime: DEFAULT_OMOIYARI_TIME,
+            timeoutOptions: {timeoutMilliseconds: 1000},
+          },
+          connectParams: ['1'],
+          connectOptions: {
+            omoiyariTime: DEFAULT_OMOIYARI_TIME,
+            timeoutOptions: {timeoutMilliseconds: 1000},
+          },
+          retrieveServicesParams: ['1'],
+          retrieveServicesOptions: {
+            omoiyariTime: DEFAULT_OMOIYARI_TIME,
+            timeoutOptions: {timeoutMilliseconds: 1000},
+          },
+        });
+        expect(BleManager.connect).toBeCalled();
+        expect(BleManager.retrieveServices).toBeCalled();
+        expect(BleManager.createBond).not.toBeCalled();
+        expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
+      });
+      test('Android', async () => {
+        mockPlatform('android', 10);
+        await blueveryCore.connect({
+          bondingParams: ['1', ''],
+          bondingOptions: {
+            omoiyariTime: DEFAULT_OMOIYARI_TIME,
+            timeoutOptions: {timeoutMilliseconds: 1000},
+          },
+          connectParams: ['1'],
+          connectOptions: {
+            omoiyariTime: DEFAULT_OMOIYARI_TIME,
+            timeoutOptions: {timeoutMilliseconds: 1000},
+          },
+          retrieveServicesParams: ['1'],
+          retrieveServicesOptions: {
+            omoiyariTime: DEFAULT_OMOIYARI_TIME,
+            timeoutOptions: {timeoutMilliseconds: 1000},
+          },
+        });
+        expect(BleManager.connect).toBeCalled();
+        expect(BleManager.retrieveServices).toBeCalled();
+        expect(BleManager.createBond).toBeCalled();
+        expect(spiedRequireCheckBeforeBleProcess).toBeCalled();
+      });
+    });
+  });
+
   describe('retrieveServices', () => {
     const spyRetrieveServicesState = jest.fn();
     beforeEach(() => {
