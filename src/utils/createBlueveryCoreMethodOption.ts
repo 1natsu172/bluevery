@@ -37,12 +37,12 @@ export function createBlueveryCoreMethodOption<
   MethodName extends keyof BlueveryCoreMethodOptions
 >(
   methodName: MethodName,
-  overrideOptions:
-    | Partial<BlueveryCoreMethodOptions[typeof methodName]>
-    | undefined,
+  overrideOptions: Partial<BlueveryCoreMethodOptions[MethodName]> | undefined,
 ) {
-  return deepmerge<BlueveryCoreMethodOptions[typeof methodName]>(
-    defaultBlueveryCoreMethodOptions[methodName],
+  return deepmerge<BlueveryCoreMethodOptions[MethodName]>(
+    defaultBlueveryCoreMethodOptions[
+      methodName
+    ] as BlueveryCoreMethodOptions[MethodName],
     overrideOptions || {},
     // @see https://github.com/TehShrike/deepmerge#arraymerge-example-overwrite-target-array
     {arrayMerge: (_destinationArray, sourceArray, _options) => sourceArray},
