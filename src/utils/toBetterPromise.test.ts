@@ -33,7 +33,7 @@ describe('toCancelablePromise', () => {
     )();
     pendingFn.cancel();
 
-    return expect(pendingFn).rejects.toBeInstanceOf(PCancelable.CancelError);
+    return expect(pendingFn).rejects.toBeInstanceOf(CancelError);
   });
   test('should not reject on cancel by option', async () => {
     const onCanceledHandler = jest.fn();
