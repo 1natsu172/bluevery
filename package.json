@@ -24,7 +24,7 @@
     "delay": "4.4.1",
     "interval-promise": "1.4.0",
     "lodash.set": "4.3.2",
-    "p-cancelable": "2.1.1",
+    "p-cancelable": "3.0.0",
     "p-retry": "4.6.1",
     "p-tap": "4.0.0",
     "p-timeout": "5.0.0",

@@ -1,5 +1,5 @@
 import delay from 'delay';
-import PCancelable, {CancelError} from 'p-cancelable';
+import {CancelError} from 'p-cancelable';
 import {TimeoutError} from 'p-timeout';
 import {
   toCancelablePromise,
@@ -33,7 +33,7 @@ describe('toCancelablePromise', () => {
     )();
     pendingFn.cancel();
 
-    return expect(pendingFn).rejects.toBeInstanceOf(PCancelable.CancelError);
+    return expect(pendingFn).rejects.toBeInstanceOf(CancelError);
   });
   test('should not reject on cancel by option', async () => {
     const onCanceledHandler = jest.fn();
