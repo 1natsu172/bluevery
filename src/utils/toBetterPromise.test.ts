@@ -1,5 +1,5 @@
 import delay from 'delay';
-import PCancelable, {CancelError} from 'p-cancelable';
+import {CancelError} from 'p-cancelable';
 import {TimeoutError} from 'p-timeout';
 import {
   toCancelablePromise,
