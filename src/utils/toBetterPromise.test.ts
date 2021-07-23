@@ -53,7 +53,7 @@ describe('toCancelablePromise', () => {
 
 describe('toRetryPromise', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    jest.useFakeTimers('legacy');
   });
   test('should can be retry', async () => {
     const normalFn = jest.fn(() => Promise.reject(new Error('fixture')));
@@ -72,7 +72,7 @@ describe('toRetryPromise', () => {
 
 describe('toTimeoutPromise', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    jest.useFakeTimers('legacy');
   });
   test('should  can be timeout', async () => {
     const mustPendingFn = () =>
@@ -96,7 +96,7 @@ describe('toTimeoutPromise', () => {
 
 describe('toBetterPromise', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    jest.useFakeTimers('legacy');
     // clear mock count
     jest.clearAllMocks();
   });

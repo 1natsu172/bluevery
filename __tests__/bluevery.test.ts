@@ -223,7 +223,7 @@ describe('bluevery: commands APIs', () => {
   });
 
   describe('startScan', () => {
-    jest.useFakeTimers();
+    jest.useFakeTimers('legacy');
     const scanFn = jest.fn();
     const initFn = jest.fn();
     const clearScannedPeripheralsFn = jest.fn();
@@ -390,7 +390,7 @@ describe('bluevery: commands APIs', () => {
   });
 
   describe('stopScan', () => {
-    jest.useFakeTimers();
+    jest.useFakeTimers('legacy');
     const scanFn = jest.fn();
     const initFn = jest.fn();
     const clearScannedPeripheralsFn = jest.fn();

@@ -9,7 +9,7 @@ import {
 const nativeEventEmitter = new NativeEventEmitter();
 
 beforeEach(() => {
-  jest.useFakeTimers();
+  jest.useFakeTimers('legacy');
 });
 
 describe('getBluetoothPowerState', () => {
