@@ -21,7 +21,7 @@
     "auto-bind": "4.0.0",
     "debug": "4.3.2",
     "deepmerge": "4.2.2",
-    "delay": "4.4.1",
+    "delay": "5.0.0",
     "interval-promise": "1.4.0",
     "lodash.set": "4.3.2",
     "p-cancelable": "3.0.0",
