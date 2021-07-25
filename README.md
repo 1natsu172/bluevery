@@ -6,6 +6,8 @@ bluevery is an easier library that aims to reduce the frustration of ble communi
 
 **This library is a wrapper library that uses [react-native-ble-manager](https://github.com/innoveit/react-native-ble-manager).**
 
+![CorrelationDiagram](./media/CorrelationDiagram.png)
+
 ## Noteworthy Features
 
 * Wrapping procedural processes in implicit knowledge
@@ -140,3 +142,10 @@ await bluevery.init({
   // ...other options
 })
 ```
+
+## Architecture diagrams
+
+<details>
+<summary>Click to toggle contents of architecture diagrams image</summary>
+<img src="./media/Architecture.png" />
+</details>
