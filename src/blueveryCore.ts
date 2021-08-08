@@ -455,13 +455,11 @@ export class BlueveryCore {
       debugBlueveryCore('disconnect: disconnect process start');
       console.log('disconnectParams:', JSON.stringify(disconnectParams));
       // TODO: disconnect が undefinedになってしまっている
-      BleManager.disconnect('1', true);
-      /*
+      //BleManager.disconnect('1', true);
       await _disconnect(...disconnectParams).then(() => {
         debugBlueveryCore('disconnect: disconnect success');
         this.state.setManagingPeripheralDisconnected(targetPeripheralId);
       });
-      */
     } catch (error) {
       debugBlueveryCore(
         'disconnect: An error has occurred in the disconnect process',
