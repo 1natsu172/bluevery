@@ -16,7 +16,7 @@ import {
   enableToDebug,
   debugBluevery,
   applyOmoiyari,
-  createBlueveryMethodOption,
+  createBlueveryCoreMethodOption,
 } from './utils';
 import {DEFAULT_OMOIYARI_TIME} from './constants';
 
@@ -106,7 +106,7 @@ export class Bluevery {
     matchFn,
   }: {
     omoiyariTime?: number;
-    scanOptions?: Partial<BlueveryMethodOptions['scan']>;
+    scanOptions?: BlueveryMethodOptions['scan'];
     discoverHandler?: (peripheralInfo: PeripheralInfo) => any;
     matchFn?: (peripheral: Peripheral) => boolean;
   }) {
@@ -114,7 +114,7 @@ export class Bluevery {
       scanningSettings,
       intervalLength,
       iterations,
-    } = createBlueveryMethodOption('scan', scanOptions);
+    } = createBlueveryCoreMethodOption('scan', scanOptions);
 
     const intervalScan = () =>
       promiseInterval(
@@ -190,17 +190,17 @@ export class Bluevery {
   }) {
     debugBluevery('connect: start');
 
-    const _connectOptions = createBlueveryMethodOption(
+    const _connectOptions = createBlueveryCoreMethodOption(
       'connect',
       connectOptions,
     );
 
-    const _retrieveServicesOptions = createBlueveryMethodOption(
+    const _retrieveServicesOptions = createBlueveryCoreMethodOption(
       'retrieveServices',
       retrieveServicesOptions,
     );
 
-    const _bondingOptions = createBlueveryMethodOption(
+    const _bondingOptions = createBlueveryCoreMethodOption(
       'createBond',
       bondingOptions,
     );
@@ -277,7 +277,7 @@ export class Bluevery {
     const [targetPeripheralId] = startNotificationParams;
 
     // Note: retrieveServicesがpendingのままになるときがあるので、タイムアウトするようにする
-    const _retrieveServicesOptions = createBlueveryMethodOption(
+    const _retrieveServicesOptions = createBlueveryCoreMethodOption(
       'retrieveServices',
       retrieveServicesOptions,
     );
@@ -342,12 +342,12 @@ export class Bluevery {
      */
     retrieveServicesOptions?: BlueveryMethodOptions['retrieveServices'];
   }) {
-    const _readValueOptions = createBlueveryMethodOption(
+    const _readValueOptions = createBlueveryCoreMethodOption(
       'read',
       readValueOptions,
     );
 
-    const _retrieveServicesOptions = createBlueveryMethodOption(
+    const _retrieveServicesOptions = createBlueveryCoreMethodOption(
       'retrieveServices',
       retrieveServicesOptions,
     );
@@ -385,12 +385,12 @@ export class Bluevery {
      */
     retrieveServicesOptions?: BlueveryMethodOptions['retrieveServices'];
   }) {
-    const _writeValueoptions = createBlueveryMethodOption(
+    const _writeValueoptions = createBlueveryCoreMethodOption(
       'write',
       writeValueOptions,
     );
 
-    const _retrieveServicesOptions = createBlueveryMethodOption(
+    const _retrieveServicesOptions = createBlueveryCoreMethodOption(
       'retrieveServices',
       retrieveServicesOptions,
     );

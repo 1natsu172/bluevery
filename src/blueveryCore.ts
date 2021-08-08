@@ -4,7 +4,7 @@ import {Permission} from 'react-native-permissions';
 import delay from 'delay';
 import {
   BlueveryOptions,
-  BlueveryMethodOptions,
+  BlueveryCoreMethodOptions,
   PeripheralInfo,
   Store,
   State,
@@ -343,11 +343,11 @@ export class BlueveryCore {
     bondingOptions,
   }: {
     connectParams: BleManagerParams['connect'];
-    connectOptions: BlueveryMethodOptions['connect'];
+    connectOptions: BlueveryCoreMethodOptions['connect'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
-    retrieveServicesOptions: BlueveryMethodOptions['retrieveServices'];
+    retrieveServicesOptions: BlueveryCoreMethodOptions['retrieveServices'];
     bondingParams: BleManagerParams['createBond'];
-    bondingOptions: BlueveryMethodOptions['createBond'];
+    bondingOptions: BlueveryCoreMethodOptions['createBond'];
   }) {
     debugBlueveryCore('connect: start', connectParams, retrieveServicesParams);
     const [targetPeripheralId] = connectParams;
@@ -475,7 +475,7 @@ export class BlueveryCore {
    */
   async retrieveServices(
     retrieveServicesParams: BleManagerParams['retrieveServices'],
-    retrieveServicesOptions: BlueveryMethodOptions['retrieveServices'],
+    retrieveServicesOptions: BlueveryCoreMethodOptions['retrieveServices'],
   ) {
     debugBlueveryCore('retrieveServices: start', retrieveServicesParams);
     const [peripheralId] = retrieveServicesParams;
@@ -508,9 +508,9 @@ export class BlueveryCore {
     retrieveServicesOptions,
   }: {
     writeValueParams: BleManagerParams['write'];
-    writeValueOptions: BlueveryMethodOptions['write'];
+    writeValueOptions: BlueveryCoreMethodOptions['write'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
-    retrieveServicesOptions: BlueveryMethodOptions['retrieveServices'];
+    retrieveServicesOptions: BlueveryCoreMethodOptions['retrieveServices'];
   }) {
     debugBlueveryCore('writeValue: start', writeValueParams);
     const [peripheralId] = writeValueParams;
@@ -564,9 +564,9 @@ export class BlueveryCore {
     retrieveServicesOptions,
   }: {
     readValueParams: BleManagerParams['read'];
-    readValueOptions: BlueveryMethodOptions['read'];
+    readValueOptions: BlueveryCoreMethodOptions['read'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
-    retrieveServicesOptions: BlueveryMethodOptions['retrieveServices'];
+    retrieveServicesOptions: BlueveryCoreMethodOptions['retrieveServices'];
   }) {
     debugBlueveryCore('readValue: start', readValueParams);
     const [peripheralId] = readValueParams;
@@ -627,7 +627,7 @@ export class BlueveryCore {
     startNotificationParams: BleManagerParams['startNotification'];
     receiveCharacteristicHandler: PublicHandlers['HandleDidUpdateValueForCharacteristic'];
     retrieveServicesParams: BleManagerParams['retrieveServices'];
-    retrieveServicesOptions: BlueveryMethodOptions['retrieveServices'];
+    retrieveServicesOptions: BlueveryCoreMethodOptions['retrieveServices'];
   }) {
     debugBlueveryCore('startNotification: called', startNotificationParams);
     const [peripheralId] = startNotificationParams;

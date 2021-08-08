@@ -1,8 +1,8 @@
 import deepmerge from 'deepmerge';
-import {BlueveryMethodOptions} from '../interface';
+import {BlueveryCoreMethodOptions} from '../interface';
 import {DEFAULT_OMOIYARI_TIME} from '../constants';
 
-export const defaultBlueveryMethodOptions: BlueveryMethodOptions = {
+export const defaultBlueveryCoreMethodOptions: BlueveryCoreMethodOptions = {
   scan: {
     scanningSettings: [[], 3, true],
     intervalLength: 0,
@@ -33,16 +33,16 @@ export const defaultBlueveryMethodOptions: BlueveryMethodOptions = {
   stopNotification: {},
 };
 
-export function createBlueveryMethodOption<
-  MethodName extends keyof BlueveryMethodOptions
+export function createBlueveryCoreMethodOption<
+  MethodName extends keyof BlueveryCoreMethodOptions
 >(
   methodName: MethodName,
-  overrideOptions:
-    | Partial<BlueveryMethodOptions[typeof methodName]>
-    | undefined,
+  overrideOptions: Partial<BlueveryCoreMethodOptions[MethodName]> | undefined,
 ) {
-  return deepmerge<BlueveryMethodOptions[typeof methodName]>(
-    defaultBlueveryMethodOptions[methodName],
+  return deepmerge<BlueveryCoreMethodOptions[MethodName]>(
+    defaultBlueveryCoreMethodOptions[
+      methodName
+    ] as BlueveryCoreMethodOptions[MethodName],
     overrideOptions || {},
     // @see https://github.com/TehShrike/deepmerge#arraymerge-example-overwrite-target-array
     {arrayMerge: (_destinationArray, sourceArray, _options) => sourceArray},

@@ -319,7 +319,7 @@ describe('BlueveryCore', () => {
   });
 
   describe('scan', () => {
-    jest.useFakeTimers();
+    jest.useFakeTimers('legacy');
 
     test('should await the number of seconds of scanning.', async () => {
       const scan1 = blueveryCore.scan({scanningSettings: [[], 1]});
@@ -400,7 +400,7 @@ describe('BlueveryCore', () => {
   });
 
   describe('cleanupScan', () => {
-    jest.useFakeTimers();
+    jest.useFakeTimers('legacy');
     test('should be resolved immediately the awaiting task of scan', async () => {
       const scanTask = blueveryCore.scan({scanningSettings: [[], 1]});
       await flushPromisesAdvanceTimer(50);
