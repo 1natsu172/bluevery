@@ -81,7 +81,7 @@ export const useAND_UC_352BLE: (props: Props) => BleController = ({
               ],
               retrieveServicesParams: [peripheralInfo.id],
             });
-            //await bluevery.disconnect(peripheralInfo.id);
+            await bluevery.disconnect({disconnectParams: [peripheralInfo.id]});
           },
           scanParams: {
             scanOptions: {

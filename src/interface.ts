@@ -120,6 +120,7 @@ export interface BlueveryCoreMethodOptions {
 export interface BlueveryMethodOptions {
   scan: Partial<BlueveryCoreMethodOptions['scan']>;
   connect: Partial<BlueveryCoreMethodOptions['connect']>;
+  disconnect: Partial<BlueveryCoreMethodOptions['disconnect']>;
   retrieveServices: Partial<BlueveryCoreMethodOptions['retrieveServices']>;
   createBond: Partial<BlueveryCoreMethodOptions['createBond']>;
   read: Partial<BlueveryCoreMethodOptions['read']>;

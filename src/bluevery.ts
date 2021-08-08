@@ -231,7 +231,7 @@ export class Bluevery {
   }) {
     debugBluevery('disconnect: start');
 
-    const _disconnectOptions = createBlueveryMethodOption(
+    const _disconnectOptions = createBlueveryCoreMethodOption(
       'disconnect',
       disconnectOptions,
     );

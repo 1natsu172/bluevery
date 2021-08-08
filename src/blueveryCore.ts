@@ -424,7 +424,7 @@ export class BlueveryCore {
     disconnectOptions,
   }: {
     disconnectParams: BleManagerParams['disconnect'];
-    disconnectOptions: BlueveryMethodOptions['disconnect'];
+    disconnectOptions: BlueveryCoreMethodOptions['disconnect'];
   }) {
     debugBlueveryCore('disconnect: start', disconnectParams);
     const [targetPeripheralId] = disconnectParams;
