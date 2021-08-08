@@ -446,7 +446,7 @@ export class BlueveryCore {
       );
     }
 
-    const _disconnect = await toBetterPromise(
+    const _disconnect = toBetterPromise(
       toThrowErrorIfRejected(BleManager.disconnect),
       disconnectOptions,
     );
