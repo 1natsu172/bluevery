@@ -1025,9 +1025,11 @@ describe('BlueveryCore', () => {
           timeoutOptions: {timeoutMilliseconds: 1000},
         },
       });
-
-      expect(spyState.mock.calls[0][0].connect).toBe(undefined);
-      expect(spyState.mock.calls[1][0].connect).toBe('disconnected');
+      expect(spyState.mock.calls.length).toBe(1);
+      expect(spyState.mock.calls[0][0].connect).toBe('disconnected');
+      expect(blueveryCore.getState().managingPeripherals['1'].connect).toBe(
+        'disconnected',
+      );
     });
 
     test('connect: should be throw error and state change to failed', async () => {
