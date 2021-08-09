@@ -1,9 +1,28 @@
 {
   "name": "bluevery",
+  "description": "bluevery is an easier library that aims to reduce the frustration of ble communication on react-native.",
   "version": "0.0.1",
-  "private": true,
+  "private": false,
+  "publishConfig": {
+		"access": "public"
+	},
+	"license": "MIT",
+	"author": "1natsu",
+	"contributors": [
+		"1natsu"
+	],
+	"bugs": {
+		"url": "https://github.com/1natsu172/bluevery/issues",
+		"email": "1natsu172@users.noreply.github.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/1natsu172/bluevery"
+	},
+  "homepage": "https://github.com/1natsu172/bluevery",
   "main": "dist",
   "types": "dist/index.d.ts",
+  "files": ["dist"],
   "scripts": {
     "postinstall": "npx patch-package",
     "dev": "tsc --watch --incremental",
