@@ -625,6 +625,53 @@ describe('bluevery: commands APIs', () => {
     });
   });
 
+  describe('disconnect', () => {
+    const disconnectFn = jest.fn();
+    const core = (jest.fn().mockImplementation(() => ({
+      listeners: {publicListeners: {}},
+      init: jest.fn(),
+      disconnect: disconnectFn,
+    })) as unknown) as typeof BlueveryCore;
+
+    beforeEach(async () => {
+      jest.clearAllMocks();
+      bluevery = new Bluevery({
+        BlueveryCore: core,
+        BlueveryState,
+        blueveryListeners: new BlueveryListeners(),
+        store: proxy({bluevery: createInitialState()}),
+      });
+      await bluevery.init();
+    });
+
+    describe('disconnect: check calls', () => {
+      beforeEach(async () => {
+        await bluevery.disconnect({
+          disconnectParams: ['1'],
+        });
+      });
+
+      test('should call core#connect', async () => {
+        expect(disconnectFn).toBeCalled();
+      });
+    });
+
+    describe('disconnect: negative pattern', () => {
+      test('should throw if not found core method', async () => {
+        bluevery = new Bluevery({
+          BlueveryCore: core,
+          BlueveryState,
+          blueveryListeners: new BlueveryListeners(),
+          store: proxy({bluevery: createInitialState()}),
+        });
+        const ret = bluevery.disconnect({
+          disconnectParams: ['1'],
+        });
+        await expect(ret).rejects.toThrow('this.core?.disconnect is undefined');
+      });
+    });
+  });
+
   describe('receiveCharacteristicValue', () => {
     const connectFn = jest.fn();
     const mockedOnCallBeforeStartNotification = jest.fn(async () => {});
