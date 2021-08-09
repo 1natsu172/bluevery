@@ -18,6 +18,10 @@ export const defaultBlueveryCoreMethodOptions: BlueveryCoreMethodOptions = {
     timeoutOptions: {timeoutMilliseconds: 8000},
     omoiyariTime: DEFAULT_OMOIYARI_TIME,
   },
+  disconnect: {
+    retryOptions: {factor: 1, retries: 4},
+    timeoutOptions: {timeoutMilliseconds: 8000},
+  },
   createBond: {
     retryOptions: {factor: 1, retries: 4},
     timeoutOptions: {timeoutMilliseconds: 10000},

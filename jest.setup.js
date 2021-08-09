@@ -61,6 +61,7 @@ jest.mock('react-native-ble-manager', () => {
       });
     }),
     connect: jest.fn(),
+    disconnect: jest.fn(),
     retrieveServices: jest.fn(),
     createBond: jest.fn(),
     startNotification: jest.fn(),

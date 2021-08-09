@@ -81,7 +81,6 @@ export const useAND_UC_352BLE: (props: Props) => BleController = ({
               ],
               retrieveServicesParams: [peripheralInfo.id],
             });
-            //await bluevery.disconnect(peripheralInfo.id);
           },
           scanParams: {
             scanOptions: {
@@ -155,7 +154,7 @@ export const useAND_UC_352BLE: (props: Props) => BleController = ({
           ],
           retrieveServicesParams: [peripheralInfo.id],
         });
-        console.log(`reade value: end write value`);
+        console.log(`end write value`);
         const value = await bluevery.readValue({
           readValueParams: [
             peripheralInfo.id,
@@ -164,7 +163,9 @@ export const useAND_UC_352BLE: (props: Props) => BleController = ({
           ],
           retrieveServicesParams: [peripheralInfo.id],
         });
-        console.log(`reade value: ${JSON.stringify(value)}`);
+        console.log(`end reade value: ${JSON.stringify(value)}`);
+        console.log('disconnect');
+        await bluevery.disconnect({disconnectParams: [peripheralInfo.id]});
       } catch (error) {
         onError(error);
       }

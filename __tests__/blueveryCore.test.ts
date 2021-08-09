@@ -953,6 +953,150 @@ describe('BlueveryCore', () => {
     });
   });
 
+  describe('disconect', () => {
+    beforeEach(() => {
+      blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
+        blueveryListeners: new BlueveryListeners(),
+        BlueveryState,
+        initialState: createInitialState({
+          scannedPeripherals: {
+            ['1']: dummyPeripheralInfo('1'),
+          },
+        }),
+      });
+    });
+
+    test('disconnect: should return false if requireCheckBeforeBleProcess failed', async () => {
+      spiedRequireCheckBeforeBleProcess.mockImplementationOnce(() => false);
+      const ret = await blueveryCore.disconnect({
+        disconnectParams: ['1'],
+        disconnectOptions: {
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
+      });
+
+      expect(ret).toBe(false);
+    });
+
+    test('disconnect: shoube be early return if not connected the peripheral', async () => {
+      // @ts-expect-error mocked at jest.setup.js
+      BleManager.isPeripheralConnected.mockImplementationOnce(() => false);
+      const ret = await blueveryCore.disconnect({
+        disconnectParams: ['1'],
+        disconnectOptions: {
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
+      });
+
+      expect(ret).toBe(false);
+    });
+
+    test('disconnect: should be change disconnect of state the managing peripheral', async () => {
+      mockPlatform('android', 10);
+      const spyState = jest.fn();
+      blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
+        blueveryListeners: new BlueveryListeners(),
+        BlueveryState,
+        initialState: createInitialState({
+          scannedPeripherals: {['1']: dummyPeripheralInfo('1')},
+          managingPeripherals: {
+            ['1']: {...dummyPeripheralInfo('1'), connect: 'connected'},
+          },
+        }),
+        onChangeStateHandler: (state) => {
+          spyState(state.managingPeripherals['1']);
+        },
+      });
+      // check initial status
+      expect(blueveryCore.getState().managingPeripherals['1'].connect).toBe(
+        'connected',
+      );
+      //BleManager.disconnect.mockImplementationOnce(async () => {});
+      // @ts-expect-error -- mocked at jest.setup.js
+      BleManager.isPeripheralConnected.mockImplementationOnce(() => true);
+
+      await blueveryCore.disconnect({
+        disconnectParams: ['1'],
+        disconnectOptions: {
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
+      });
+      expect(spyState.mock.calls.length).toBe(1);
+      expect(spyState.mock.calls[0][0].connect).toBe('disconnected');
+      expect(blueveryCore.getState().managingPeripherals['1'].connect).toBe(
+        'disconnected',
+      );
+    });
+
+    test('disconnect: should be throw error and state change to failed', async () => {
+      // @ts-expect-error -- mocked at jest.setup.js
+      BleManager.disconnect.mockImplementationOnce(async () => {
+        throw new Error('fixture error');
+      });
+      //BleManager.disconnect.mockImplementationOnce(async () => {});
+      // @ts-expect-error -- mocked at jest.setup.js
+      BleManager.isPeripheralConnected.mockImplementationOnce(() => true);
+
+      const spyState = jest.fn();
+      blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
+        blueveryListeners: new BlueveryListeners(),
+        BlueveryState,
+        initialState: createInitialState({
+          scannedPeripherals: {['1']: dummyPeripheralInfo('1')},
+          managingPeripherals: {
+            ['1']: {...dummyPeripheralInfo('1'), connect: 'connected'},
+          },
+        }),
+        onChangeStateHandler: (state) => {
+          spyState(state.managingPeripherals['1']);
+        },
+      });
+
+      const disconnect = blueveryCore.disconnect({
+        disconnectParams: ['1'],
+        disconnectOptions: {
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
+      });
+
+      await expect(disconnect).rejects.toThrow('fixture error');
+      expect(spyState.mock.calls.length).toBe(0);
+    });
+
+    test('disconnect: should be throw if not found peripheral in scannedPeripherals', async () => {
+      blueveryCore = new BlueveryCore({
+        store: proxy({bluevery: createInitialState()}),
+
+        blueveryListeners: new BlueveryListeners(),
+        BlueveryState,
+        initialState: createInitialState({
+          scannedPeripherals: {},
+          managingPeripherals: {
+            ['2']: {...dummyPeripheralInfo('2'), connect: 'connected'},
+          },
+        }),
+        onChangeStateHandler: () => undefined,
+      });
+      //BleManager.disconnect.mockImplementationOnce(async () => {});
+      // @ts-expect-error -- mocked at jest.setup.js
+      BleManager.isPeripheralConnected.mockImplementationOnce(() => true);
+
+      const disconnecting = blueveryCore.disconnect({
+        disconnectParams: ['2'],
+        disconnectOptions: {
+          timeoutOptions: {timeoutMilliseconds: 1000},
+        },
+      });
+      await expect(disconnecting).rejects.toThrow();
+    });
+  });
+
   describe('retrieveServices', () => {
     const spyRetrieveServicesState = jest.fn();
     beforeEach(() => {

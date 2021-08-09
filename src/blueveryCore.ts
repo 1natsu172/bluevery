@@ -419,6 +419,60 @@ export class BlueveryCore {
     debugBlueveryCore('connect: connect process end');
   }
 
+  async disconnect({
+    disconnectParams,
+    disconnectOptions,
+  }: {
+    disconnectParams: BleManagerParams['disconnect'];
+    disconnectOptions: BlueveryCoreMethodOptions['disconnect'];
+  }) {
+    debugBlueveryCore('disconnect: start', disconnectParams);
+    const [targetPeripheralId] = disconnectParams;
+
+    const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
+    debugBlueveryCore('disconnect: isPassedRequireCheck', isPassedRequireCheck);
+    if (isPassedRequireCheck === false) {
+      return false;
+    }
+
+    const isAlreadyConnected = await BleManager.isPeripheralConnected(
+      targetPeripheralId,
+      [],
+    );
+    debugBlueveryCore('disconnect: isAlreadyConnected', isAlreadyConnected);
+    if (!isAlreadyConnected) {
+      return false;
+    }
+
+    // FIXME: selector化したい
+    const peripheral = this.getState().scannedPeripherals[targetPeripheralId];
+    if (!peripheral) {
+      throw new Error(
+        `${targetPeripheralId} is not found in scannedPeripherals`,
+      );
+    }
+
+    const _disconnect = toBetterPromise(
+      toThrowErrorIfRejected(BleManager.disconnect),
+      disconnectOptions,
+    );
+
+    try {
+      debugBlueveryCore('disconnect: disconnect process start');
+      await _disconnect(...disconnectParams).then(() => {
+        debugBlueveryCore('disconnect: disconnect success');
+        this.state.setManagingPeripheralDisconnected(targetPeripheralId);
+      });
+    } catch (error) {
+      debugBlueveryCore(
+        'disconnect: An error has occurred in the disconnect process',
+        error,
+      );
+      throw error;
+    }
+    debugBlueveryCore('disconnect: disconnect process end');
+  }
+
   /**
    * @description retrieveServices must have timeout
    */
