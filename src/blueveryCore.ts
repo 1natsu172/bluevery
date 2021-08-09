@@ -429,6 +429,12 @@ export class BlueveryCore {
     debugBlueveryCore('disconnect: start', disconnectParams);
     const [targetPeripheralId] = disconnectParams;
 
+    const isPassedRequireCheck = await this.requireCheckBeforeBleProcess();
+    debugBlueveryCore('disconnect: isPassedRequireCheck', isPassedRequireCheck);
+    if (isPassedRequireCheck === false) {
+      return false;
+    }
+
     const isAlreadyConnected = await BleManager.isPeripheralConnected(
       targetPeripheralId,
       [],
