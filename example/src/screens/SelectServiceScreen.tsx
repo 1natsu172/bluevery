@@ -23,6 +23,7 @@ export const SelectServiceScreen = () => {
         keyExtractor={(name, index) => name + index}
         renderItem={({item}) => (
           <Button
+            testID={`selectService:${item}`}
             key={item}
             title={item}
             onPress={() => navigation.navigate(item)}
