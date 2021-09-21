@@ -44,7 +44,7 @@
     "@react-native-community/eslint-config": "3.0.0",
     "@testing-library/react-hooks": "7.0.1",
     "@types/debug": "4.1.7",
-    "@types/jest": "26.0.24",
+    "@types/jest": "27.0.2",
     "@types/lodash.set": "4.3.6",
     "@types/react-native": "0.64.12",
     "@types/react-test-renderer": "17.0.1",
