@@ -34,14 +34,14 @@
   },
   "peerDependencies": {
     "react": "17.0.2",
-    "react-native": "0.64.2",
+    "react-native": "0.70.6",
     "react-native-ble-manager": "^7.3.1",
     "react-native-permissions": "^3.0.5"
   },
   "devDependencies": {
     "@babel/core": "7.14.8",
     "@babel/runtime": "7.14.8",
-    "@react-native-community/eslint-config": "3.0.0",
+    "@react-native-community/eslint-config": "3.2.0",
     "@testing-library/react-hooks": "7.0.1",
     "@types/debug": "4.1.7",
     "@types/jest": "26.0.24",
@@ -59,7 +59,7 @@
     "jest-extended": "0.11.5",
     "metro-react-native-babel-preset": "0.66.2",
     "react": "17.0.2",
-    "react-native": "0.64.2",
+    "react-native": "0.70.6",
     "react-test-renderer": "17.0.2",
     "time-span": "5.0.0",
     "tsd": "0.17.0",
