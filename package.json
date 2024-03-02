@@ -30,7 +30,7 @@
     "p-timeout": "5.0.0",
     "react-native-ble-manager": "7.6.0",
     "react-native-permissions": "3.0.5",
-    "valtio": "1.1.2"
+    "valtio": "1.13.2"
   },
   "peerDependencies": {
     "react": "17.0.2",

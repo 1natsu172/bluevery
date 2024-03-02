@@ -3048,6 +3048,11 @@ depd@~1.1.2:
   resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.2.tgz#9bcd52e14c097763e749b274c4346ed2e560b5a9"
   integrity sha1-m81S4UwJd2PnSbJ0xDRu0uVgtak=
 
+derive-valtio@0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/derive-valtio/-/derive-valtio-0.1.0.tgz#4b9fb393dfefccfef15fcbbddd745dd22d5d63d7"
+  integrity sha512-OCg2UsLbXK7GmmpzMXhYkdO64vhJ1ROUUGaTFyHjVwEdMEcTTRj7W1TxLbSBxdY8QLBPCcp66MTyaSy0RpO17A==
+
 destroy@~1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.0.4.tgz#978857442c44749e4206613e37946205826abd80"
@@ -6421,10 +6426,10 @@ prop-types@^15.7.2:
     object-assign "^4.1.1"
     react-is "^16.8.1"
 
-proxy-compare@2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/proxy-compare/-/proxy-compare-2.0.1.tgz#3ae19cf47f64e89bd60fe4f57afd124f733ef64f"
-  integrity sha512-uXj3TtWdR1S2SNwJKbgJB+1FJm9HM3sFzlVc8W6PZvU6ogt9mlkb1WwZQpuKFLkDS6LKY4+FBE18K6ZArphnHA==
+proxy-compare@2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/proxy-compare/-/proxy-compare-2.6.0.tgz#5e8c8b5c3af7e7f17e839bf6cf1435bcc4d315b0"
+  integrity sha512-8xuCeM3l8yqdmbPoYeLbrAXCBWu19XEYc5/F28f5qOaoAIMyfmBUkl5axiK+x9olUvRlcekvnm98AP9RDngOIw==
 
 psl@^1.1.33:
   version "1.8.0"
@@ -7669,6 +7674,11 @@ use-subscription@^1.0.0:
   dependencies:
     object-assign "^4.1.1"
 
+use-sync-external-store@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
+  integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
+
 use@^3.1.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/use/-/use-3.1.1.tgz#d50c8cac79a19fbc20f2911f56eb973f4e10070f"
@@ -7711,12 +7721,14 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
-valtio@1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/valtio/-/valtio-1.1.2.tgz#232095f61efe13755719ed0019b70d7926630be1"
-  integrity sha512-nj2tba3pM/Z3awGZ/A3aRYmBBYjyaeusfUKoWvRdDAO+VL+RgXjKzfarv/ql2HDRQboa3w9FGlpBKiGUODQuQw==
+valtio@1.13.2:
+  version "1.13.2"
+  resolved "https://registry.yarnpkg.com/valtio/-/valtio-1.13.2.tgz#e31d452d5da3550935417670aafd34d832dc7241"
+  integrity sha512-Qik0o+DSy741TmkqmRfjq+0xpZBXi/Y6+fXZLn0xNF1z/waFMbE3rkivv5Zcf9RrMUp6zswf2J7sbh2KBlba5A==
   dependencies:
-    proxy-compare "2.0.1"
+    derive-valtio "0.1.0"
+    proxy-compare "2.6.0"
+    use-sync-external-store "1.2.0"
 
 vary@~1.1.2:
   version "1.1.2"
